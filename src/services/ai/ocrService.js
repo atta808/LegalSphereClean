@@ -1,6 +1,7 @@
 // services/ocrService.js
 import axios from "axios";
 import * as FileSystem from "expo-file-system";
+import Constants from "expo-constants";
 
 // ============================================================================
 // GOOGLE CLOUD VISION API CONFIGURATION
@@ -14,9 +15,9 @@ import * as FileSystem from "expo-file-system";
 // 6. Click "Create Credentials" > "API key".
 // 7. (Highly Recommended) Edit the API Key and add restrictions so it can only
 //    be used by your Android/iOS app's bundle ID.
-// 8. Add the API key to your environment variables as EXPO_PUBLIC_GOOGLE_VISION_API_KEY.
+// 8. Add the API key securely to EAS Secrets as GOOGLE_VISION_API_KEY.
 // ============================================================================
-const GOOGLE_VISION_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY || "";
+const GOOGLE_VISION_API_KEY = Constants.expoConfig?.extra?.googleVisionApiKey || "";
 const OCR_API_KEY = "K85664157688957"; // Fallback OCR.Space API Key for PDFs
 
 /**

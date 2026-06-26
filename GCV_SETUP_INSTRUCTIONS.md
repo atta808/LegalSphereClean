@@ -1,6 +1,6 @@
 # Google Cloud Vision Setup Instructions for LegalSphere
 
-To enable high-performance, multi-lingual OCR (specifically for mixed English and Urdu text) in the LegalSphere application, you must configure a Google Cloud Vision API key using environment variables.
+To enable high-performance, multi-lingual OCR (specifically for mixed English and Urdu text) in the LegalSphere application, you must configure a Google Cloud Vision API key securely via Expo Application Services (EAS) Secrets.
 
 ## Step-by-Step Guide
 
@@ -30,20 +30,28 @@ To enable high-performance, multi-lingual OCR (specifically for mixed English an
    - Under **API restrictions**, select **Restrict key** and check **Cloud Vision API**. This ensures the key can only be used for OCR and no other Google Cloud services.
    - Click **Save**.
 
-6. **Integrate the Key into LegalSphere:**
-   - In the root of your project, create a file named `.env` if it doesn't already exist.
-   - Add the following line to the `.env` file, replacing `YOUR_API_KEY_HERE` with your actual key:
-     ```
-     EXPO_PUBLIC_GOOGLE_VISION_API_KEY=YOUR_API_KEY_HERE
-     ```
-   - *Note: Ensure `.env` is listed in your `.gitignore` so your API key is not committed to version control.*
+6. **Integrate the Key into EAS Build (Production / Preview):**
+   - Do NOT commit this key to version control. Do NOT use a `.env` file in production.
+   - Instead, go to your [Expo Dashboard](https://expo.dev).
+   - Select your `LegalSphereUltimate` project.
+   - Navigate to **Secrets** (under Configuration).
+   - Create a new Secret:
+     - Name: `GOOGLE_VISION_API_KEY`
+     - Value: `YOUR_ACTUAL_API_KEY_HERE`
+   - EAS Build will now securely inject this variable during compilation into `app.config.js`.
+
+7. **Local Development Setup:**
+   - For local development with `npx expo start`, you can start the bundler by injecting the variable inline:
+     `GOOGLE_VISION_API_KEY="your-key" npx expo start -c`
+   - Or, export it to your terminal profile.
+   - Note: We explicitly avoid relying on `.env` parsing within EAS to prevent accidental commits of secrets.
 
 ## Verification
 
-Once configured, restart your Expo development server and clear the cache (`npx expo start -c`), then test the application by uploading:
+Once configured and built (using EAS or local terminal injection), test the application by uploading:
 - An image containing pure English text.
 - An image containing pure Urdu text (e.g., FIR, court order).
 - An image with mixed English and Urdu text.
-- A scanned PDF document (up to 5 pages).
+- A scanned PDF document (this will automatically route to the fallback OCR.Space workflow).
 
 The system will automatically detect the languages and extract the text perfectly as UTF-8 characters.

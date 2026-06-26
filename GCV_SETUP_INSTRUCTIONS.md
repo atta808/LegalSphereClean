@@ -1,6 +1,6 @@
 # Google Cloud Vision Setup Instructions for LegalSphere
 
-To enable high-performance, multi-lingual OCR (specifically for mixed English and Urdu text) in the LegalSphere application, you must configure a Google Cloud Vision API key.
+To enable high-performance, multi-lingual OCR (specifically for mixed English and Urdu text) in the LegalSphere application, you must configure a Google Cloud Vision API key using environment variables.
 
 ## Step-by-Step Guide
 
@@ -31,18 +31,19 @@ To enable high-performance, multi-lingual OCR (specifically for mixed English an
    - Click **Save**.
 
 6. **Integrate the Key into LegalSphere:**
-   - Open the file `src/services/ai/ocrService.js` in your source code.
-   - Locate the constant `GOOGLE_VISION_API_KEY`:
-     ```javascript
-     const GOOGLE_VISION_API_KEY = "YOUR_GOOGLE_VISION_API_KEY";
+   - In the root of your project, create a file named `.env` if it doesn't already exist.
+   - Add the following line to the `.env` file, replacing `YOUR_API_KEY_HERE` with your actual key:
      ```
-   - Replace `"YOUR_GOOGLE_VISION_API_KEY"` with the actual API key you generated.
+     EXPO_PUBLIC_GOOGLE_VISION_API_KEY=YOUR_API_KEY_HERE
+     ```
+   - *Note: Ensure `.env` is listed in your `.gitignore` so your API key is not committed to version control.*
 
 ## Verification
 
-Once configured, test the application by uploading:
+Once configured, restart your Expo development server and clear the cache (`npx expo start -c`), then test the application by uploading:
 - An image containing pure English text.
 - An image containing pure Urdu text (e.g., FIR, court order).
 - An image with mixed English and Urdu text.
+- A scanned PDF document (up to 5 pages).
 
 The system will automatically detect the languages and extract the text perfectly as UTF-8 characters.

@@ -17,10 +17,12 @@ import * as FileSystem from "expo-file-system";
 // 8. Add the API key to your environment variables as EXPO_PUBLIC_GOOGLE_VISION_API_KEY.
 // ============================================================================
 const GOOGLE_VISION_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY || "";
+const OCR_API_KEY = "K85664157688957"; // Fallback OCR.Space API Key for PDFs
 
 /**
- * High-performance OCR pipeline utilizing Google Cloud Vision for
- * excellent mixed English and Urdu text extraction.
+ * High-performance OCR pipeline utilizing structural multi-page extraction.
+ * Google Cloud Vision handles Image OCR for mixed English/Urdu extraction.
+ * OCR.Space handles PDF OCR to avoid base64 memory overhead and synchronous GCV limits.
  * @param {string} fileUri - The localized file path URI.
  * @param {string} mimeType - The target document MIME type.
  * @param {string} fileName - File descriptor.
@@ -33,7 +35,48 @@ export const extractTextWithOCR = async (
   language = "eng",
 ) => {
   try {
-    console.log(`📡 Initializing Google Cloud Vision OCR for: ${fileName}`);
+    // ---------------------------------------------------------
+    // BRANCH 1: PDFs -> Preserve OCR.Space functionality
+    // ---------------------------------------------------------
+    if (mimeType === "application/pdf") {
+      console.log(`📡 Dispatched OCR request instance (OCR.Space) [Language: ${language}] for PDF: ${fileName}`);
+
+      const formData = new FormData();
+      formData.append("apikey", OCR_API_KEY);
+      // Fallback language strictly to 'eng' for OCR.Space since it doesn't support 'urd'
+      formData.append("language", "eng");
+      formData.append("isOverlayRequired", "false");
+      formData.append("isCreateSearchablePdf", "false");
+      formData.append("detectOrientation", "true");
+
+      formData.append("file", {
+        uri: fileUri,
+        type: mimeType,
+        name: fileName,
+      });
+
+      const response = await axios.post(
+        "https://api.ocr.space/parse/image",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data?.ParsedResults) {
+        return response.data.ParsedResults.map(
+          (result) => result.ParsedText
+        ).join("\n");
+      }
+      return "";
+    }
+
+    // ---------------------------------------------------------
+    // BRANCH 2: Images -> Use Google Cloud Vision API
+    // ---------------------------------------------------------
+    console.log(`📡 Initializing Google Cloud Vision OCR for Image: ${fileName}`);
 
     // Google Cloud Vision requires a base64 encoded image string
     const base64Image = await FileSystem.readAsStringAsync(fileUri, {
@@ -41,49 +84,24 @@ export const extractTextWithOCR = async (
     });
 
     // We pass language hints to assist the Vision API.
-    // GCV has automatic language detection, but hints improve accuracy for mixed docs.
     const languageHints = language === "urd" ? ["ur", "en"] : ["en", "ur"];
 
-    let requestPayload;
-    let endpointUrl;
-
-    if (mimeType === "application/pdf") {
-      endpointUrl = `https://vision.googleapis.com/v1/files:annotate?key=${GOOGLE_VISION_API_KEY}`;
-      requestPayload = {
-        requests: [
-          {
-            inputConfig: {
-              content: base64Image,
-              mimeType: "application/pdf",
-            },
-            features: [{ type: "DOCUMENT_TEXT_DETECTION" }],
-            imageContext: {
-              languageHints: languageHints,
-            },
-            // Process up to first 5 pages inline
-            pages: [1, 2, 3, 4, 5],
+    const requestPayload = {
+      requests: [
+        {
+          image: {
+            content: base64Image,
           },
-        ],
-      };
-    } else {
-      endpointUrl = `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`;
-      requestPayload = {
-        requests: [
-          {
-            image: {
-              content: base64Image,
-            },
-            features: [{ type: "DOCUMENT_TEXT_DETECTION" }],
-            imageContext: {
-              languageHints: languageHints,
-            },
+          features: [{ type: "DOCUMENT_TEXT_DETECTION" }],
+          imageContext: {
+            languageHints: languageHints,
           },
-        ],
-      };
-    }
+        },
+      ],
+    };
 
     const response = await axios.post(
-      endpointUrl,
+      `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
       requestPayload,
       {
         headers: {
@@ -93,20 +111,8 @@ export const extractTextWithOCR = async (
     );
 
     const responses = response.data.responses;
-    if (responses && responses.length > 0) {
-      if (mimeType === "application/pdf") {
-        // Files annotate returns a list of file responses with nested page responses
-        const fileResponses = responses[0].responses;
-        if (fileResponses) {
-          return fileResponses
-            .map((pageRes) => pageRes.fullTextAnnotation?.text || "")
-            .join("\n");
-        }
-      } else {
-        if (responses[0].fullTextAnnotation) {
-          return responses[0].fullTextAnnotation.text;
-        }
-      }
+    if (responses && responses.length > 0 && responses[0].fullTextAnnotation) {
+      return responses[0].fullTextAnnotation.text;
     }
 
     return "";

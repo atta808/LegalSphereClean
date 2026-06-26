@@ -372,21 +372,21 @@ USER QUERY: ${prompt}
       );
       const initialResponse = await askDeepSeek(initialPrompt);
 
-      let intentObject;
+      let intentObject = { type: "answer", text: initialResponse };
       try {
-        const firstBrace = initialResponse.indexOf("{");
-        const lastBrace = initialResponse.lastIndexOf("}");
+        if (typeof initialResponse === "string") {
+          const firstBrace = initialResponse.indexOf("{");
+          const lastBrace = initialResponse.lastIndexOf("}");
 
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          const pureJson = initialResponse.substring(firstBrace, lastBrace + 1);
-          intentObject = JSON.parse(pureJson);
-        } else {
-          intentObject = { type: "answer", text: initialResponse };
+          if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            const pureJson = initialResponse.substring(firstBrace, lastBrace + 1);
+            intentObject = JSON.parse(pureJson);
+          }
         }
       } catch (e) {
         intentObject = {
           type: "answer",
-          text: initialResponse.replace(/```json|```/g, "").trim(),
+          text: (initialResponse || "").replace(/```json|```/g, "").trim(),
         };
       }
 
@@ -593,6 +593,10 @@ USER QUERY: ${prompt}
           onLayout={scrollToBottom}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          removeClippedSubviews={true}
           ListHeaderComponent={
             messages.length === 1 ? renderQuickActions : null
           }

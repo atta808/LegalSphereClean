@@ -18,11 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { askDeepSeek } from "../services/deepseekService";
 import { normalizeCourtJudgeFields } from "../utils/courtJudgeParser";
 export default function LegalBrowserScreen({ route, navigation }) {
-  const { url, title, caseId, aiMode } = route.params;
-  console.log("AI MODE =", aiMode);
-  useEffect(() => {
-    console.log("LEGAL BROWSER CASE ID =", caseId);
-  }, [caseId]);
+  const { url = "https://google.com", title = "Browser", caseId = null, aiMode = null } = route?.params || {};
+
   const insets = useSafeAreaInsets();
   // Refs
   const webViewRef = useRef(null);
@@ -356,8 +353,7 @@ PAGE:
 ${payload.text}
 `);
 
-                console.log("CMS RAW:");
-                console.log(cmsResult);
+
 
                 const cmsCleaned = cmsResult
                   .replace(/```json/g, "")
@@ -375,8 +371,7 @@ ${payload.text}
                   rawResponse: cmsCleaned,
                 });
 
-                console.log("CMS DATA:");
-                console.log(normalizedCmsData);
+
 
                 setAnalyzing(false);
 
@@ -539,20 +534,17 @@ PAGE:
 
 ${payload.text}
 `);
-              console.log("RAW AI:");
-              console.log(aiResult);
+
 
               const cleaned = aiResult
                 .replace(/```json/g, "")
                 .replace(/```/g, "")
                 .trim();
 
-              console.log("CLEANED AI:");
-              console.log(cleaned);
+
 
               if (!cleaned.startsWith("{")) {
-                console.log("INVALID AI RESPONSE:");
-                console.log(cleaned);
+
 
                 Alert.alert("AI Error", "AI did not return valid JSON.");
 
@@ -578,8 +570,7 @@ ${payload.text}
 
               // CMS AUTO FILL MODE
               if (payload.type === "CMS_AUTOFILL") {
-                console.log("GOING TO ADDCASE");
-                console.log(data);
+
                 navigation.navigate("AddCase", {
                   aiCaseData: data,
                 });

@@ -11,7 +11,7 @@ import { getTimelineByCaseId } from "../services/sqliteService";
 import { toDisplay } from "../utils/date";
 
 export default function TimelineScreen({ route, navigation }) {
-  const { caseId } = route.params;
+  const { caseId = null } = route?.params || {};
   const insets = useSafeAreaInsets();
 
   const [timeline, setTimeline] = useState([]);

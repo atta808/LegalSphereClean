@@ -413,6 +413,10 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.chatScroll}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          removeClippedSubviews={true}
           onContentSizeChange={() =>
             flatListRef.current?.scrollToEnd({ animated: true })
           }

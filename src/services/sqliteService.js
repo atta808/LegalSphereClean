@@ -2050,12 +2050,19 @@ export const deleteDocument = (id) => {
 };
 // 🧹 CLEAR ALL LOCAL DATA
 export const clearAllLocalData = () => {
-  db.runSync("DELETE FROM cases");
-  db.runSync("DELETE FROM clients");
-  db.runSync("DELETE FROM hearings");
-  db.runSync("DELETE FROM case_notes");
-  db.runSync("DELETE FROM citations");
-  db.runSync("DELETE FROM quick_links");
-  db.runSync("DELETE FROM master_items");
-  db.runSync("DELETE FROM processFees");
+  try {
+    db.runSync("BEGIN TRANSACTION");
+    db.runSync("DELETE FROM cases");
+    db.runSync("DELETE FROM clients");
+    db.runSync("DELETE FROM hearings");
+    db.runSync("DELETE FROM case_notes");
+    db.runSync("DELETE FROM citations");
+    db.runSync("DELETE FROM quick_links");
+    db.runSync("DELETE FROM master_items");
+    db.runSync("DELETE FROM processFees");
+    db.runSync("COMMIT");
+  } catch (e) {
+    db.runSync("ROLLBACK");
+    console.log("❌ clearAllLocalData error:", e);
+  }
 };

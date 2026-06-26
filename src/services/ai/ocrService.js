@@ -39,7 +39,7 @@ export const extractTextWithOCR = async (
     // BRANCH 1: PDFs -> Preserve OCR.Space functionality
     // ---------------------------------------------------------
     if (mimeType === "application/pdf") {
-      console.log(`📡 Dispatched OCR request instance (OCR.Space) [Language: ${language}] for PDF: ${fileName}`);
+      if (__DEV__) console.log(`📡 Dispatched OCR request instance (OCR.Space) [Language: ${language}] for PDF: ${fileName}`);
 
       const formData = new FormData();
       formData.append("apikey", OCR_API_KEY);
@@ -76,7 +76,7 @@ export const extractTextWithOCR = async (
     // ---------------------------------------------------------
     // BRANCH 2: Images -> Use Google Cloud Vision API
     // ---------------------------------------------------------
-    console.log(`📡 Initializing Google Cloud Vision OCR for Image: ${fileName}`);
+    if (__DEV__) console.log(`📡 Initializing Google Cloud Vision OCR for Image: ${fileName}`);
 
     // Google Cloud Vision requires a base64 encoded image string
     const base64Image = await FileSystem.readAsStringAsync(fileUri, {
@@ -117,7 +117,7 @@ export const extractTextWithOCR = async (
 
     return "";
   } catch (error) {
-    console.log("❌ OCR Service Engine Exception:", error?.response?.data || error.message);
+    if (__DEV__) console.log("❌ OCR Service Engine Exception");
     return "";
   }
 };

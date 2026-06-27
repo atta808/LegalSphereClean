@@ -44,7 +44,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { caseId, caseData, mode } = route.params || {};
+  const { caseId = null, caseData = null, mode = null } = route.params || {};
   const isEditMode = mode === "edit";
   const insets = useSafeAreaInsets();
 

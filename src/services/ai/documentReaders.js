@@ -16,9 +16,7 @@ export const extractDocumentText = async (
     if (!document) return "";
 
     const extension = document.name?.split(".").pop()?.toLowerCase() || "";
-    console.log(
-      `📄 Initializing extraction pipeline for: ${document.name} (Ext: ${extension})`,
-    );
+    if (__DEV__) console.log(`📄 Initializing extraction pipeline for: ${document.name} (Ext: ${extension})`);
 
     switch (extension) {
       case "txt":
@@ -36,14 +34,22 @@ export const extractDocumentText = async (
       case "jpeg":
       case "png":
       case "webp":
+      case "gif":
+      case "bmp":
+      case "tiff":
+      case "tif":
         return await extractImageText(document, targetedLanguage);
 
       default:
-        console.log("⚠ Non-supported legal file format signature:", extension);
+        // Try to detect by mime type if extension is unknown
+        if (document.mimeType?.startsWith("image/")) {
+          return await extractImageText(document, targetedLanguage);
+        }
+        if (__DEV__) console.log("⚠ Non-supported legal file format signature:", extension);
         return "";
     }
   } catch (error) {
-    console.log("❌ Pipeline Core Execution Exception:", error);
+    if (__DEV__) console.log("❌ Pipeline Core Execution Exception:", error?.message || error);
     return "";
   }
 };
@@ -52,7 +58,7 @@ const extractTextFile = async (document) => {
   try {
     return await FileSystem.readAsStringAsync(document.uri);
   } catch (error) {
-    console.log("❌ Plain text extraction failure:", error);
+    if (__DEV__) console.log("❌ Plain text extraction failure:", error?.message || error);
     return "";
   }
 };
@@ -68,7 +74,7 @@ const extractDocx = async (document) => {
     const result = await mammoth.extractRawText({ arrayBuffer });
     return result.value || "";
   } catch (error) {
-    console.log("❌ DOCX layout compilation failure:", error);
+    if (__DEV__) console.log("❌ DOCX layout compilation failure:", error?.message || error);
     return "";
   }
 };
@@ -82,7 +88,7 @@ const extractPdf = async (document, language) => {
       language,
     );
   } catch (error) {
-    console.log("❌ PDF rendering engine exception:", error);
+    if (__DEV__) console.log("❌ PDF rendering engine exception:", error?.message || error);
     return "";
   }
 };
@@ -98,7 +104,7 @@ const extractImageText = async (document, language) => {
       language,
     );
   } catch (error) {
-    console.log("❌ Image vector scanning exception:", error);
+    if (__DEV__) console.log("❌ Image vector scanning exception:", error?.message || error);
     return "";
   }
 };
@@ -114,6 +120,10 @@ export const getDocumentType = (fileName = "") => {
     case "jpg":
     case "jpeg":
     case "webp":
+    case "gif":
+    case "bmp":
+    case "tiff":
+    case "tif":
       return "IMAGE";
     default:
       return "TXT";

@@ -1,5 +1,5 @@
 // screens/LexAiScreen.js
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,34 +9,32 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   Alert,
   Animated,
   StatusBar,
-} from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard";
-import * as DocumentPicker from "expo-document-picker";
-import * as Haptics from "expo-haptics";
-import { BlurView } from "expo-blur";
+  Image,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import * as Haptics from 'expo-haptics';
+import { BlurView } from 'expo-blur';
 
-import { askDeepSeek } from "../services/deepseekService";
-import { db } from "../services/sqliteService";
-import LegalInput from "../components/LegalInput";
+import { askDeepSeek } from '../services/deepseekService';
+import { db } from '../services/sqliteService';
+import LegalInput from '../components/LegalInput';
 import {
   generateSQL,
   summarizeSQLResults,
-} from "../services/ai/promptTemplates";
-import { extractDocumentText } from "../services/ai/documentReaders";
+} from '../services/ai/promptTemplates';
+import { extractDocumentText } from '../services/ai/documentReaders';
 
-// Sleek typing animation component
+// --- Typing Indicator Component ---
 const TypingIndicator = () => {
   const [dot1] = useState(new Animated.Value(0));
   const [dot2] = useState(new Animated.Value(0));
@@ -46,38 +44,14 @@ const TypingIndicator = () => {
     const animateDots = () => {
       Animated.sequence([
         Animated.stagger(150, [
-          Animated.timing(dot1, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot2, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot3, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }),
+          Animated.timing(dot1, { toValue: 1, duration: 300, useNativeDriver: true }),
+          Animated.timing(dot2, { toValue: 1, duration: 300, useNativeDriver: true }),
+          Animated.timing(dot3, { toValue: 1, duration: 300, useNativeDriver: true }),
         ]),
         Animated.stagger(150, [
-          Animated.timing(dot1, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot2, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot3, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }),
+          Animated.timing(dot1, { toValue: 0, duration: 300, useNativeDriver: true }),
+          Animated.timing(dot2, { toValue: 0, duration: 300, useNativeDriver: true }),
+          Animated.timing(dot3, { toValue: 0, duration: 300, useNativeDriver: true }),
         ]),
       ]).start(() => animateDots());
     };
@@ -88,17 +62,10 @@ const TypingIndicator = () => {
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#94A3B8",
+    backgroundColor: '#94A3B8',
     marginHorizontal: 3,
     opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }),
-    transform: [
-      {
-        scale: anim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.8, 1.2],
-        }),
-      },
-    ],
+    transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1.2] }) }],
   });
 
   return (
@@ -110,27 +77,13 @@ const TypingIndicator = () => {
   );
 };
 
+// --- Quick Actions ---
 const QUICK_ACTIONS = [
-  {
-    icon: "scale-balance",
-    label: "Case Law",
-    prompt: "Find relevant case law about",
-  },
-  {
-    icon: "file-document",
-    label: "Review Doc",
-    prompt: "Review this legal document:",
-  },
-  {
-    icon: "gavel",
-    label: "Precedents",
-    prompt: "Research legal precedent for",
-  },
-  {
-    icon: "clock-time",
-    label: "Limitations",
-    prompt: "What's the statute of limitations for",
-  },
+  { icon: 'scale-balance', label: 'Case Law', prompt: 'Find relevant case law about' },
+  { icon: 'file-document', label: 'Review Doc', prompt: 'Review this legal document:' },
+  { icon: 'image', label: 'Scan Image', prompt: 'Extract text from this image:' },
+  { icon: 'gavel', label: 'Precedents', prompt: 'Research legal precedent for' },
+  { icon: 'clock-time', label: 'Limitations', prompt: "What's the statute of limitations for" },
 ];
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -146,34 +99,31 @@ export default function LexAiScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState('');
   const [isAttaching, setIsAttaching] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [attachedFile, setAttachedFile] = useState(null);
+  const [attachedImage, setAttachedImage] = useState(null);
 
+  // --- Load / Save Messages ---
   useEffect(() => {
     loadMessages();
-    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBarStyle('dark-content');
 
     const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
-        setKeyboardHeight(e.endCoordinates.height);
         setTimeout(scrollToBottom, 200);
-      },
+      }
     );
-
     const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => {
-        setKeyboardHeight(0);
-      },
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {}
     );
-
     return () => {
       keyboardWillShow.remove();
       keyboardWillHide.remove();
@@ -182,9 +132,7 @@ export default function LexAiScreen() {
 
   const loadMessages = async () => {
     try {
-      const storageKey = caseId
-        ? `chat_history_${caseId}`
-        : "chat_history_global";
+      const storageKey = caseId ? `chat_history_${caseId}` : 'chat_history_global';
       const cached = await AsyncStorage.getItem(storageKey);
       if (cached) {
         const parsed = JSON.parse(cached);
@@ -193,58 +141,55 @@ export default function LexAiScreen() {
       } else {
         setMessages([
           {
-            id: "welcome",
-            role: "ai",
-            text: "Welcome to your AI Workspace. I am Lex, your intelligent legal assistant.\n\nI operate in English by default for optimal legal precision, but feel free to ask questions in Urdu or any other language if you prefer.",
+            id: 'welcome',
+            role: 'ai',
+            text: 'Welcome to your AI Workspace. I am Lex, your intelligent legal assistant.\n\nI can analyze both images and documents. Upload a photo of a document, and I\'ll extract text using Google Cloud Vision OCR, or upload PDFs/Word documents for text extraction.\n\nI operate in English by default for optimal legal precision, but feel free to ask questions in Urdu or any other language if you prefer.',
             timestamp: Date.now(),
           },
         ]);
       }
     } catch (e) {
-      console.log("❌ Failed to resolve message cache storage:", e);
+      console.log('❌ Failed to load messages:', e);
     }
   };
 
   const saveMessages = async (updatedList) => {
     try {
-      const storageKey = caseId
-        ? `chat_history_${caseId}`
-        : "chat_history_global";
+      const storageKey = caseId ? `chat_history_${caseId}` : 'chat_history_global';
       await AsyncStorage.setItem(storageKey, JSON.stringify(updatedList));
     } catch (e) {
-      console.log("❌ Error synchronizing local state persistence cache:", e);
+      console.log('❌ Error saving messages:', e);
     }
   };
 
   const clearChatHistory = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
-      "Clear Workspace",
-      "This will permanently delete all messages in this conversation.",
+      'Clear Workspace',
+      'This will permanently delete all messages in this conversation.',
       [
-        { text: "Cancel", style: "cancel" },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: "Clear All",
-          style: "destructive",
+          text: 'Clear All',
+          style: 'destructive',
           onPress: async () => {
-            const storageKey = caseId
-              ? `chat_history_${caseId}`
-              : "chat_history_global";
+            const storageKey = caseId ? `chat_history_${caseId}` : 'chat_history_global';
             await AsyncStorage.removeItem(storageKey);
-            const defaultMsg = [
+            setMessages([
               {
-                id: "welcome",
-                role: "ai",
-                text: "✨ Workspace cleared. Ready for a new conversation.",
+                id: 'welcome',
+                role: 'ai',
+                text: '✨ Workspace cleared. Ready for a new conversation.',
                 timestamp: Date.now(),
               },
-            ];
-            setMessages(defaultMsg);
+            ]);
             setShowQuickActions(true);
+            setAttachedFile(null);
+            setAttachedImage(null);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           },
         },
-      ],
+      ]
     );
   };
 
@@ -256,14 +201,13 @@ export default function LexAiScreen() {
   };
 
   const getSystemDateString = () => {
-    return new Date().toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
-  // UPDATED: Dynamic Language Policy
   const enforceLanguagePolicy = (prompt) => {
     return `
 LANGUAGE INSTRUCTION:
@@ -276,14 +220,121 @@ USER QUERY: ${prompt}
 `;
   };
 
+  // --- Image & Document Handlers ---
+  const handlePickImage = async () => {
+    try {
+      Alert.alert(
+        'Select Image Source',
+        'Choose where to get the image from',
+        [
+          {
+            text: 'Camera',
+            onPress: async () => {
+              const { status } = await ImagePicker.requestCameraPermissionsAsync();
+              if (status !== 'granted') {
+                Alert.alert('Permission needed', 'Camera permission is required.');
+                return;
+              }
+              const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 0.8,
+              });
+              if (!result.canceled) {
+                await processImage(result.assets[0]);
+              }
+            },
+          },
+          {
+            text: 'Gallery',
+            onPress: async () => {
+              const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+              if (status !== 'granted') {
+                Alert.alert('Permission needed', 'Gallery permission is required.');
+                return;
+              }
+              const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 0.8,
+              });
+              if (!result.canceled) {
+                await processImage(result.assets[0]);
+              }
+            },
+          },
+          { text: 'Cancel', style: 'cancel' },
+        ],
+        { cancelable: true }
+      );
+    } catch (error) {
+      console.log('❌ Image pick error:', error);
+      Alert.alert('Error', 'Failed to pick image.');
+    }
+  };
+
+  const processImage = async (asset) => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setIsAttaching(true);
+      setLoadingMessage('Extracting text from image...');
+
+      const imageDoc = {
+        uri: asset.uri,
+        name: asset.fileName || `image_${Date.now()}.jpg`,
+        mimeType: asset.mimeType || 'image/jpeg',
+        size: asset.fileSize || 0,
+      };
+
+      const extractedText = await extractDocumentText(imageDoc, 'eng');
+
+      setIsAttaching(false);
+
+      if (extractedText && extractedText.trim().length > 0) {
+        setAttachedImage(asset.uri);
+        setInput(
+          `📸 Extracted text from image:\n\n${extractedText.substring(0, 8000)}\n\nPlease analyze this document and provide key legal insights.`
+        );
+        inputRef.current?.focus();
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else {
+        Alert.alert(
+          'Extraction Failed',
+          'Unable to extract readable text from this image. Please try a clearer photo.'
+        );
+      }
+    } catch (error) {
+      setIsAttaching(false);
+      console.log('❌ Image processing error:', error);
+      Alert.alert('Error', 'Failed to process image. Please try again.');
+    }
+  };
+
   const handleAttachDocument = async () => {
+    try {
+      Alert.alert(
+        'Attach File',
+        'Choose what to upload',
+        [
+          { text: '📸 Image', onPress: handlePickImage },
+          { text: '📄 Document (PDF, DOCX, TXT)', onPress: handlePickDocument },
+          { text: 'Cancel', style: 'cancel' },
+        ],
+        { cancelable: true }
+      );
+    } catch (error) {
+      console.log('❌ Attachment error:', error);
+    }
+  };
+
+  const handlePickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: [
-          "application/pdf",
-          "text/plain",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          'application/pdf',
+          'text/plain',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ],
         copyToCacheDirectory: true,
         multiple: false,
@@ -296,10 +347,7 @@ USER QUERY: ${prompt}
       const asset = result.assets[0];
 
       if (asset.size && asset.size > 10 * 1024 * 1024) {
-        Alert.alert(
-          "File Too Large",
-          "Please upload documents smaller than 10MB.",
-        );
+        Alert.alert('File Too Large', 'Please upload documents smaller than 10MB.');
         setIsAttaching(false);
         return;
       }
@@ -310,23 +358,26 @@ USER QUERY: ${prompt}
         mimeType: asset.mimeType,
         size: asset.size,
       };
-      const extractedText = await extractDocumentText(docObj, "eng");
+      const extractedText = await extractDocumentText(docObj, 'eng');
+
+      setIsAttaching(false);
 
       if (extractedText && extractedText.trim().length > 0) {
+        setAttachedFile({ name: asset.name, text: extractedText });
         setInput(
-          `📄 Analyzing document: "${asset.name}"\n\n${extractedText.substring(0, 10000)}\n\nPlease analyze this document and provide key legal insights.`,
+          `📄 Analyzing document: "${asset.name}"\n\n${extractedText.substring(0, 10000)}\n\nPlease analyze this document and provide key legal insights.`
         );
         inputRef.current?.focus();
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
         Alert.alert(
-          "Extraction Failed",
-          "Unable to extract readable text. Please ensure the document contains selectable text.",
+          'Extraction Failed',
+          'Unable to extract readable text. Please ensure the document contains selectable text.'
         );
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to process the document. Please try again.");
-    } finally {
       setIsAttaching(false);
+      Alert.alert('Error', 'Failed to process the document. Please try again.');
     }
   };
 
@@ -336,48 +387,47 @@ USER QUERY: ${prompt}
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
+  // --- Send Message ---
   const handleSendMessage = async () => {
     if (!input.trim() || loading || isAttaching) return;
 
     const userRawText = input.trim();
-    setInput("");
+    setInput('');
     setShowQuickActions(false);
+    setAttachedFile(null);
+    setAttachedImage(null);
     Keyboard.dismiss();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const userMessage = {
       id: `user_${Date.now()}`,
-      role: "user",
+      role: 'user',
       text: userRawText,
       timestamp: Date.now(),
+      hasImage: !!attachedImage,
+      hasFile: !!attachedFile,
     };
     const currentHistory = [...messages, userMessage];
-
     setMessages(currentHistory);
     await saveMessages(currentHistory);
     scrollToBottom();
 
     setLoading(true);
     setIsTyping(true);
-    setLoadingMessage("Analyzing query...");
+    setLoadingMessage('Analyzing query...');
 
     try {
       const dynamicLanguagePrompt = enforceLanguagePolicy(userRawText);
       const systemDate = getSystemDateString();
 
-      const initialPrompt = generateSQL(
-        dynamicLanguagePrompt,
-        caseId,
-        systemDate,
-      );
+      const initialPrompt = generateSQL(dynamicLanguagePrompt, caseId, systemDate);
       const initialResponse = await askDeepSeek(initialPrompt);
 
-      let intentObject = { type: "answer", text: initialResponse };
+      let intentObject = { type: 'answer', text: initialResponse };
       try {
-        if (typeof initialResponse === "string") {
-          const firstBrace = initialResponse.indexOf("{");
-          const lastBrace = initialResponse.lastIndexOf("}");
-
+        if (typeof initialResponse === 'string') {
+          const firstBrace = initialResponse.indexOf('{');
+          const lastBrace = initialResponse.lastIndexOf('}');
           if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
             const pureJson = initialResponse.substring(firstBrace, lastBrace + 1);
             intentObject = JSON.parse(pureJson);
@@ -385,30 +435,27 @@ USER QUERY: ${prompt}
         }
       } catch (e) {
         intentObject = {
-          type: "answer",
-          text: (initialResponse || "").replace(/```json|```/g, "").trim(),
+          type: 'answer',
+          text: (initialResponse || '').replace(/```json|```/g, '').trim(),
         };
       }
 
-      let ultimateAiResponseText = "";
-
-      if (intentObject.type === "sql" && intentObject.sql) {
-        setLoadingMessage("Querying database...");
+      let ultimateAiResponseText = '';
+      if (intentObject.type === 'sql' && intentObject.sql) {
+        setLoadingMessage('Querying database...');
         try {
           const dataset = db.getAllSync(intentObject.sql);
-          setLoadingMessage("Synthesizing findings...");
-
+          setLoadingMessage('Synthesizing findings...');
           const summaryPrompt = summarizeSQLResults(
             dynamicLanguagePrompt,
             JSON.stringify(dataset),
             systemDate,
-            "Match User's Language (English Default, Urdu if requested)",
+            "Match User's Language (English Default, Urdu if requested)"
           );
-
           ultimateAiResponseText = await askDeepSeek(summaryPrompt);
         } catch (dbError) {
           ultimateAiResponseText =
-            "⚠️ I encountered an error querying the database. Please refine your query criteria.";
+            '⚠️ I encountered an error querying the database. Please refine your query criteria.';
         }
       } else {
         ultimateAiResponseText = intentObject.text || initialResponse;
@@ -416,21 +463,20 @@ USER QUERY: ${prompt}
 
       const aiMessage = {
         id: `ai_${Date.now()}`,
-        role: "ai",
+        role: 'ai',
         text: ultimateAiResponseText,
         timestamp: Date.now(),
       };
       const finalHistory = [...currentHistory, aiMessage];
-
       setMessages(finalHistory);
       await saveMessages(finalHistory);
       scrollToBottom();
     } catch (coreError) {
-      Alert.alert("Connection Issue", "Unable to reach the AI service.");
+      Alert.alert('Connection Issue', 'Unable to reach the AI service.');
     } finally {
       setLoading(false);
       setIsTyping(false);
-      setLoadingMessage("");
+      setLoadingMessage('');
     }
   };
 
@@ -440,9 +486,10 @@ USER QUERY: ${prompt}
     }, 150);
   };
 
+  // --- Render Message ---
   const renderMessageItem = useCallback(
     ({ item }) => {
-      const isUser = item.role === "user";
+      const isUser = item.role === 'user';
       const isCopied = copyFeedback === item.id;
 
       return (
@@ -454,7 +501,7 @@ USER QUERY: ${prompt}
               opacity: scrollY.interpolate({
                 inputRange: [0, 100],
                 outputRange: [1, 0.95],
-                extrapolate: "clamp",
+                extrapolate: 'clamp',
               }),
             },
           ]}
@@ -467,35 +514,30 @@ USER QUERY: ${prompt}
             </View>
           )}
 
-          <View
-            style={[styles.bubbleWrapper, isUser && styles.userBubbleWrapper]}
-          >
-            <View
-              style={[
-                styles.messageBubble,
-                isUser ? styles.userBubble : styles.aiBubble,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.messageText,
-                  isUser ? styles.userText : styles.aiText,
-                ]}
-              >
+          <View style={[styles.bubbleWrapper, isUser && styles.userBubbleWrapper]}>
+            <View style={[styles.messageBubble, isUser ? styles.userBubble : styles.aiBubble]}>
+              {item.hasImage && (
+                <View style={styles.attachmentPreview}>
+                  <Text style={styles.attachmentLabel}>📸 Image</Text>
+                </View>
+              )}
+              {item.hasFile && (
+                <View style={styles.attachmentPreview}>
+                  <Text style={styles.attachmentLabel}>📄 Document</Text>
+                </View>
+              )}
+              <Text style={[styles.messageText, isUser ? styles.userText : styles.aiText]}>
                 {item.text}
               </Text>
             </View>
 
-            <View
-              style={[styles.messageFooter, isUser && styles.messageFooterUser]}
-            >
+            <View style={[styles.messageFooter, isUser && styles.messageFooterUser]}>
               <Text style={styles.timestamp}>
-                {new Date(item.timestamp).toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
+                {new Date(item.timestamp).toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
                 })}
               </Text>
-
               {!isUser && (
                 <TouchableOpacity
                   style={styles.copyButton}
@@ -503,14 +545,12 @@ USER QUERY: ${prompt}
                   activeOpacity={0.7}
                 >
                   <Ionicons
-                    name={isCopied ? "checkmark" : "copy-outline"}
+                    name={isCopied ? 'checkmark' : 'copy-outline'}
                     size={12}
-                    color={isCopied ? "#10B981" : "#94A3B8"}
+                    color={isCopied ? '#10B981' : '#94A3B8'}
                   />
-                  <Text
-                    style={[styles.copyText, isCopied && styles.copyTextActive]}
-                  >
-                    {isCopied ? "Copied" : "Copy"}
+                  <Text style={[styles.copyText, isCopied && styles.copyTextActive]}>
+                    {isCopied ? 'Copied' : 'Copy'}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -519,9 +559,10 @@ USER QUERY: ${prompt}
         </Animated.View>
       );
     },
-    [copyFeedback, scrollY],
+    [copyFeedback, scrollY]
   );
 
+  // --- Quick Actions Render ---
   const renderQuickActions = () => (
     <View style={styles.quickActionsContainer}>
       <View style={styles.quickActionsGrid}>
@@ -532,11 +573,7 @@ USER QUERY: ${prompt}
             onPress={() => handleQuickAction(`${action.prompt} `)}
             activeOpacity={0.7}
           >
-            <MaterialCommunityIcons
-              name={action.icon}
-              size={16}
-              color="#0F172A"
-            />
+            <MaterialCommunityIcons name={action.icon} size={16} color="#0F172A" />
             <Text style={styles.quickActionLabel}>{action.label}</Text>
           </TouchableOpacity>
         ))}
@@ -546,14 +583,14 @@ USER QUERY: ${prompt}
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: true },
+    { useNativeDriver: true }
   );
 
+  // --- Main Render ---
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" />
 
-      {/* Clean Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <TouchableOpacity
@@ -568,19 +605,15 @@ USER QUERY: ${prompt}
             <View style={styles.statusDot} />
           </View>
         </View>
-        <TouchableOpacity
-          onPress={clearChatHistory}
-          style={styles.iconButton}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity onPress={clearChatHistory} style={styles.iconButton} activeOpacity={0.7}>
           <Ionicons name="trash-outline" size={18} color="#94A3B8" />
         </TouchableOpacity>
       </View>
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <AnimatedFlatList
           ref={flatListRef}
@@ -597,15 +630,11 @@ USER QUERY: ${prompt}
           maxToRenderPerBatch={10}
           windowSize={10}
           removeClippedSubviews={true}
-          ListHeaderComponent={
-            messages.length === 1 ? renderQuickActions : null
-          }
+          ListHeaderComponent={messages.length === 1 ? renderQuickActions : null}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           automaticallyAdjustKeyboardInsets={true}
-          maintainVisibleContentPosition={{
-            minIndexForVisible: 0,
-          }}
+          maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
         />
 
         {isTyping && (
@@ -616,14 +645,37 @@ USER QUERY: ${prompt}
           </View>
         )}
 
-        {/* Fixed Input Wrapper - Now properly positioned */}
+        {/* Attachment Preview */}
+        {(attachedImage || attachedFile) && (
+          <View style={styles.attachmentPreviewContainer}>
+            {attachedImage && (
+              <View style={styles.attachmentPreviewCard}>
+                <Image source={{ uri: attachedImage }} style={styles.attachmentThumb} />
+                <Text style={styles.attachmentPreviewText}>Image ready</Text>
+                <TouchableOpacity onPress={() => setAttachedImage(null)}>
+                  <Ionicons name="close-circle" size={20} color="#EF4444" />
+                </TouchableOpacity>
+              </View>
+            )}
+            {attachedFile && (
+              <View style={styles.attachmentPreviewCard}>
+                <Ionicons name="document-text" size={20} color="#1E3A8A" />
+                <Text style={styles.attachmentPreviewText} numberOfLines={1}>
+                  {attachedFile.name}
+                </Text>
+                <TouchableOpacity onPress={() => setAttachedFile(null)}>
+                  <Ionicons name="close-circle" size={20} color="#EF4444" />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Input Bar */}
         <View
           style={[
             styles.bottomInputWrapper,
-            {
-              paddingBottom:
-                Platform.OS === "ios" ? Math.max(insets.bottom, 20) : 20,
-            },
+            { paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 20) : 20 },
           ]}
         >
           <View style={styles.inputGlass}>
@@ -636,7 +688,7 @@ USER QUERY: ${prompt}
                 {isAttaching ? (
                   <ActivityIndicator size="small" color="#0F172A" />
                 ) : (
-                  <Ionicons name="add" size={24} color="#64748B" />
+                  <Ionicons name="add-circle-outline" size={24} color="#64748B" />
                 )}
               </TouchableOpacity>
 
@@ -668,14 +720,10 @@ USER QUERY: ${prompt}
         </View>
       </KeyboardAvoidingView>
 
-      {/* Centered Loading Overlay */}
+      {/* Loading Overlay */}
       {loading && (
         <View style={styles.loadingOverlay} pointerEvents="none">
-          <BlurView
-            intensity={20}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
+          <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
           <View style={styles.loadingPill}>
             <ActivityIndicator size="small" color="#0F172A" />
             <Text style={styles.loadingText}>{loadingMessage}</Text>
@@ -687,275 +735,163 @@ USER QUERY: ${prompt}
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FAFAFA",
-  },
+  container: { flex: 1, backgroundColor: '#FAFAFA' },
   header: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 56,
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: '#FAFAFA',
     zIndex: 10,
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   iconButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F1F5F9",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F1F5F9',
   },
-  headerTitleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#0F172A",
-    letterSpacing: -0.3,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#10B981",
-  },
-  messageContainer: {
-    flexDirection: "row",
-    width: "100%",
-    marginBottom: 6,
-  },
-  userAlign: {
-    justifyContent: "flex-end",
-  },
-  aiAlign: {
-    justifyContent: "flex-start",
-  },
-  avatarContainer: {
-    marginRight: 10,
-    alignSelf: "flex-end",
-    marginBottom: 20,
-  },
+  headerTitleContainer: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  headerTitle: { fontSize: 16, fontWeight: '700', color: '#0F172A', letterSpacing: -0.3 },
+  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981' },
+  messageContainer: { flexDirection: 'row', width: '100%', marginBottom: 6 },
+  userAlign: { justifyContent: 'flex-end' },
+  aiAlign: { justifyContent: 'flex-start' },
+  avatarContainer: { marginRight: 10, alignSelf: 'flex-end', marginBottom: 20 },
   aiAvatar: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: '#F1F5F9',
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    alignItems: "center",
-    justifyContent: "center",
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  bubbleWrapper: {
-    maxWidth: "80%",
-  },
-  userBubbleWrapper: {
-    maxWidth: "75%",
-  },
-  messageBubble: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  userBubble: {
-    backgroundColor: "#0A0A0A",
-    borderBottomRightRadius: 4,
-  },
+  bubbleWrapper: { maxWidth: '80%' },
+  userBubbleWrapper: { maxWidth: '75%' },
+  messageBubble: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 20 },
+  userBubble: { backgroundColor: '#0A0A0A', borderBottomRightRadius: 4 },
   aiBubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderBottomLeftRadius: 4,
     borderWidth: 0.5,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: '#E2E8F0',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     shadowRadius: 4,
     elevation: 1,
   },
-  messageText: {
-    fontSize: 15,
-    lineHeight: 22,
-    fontWeight: "400",
-  },
-  userText: {
-    color: "#FFFFFF",
-  },
-  aiText: {
-    color: "#1E293B",
-  },
-  messageFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 6,
-    paddingHorizontal: 4,
-    gap: 12,
-  },
-  messageFooterUser: {
-    justifyContent: "flex-end",
-  },
-  timestamp: {
-    fontSize: 11,
-    color: "#94A3B8",
-    fontWeight: "500",
-  },
-  copyButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  copyText: {
-    fontSize: 11,
-    color: "#94A3B8",
-    fontWeight: "600",
-  },
-  copyTextActive: {
-    color: "#10B981",
-  },
-  quickActionsContainer: {
-    paddingBottom: 16,
-    paddingTop: 8,
-  },
-  quickActionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
+  messageText: { fontSize: 15, lineHeight: 22, fontWeight: '400' },
+  userText: { color: '#FFFFFF' },
+  aiText: { color: '#1E293B' },
+  messageFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 6, paddingHorizontal: 4, gap: 12 },
+  messageFooterUser: { justifyContent: 'flex-end' },
+  timestamp: { fontSize: 11, color: '#94A3B8', fontWeight: '500' },
+  copyButton: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  copyText: { fontSize: 11, color: '#94A3B8', fontWeight: '600' },
+  copyTextActive: { color: '#10B981' },
+  quickActionsContainer: { paddingBottom: 16, paddingTop: 8 },
+  quickActionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   quickActionItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 24,
     borderWidth: 0.5,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: '#E2E8F0',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     shadowRadius: 3,
     elevation: 1,
   },
-  quickActionLabel: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "#0F172A",
-  },
-  typingWrapper: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
+  quickActionLabel: { fontSize: 13, fontWeight: '500', color: '#0F172A' },
+  typingWrapper: { paddingHorizontal: 16, paddingBottom: 8 },
   typingBubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 20,
     borderBottomLeftRadius: 4,
     borderWidth: 0.5,
-    borderColor: "#E2E8F0",
-    alignSelf: "flex-start",
+    borderColor: '#E2E8F0',
+    alignSelf: 'flex-start',
   },
-  typingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  typingContainer: { flexDirection: 'row', alignItems: 'center' },
   attachButton: {
     width: 40,
     height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 20,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: '#F1F5F9',
     marginRight: 8,
   },
   textInputModifier: {
     flex: 1,
     fontSize: 15,
-    color: "#0F172A",
+    color: '#0F172A',
     maxHeight: 100,
     minHeight: 40,
     paddingTop: 10,
     paddingBottom: 10,
     paddingHorizontal: 8,
   },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 8,
-  },
-  sendActive: {
-    backgroundColor: "#0A0A0A",
-  },
-  sendDisabled: {
-    backgroundColor: "#E2E8F0",
-  },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 999,
-  },
+  sendButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
+  sendActive: { backgroundColor: '#0A0A0A' },
+  sendDisabled: { backgroundColor: '#E2E8F0' },
+  loadingOverlay: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', zIndex: 999 },
   loadingPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 30,
     gap: 12,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
     shadowRadius: 16,
     elevation: 5,
   },
-  loadingText: {
-    fontSize: 14,
-    color: "#0F172A",
-    fontWeight: "500",
-  },
-  scrollWindow: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 140, // Increased significantly for keyboard space
-    gap: 16,
-    flexGrow: 1,
-  },
-  bottomInputWrapper: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    backgroundColor: "#FAFAFA",
-    borderTopWidth: 0,
-    // Removed absolute positioning
-  },
+  loadingText: { fontSize: 14, color: '#0F172A', fontWeight: '500' },
+  scrollWindow: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 140, gap: 16, flexGrow: 1 },
+  bottomInputWrapper: { paddingHorizontal: 16, paddingTop: 8, backgroundColor: '#FAFAFA', borderTopWidth: 0 },
   inputGlass: {
     borderRadius: 32,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: '#E2E8F0',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 12,
     elevation: 3,
   },
-  inputInner: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
+  inputInner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 8 },
+  attachmentPreviewContainer: { paddingHorizontal: 16, paddingBottom: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  attachmentPreviewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
     paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    gap: 8,
   },
+  attachmentPreviewText: { fontSize: 12, color: '#1E293B', fontWeight: '500', maxWidth: 150 },
+  attachmentThumb: { width: 30, height: 30, borderRadius: 6 },
+  attachmentPreview: { marginBottom: 8 },
+  attachmentLabel: { fontSize: 12, color: '#64748B', fontWeight: '600' },
 });

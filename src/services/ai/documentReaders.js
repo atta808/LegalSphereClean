@@ -34,9 +34,17 @@ export const extractDocumentText = async (
       case "jpeg":
       case "png":
       case "webp":
+      case "gif":
+      case "bmp":
+      case "tiff":
+      case "tif":
         return await extractImageText(document, targetedLanguage);
 
       default:
+        // Try to detect by mime type if extension is unknown
+        if (document.mimeType?.startsWith("image/")) {
+          return await extractImageText(document, targetedLanguage);
+        }
         if (__DEV__) console.log("⚠ Non-supported legal file format signature:", extension);
         return "";
     }
@@ -112,6 +120,10 @@ export const getDocumentType = (fileName = "") => {
     case "jpg":
     case "jpeg":
     case "webp":
+    case "gif":
+    case "bmp":
+    case "tiff":
+    case "tif":
       return "IMAGE";
     default:
       return "TXT";

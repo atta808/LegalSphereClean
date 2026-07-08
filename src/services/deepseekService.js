@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const client = new OpenAI({
   baseURL: "https://api.deepseek.com",
-  apiKey: process.env.DEEPSEEK_API_KEY,
+  apiKey: "sk-758caca222404081af81da2e1005bbef",
 });
 
 export const askDeepSeek = async (prompt) => {

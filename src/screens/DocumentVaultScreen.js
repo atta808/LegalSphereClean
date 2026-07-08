@@ -114,7 +114,9 @@ export default function DocumentVaultScreen() {
 
       Alert.alert("Saved", "AI analysis saved to Notes.");
     } catch (error) {
-      console.log(error);
+      if (__DEV__) {
+        console.log(error);
+      }
 
       Alert.alert("Error", "Failed to save note.");
     }
@@ -406,7 +408,9 @@ Case: ${doc.caseTitle || "—"}
 
       const documentText = await extractDocumentText(doc);
 
-      console.log("📄 Extracted Text:", documentText);
+      if (__DEV__) {
+        console.log("📄 Extracted Text:", documentText);
+      }
 
       const result = await askLegalSphereAI({
         mode: "document",

@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const client = new OpenAI({
   baseURL: "https://api.deepseek.com",
-  apiKey: "sk-758caca222404081af81da2e1005bbef",
+  apiKey: process.env.DEEPSEEK_API_KEY,
 });
 
 export const askDeepSeek = async (prompt) => {
@@ -66,7 +66,9 @@ Always be concise, practical, and supportive.
 
     return completion.choices[0]?.message?.content || "";
   } catch (error) {
-    console.log("DeepSeek Error:", JSON.stringify(error, null, 2));
+    if (__DEV__) {
+      console.log("DeepSeek Error:", JSON.stringify(error, null, 2));
+    }
     return JSON.stringify(error, null, 2);
   }
 };

@@ -1,7 +1,7 @@
 // services/ocrService.js
 import axios from "axios";
 
-const OCR_API_KEY = "K85664157688957";
+const OCR_API_KEY = process.env.OCR_SPACE_API_KEY;
 
 /**
  * High-performance OCR pipeline utilizing structural multi-page extraction.
@@ -52,7 +52,9 @@ export const extractTextWithOCR = async (
 
     return "";
   } catch (error) {
-    console.log("❌ OCR Service Engine Exception:", error);
+    if (__DEV__) {
+      console.log("❌ OCR Service Engine Exception:", error);
+    }
     return "";
   }
 };

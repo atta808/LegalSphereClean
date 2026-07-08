@@ -356,8 +356,10 @@ PAGE:
 ${payload.text}
 `);
 
-                console.log("CMS RAW:");
-                console.log(cmsResult);
+                if (__DEV__) {
+                  console.log("CMS RAW:");
+                  console.log(cmsResult);
+                }
 
                 const cmsCleaned = cmsResult
                   .replace(/```json/g, "")
@@ -375,8 +377,10 @@ ${payload.text}
                   rawResponse: cmsCleaned,
                 });
 
-                console.log("CMS DATA:");
-                console.log(normalizedCmsData);
+                if (__DEV__) {
+                  console.log("CMS DATA:");
+                  console.log(normalizedCmsData);
+                }
 
                 setAnalyzing(false);
 
@@ -539,20 +543,26 @@ PAGE:
 
 ${payload.text}
 `);
-              console.log("RAW AI:");
-              console.log(aiResult);
+              if (__DEV__) {
+                console.log("RAW AI:");
+                console.log(aiResult);
+              }
 
               const cleaned = aiResult
                 .replace(/```json/g, "")
                 .replace(/```/g, "")
                 .trim();
 
-              console.log("CLEANED AI:");
-              console.log(cleaned);
+              if (__DEV__) {
+                console.log("CLEANED AI:");
+                console.log(cleaned);
+              }
 
               if (!cleaned.startsWith("{")) {
-                console.log("INVALID AI RESPONSE:");
-                console.log(cleaned);
+                if (__DEV__) {
+                  console.log("INVALID AI RESPONSE:");
+                  console.log(cleaned);
+                }
 
                 Alert.alert("AI Error", "AI did not return valid JSON.");
 
@@ -578,8 +588,10 @@ ${payload.text}
 
               // CMS AUTO FILL MODE
               if (payload.type === "CMS_AUTOFILL") {
-                console.log("GOING TO ADDCASE");
-                console.log(data);
+                if (__DEV__) {
+                  console.log("GOING TO ADDCASE");
+                  console.log(data);
+                }
                 navigation.navigate("AddCase", {
                   aiCaseData: data,
                 });

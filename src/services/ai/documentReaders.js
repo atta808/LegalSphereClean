@@ -43,7 +43,9 @@ export const extractDocumentText = async (
         return "";
     }
   } catch (error) {
-    console.log("❌ Pipeline Core Execution Exception:", error);
+    if (__DEV__) {
+      console.log("❌ Pipeline Core Execution Exception:", error);
+    }
     return "";
   }
 };
@@ -52,7 +54,9 @@ const extractTextFile = async (document) => {
   try {
     return await FileSystem.readAsStringAsync(document.uri);
   } catch (error) {
-    console.log("❌ Plain text extraction failure:", error);
+    if (__DEV__) {
+      console.log("❌ Plain text extraction failure:", error);
+    }
     return "";
   }
 };
@@ -68,7 +72,9 @@ const extractDocx = async (document) => {
     const result = await mammoth.extractRawText({ arrayBuffer });
     return result.value || "";
   } catch (error) {
-    console.log("❌ DOCX layout compilation failure:", error);
+    if (__DEV__) {
+      console.log("❌ DOCX layout compilation failure:", error);
+    }
     return "";
   }
 };
@@ -82,7 +88,9 @@ const extractPdf = async (document, language) => {
       language,
     );
   } catch (error) {
-    console.log("❌ PDF rendering engine exception:", error);
+    if (__DEV__) {
+      console.log("❌ PDF rendering engine exception:", error);
+    }
     return "";
   }
 };
@@ -98,7 +106,9 @@ const extractImageText = async (document, language) => {
       language,
     );
   } catch (error) {
-    console.log("❌ Image vector scanning exception:", error);
+    if (__DEV__) {
+      console.log("❌ Image vector scanning exception:", error);
+    }
     return "";
   }
 };

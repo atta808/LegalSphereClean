@@ -313,6 +313,7 @@ ${profile?.name || "Advocate"}`;
       <View style={[styles.newHeader, { paddingTop: insets.top + 10 }]}>
         <View style={styles.newHeaderRow}>
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={() => navigation.goBack()}
             style={styles.newBackButton}
           >
@@ -323,22 +324,20 @@ ${profile?.name || "Advocate"}`;
             <Text style={styles.newHeaderTitle}>Case Details</Text>
             {caseData?.caseNo && (
               <TouchableOpacity
-                activeOpacity={0.8}
+                activeOpacity={0.7}
                 onPress={() => {
                   Clipboard.setString(String(caseData.caseNo));
                   Alert.alert("Copied", "Case No copied");
                 }}
               >
-                <Text style={styles.newHeaderSubtitle}>
-                  #{caseData.caseNo}
-                </Text>
+                <Text style={styles.newHeaderSubtitle}>#{caseData.caseNo}</Text>
               </TouchableOpacity>
             )}
           </View>
 
           <TouchableOpacity
+            activeOpacity={0.7}
             style={styles.newAiCopyBtn}
-            activeOpacity={0.8}
             onPress={async () => {
               try {
                 const aiCaseText = `
@@ -428,13 +427,15 @@ Notes: ${caseData?.notes || "-"}`;
             <View
               style={[
                 styles.statusTag,
-                isArchived ? { backgroundColor: "#FEF2F2" } : { backgroundColor: "#ECFDF5" }
+                isArchived
+                  ? { backgroundColor: "#FEF2F2" }
+                  : { backgroundColor: "#ECFDF5" },
               ]}
             >
               <Text
                 style={[
                   styles.statusTagText,
-                  isArchived ? { color: "#DC2626" } : { color: "#15803D" }
+                  isArchived ? { color: "#DC2626" } : { color: "#15803D" },
                 ]}
               >
                 {caseData.status?.toUpperCase()}
@@ -477,6 +478,7 @@ Notes: ${caseData?.notes || "-"}`;
           {/* Row 1: Add Hearing (full width) */}
           <View style={styles.actionRow}>
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnFull]}
               onPress={() =>
                 navigation.navigate("UpdateCaseHearing", {
@@ -494,6 +496,7 @@ Notes: ${caseData?.notes || "-"}`;
           {/* Row 2: AI Room | Lex AI | Timeline */}
           <View style={styles.actionRow}>
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => {
                 if (aiChatLink) {
@@ -508,6 +511,7 @@ Notes: ${caseData?.notes || "-"}`;
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() =>
                 navigation.navigate("AIChatRoom", {
@@ -520,6 +524,7 @@ Notes: ${caseData?.notes || "-"}`;
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -534,6 +539,7 @@ Notes: ${caseData?.notes || "-"}`;
           {/* Row 3: Documents | Notes | Citations */}
           <View style={styles.actionRow}>
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() =>
                 navigation.navigate("DocumentVault", {
@@ -547,18 +553,28 @@ Notes: ${caseData?.notes || "-"}`;
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowNotesScreen(true)}
             >
-              <Ionicons name="document-text-outline" size={18} color="#1E3A8A" />
+              <Ionicons
+                name="document-text-outline"
+                size={18}
+                color="#1E3A8A"
+              />
               <Text style={styles.actionBtnLabel}>Notes</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowCitationsScreen(true)}
             >
-              <MaterialCommunityIcons name="scale-balance" size={18} color="#1E3A8A" />
+              <MaterialCommunityIcons
+                name="scale-balance"
+                size={18}
+                color="#1E3A8A"
+              />
               <Text style={styles.actionBtnLabel}>Citations</Text>
             </TouchableOpacity>
           </View>
@@ -634,7 +650,13 @@ Notes: ${caseData?.notes || "-"}`;
             />
             <ActionIconButton
               color="#FFF7ED"
-              icon={<Ionicons name="notifications-outline" size={20} color="#D97706" />}
+              icon={
+                <Ionicons
+                  name="notifications-outline"
+                  size={20}
+                  color="#D97706"
+                />
+              }
               onPress={handleSendReminder}
             />
           </View>
@@ -643,7 +665,10 @@ Notes: ${caseData?.notes || "-"}`;
         {/* FINANCIAL SUMMARY */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Financial Summary</Text>
-          <TouchableOpacity onPress={() => setPaymentModalVisible(true)}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setPaymentModalVisible(true)}
+          >
             <Text style={styles.addPaymentLink}>+ Add Payment</Text>
           </TouchableOpacity>
         </View>
@@ -672,6 +697,7 @@ Notes: ${caseData?.notes || "-"}`;
           <Text style={styles.sectionTitle}>Recent Hearings</Text>
           {hearings.length > 2 && (
             <TouchableOpacity
+              activeOpacity={0.7}
               onPress={() =>
                 navigation.navigate("Timeline", { caseId: caseData.id })
               }
@@ -698,6 +724,7 @@ Notes: ${caseData?.notes || "-"}`;
                       {toDisplay(item.hearingDate, locale)}
                     </Text>
                     <TouchableOpacity
+                      activeOpacity={0.7}
                       onPress={() => handleDeleteHearing(item.id)}
                     >
                       <Text style={styles.delText}>Remove</Text>
@@ -715,6 +742,7 @@ Notes: ${caseData?.notes || "-"}`;
           )}
           {hearings.length > 2 && (
             <TouchableOpacity
+              activeOpacity={0.7}
               style={styles.viewFullButton}
               onPress={() =>
                 navigation.navigate("Timeline", { caseId: caseData.id })
@@ -737,6 +765,7 @@ Notes: ${caseData?.notes || "-"}`;
         <View style={{ marginTop: 10, marginBottom: 20 }}>
           {isArchived ? (
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.mainActionBtn, { backgroundColor: "#10B981" }]}
               onPress={handleRestore}
             >
@@ -746,6 +775,7 @@ Notes: ${caseData?.notes || "-"}`;
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
+              activeOpacity={0.7}
               style={[styles.mainActionBtn, { backgroundColor: "#EF4444" }]}
               onPress={handleArchive}
             >
@@ -765,6 +795,7 @@ Notes: ${caseData?.notes || "-"}`;
             <Text style={styles.modalSub}>Choose an AI workflow</Text>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
                 const summary = `
@@ -801,43 +832,66 @@ ${caseData?.status || "-"}
                 );
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Ionicons name="document-text-outline" size={16} color="#1E3A8A" />
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              >
+                <Ionicons
+                  name="document-text-outline"
+                  size={16}
+                  color="#1E3A8A"
+                />
                 <Text style={styles.aiActionText}>Summarize Case</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
                 Alert.alert("Coming Next", "Prepare Arguments AI");
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <MaterialCommunityIcons name="scale-balance" size={16} color="#1E3A8A" />
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              >
+                <MaterialCommunityIcons
+                  name="scale-balance"
+                  size={16}
+                  color="#1E3A8A"
+                />
                 <Text style={styles.aiActionText}>Prepare Arguments</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
                 Alert.alert("Coming Next", "Cross Examination AI");
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Ionicons name="help-circle-outline" size={16} color="#1E3A8A" />
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              >
+                <Ionicons
+                  name="help-circle-outline"
+                  size={16}
+                  color="#1E3A8A"
+                />
                 <Text style={styles.aiActionText}>Cross Examination</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
                 Alert.alert("Coming Next", "Next Hearing Strategy AI");
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              >
                 <Ionicons name="calendar-outline" size={16} color="#1E3A8A" />
                 <Text style={styles.aiActionText}>Next Hearing Strategy</Text>
               </View>
@@ -852,7 +906,7 @@ ${caseData?.status || "-"}
                   marginBottom: 12,
                   maxHeight: 220,
                   borderWidth: 1,
-                  borderColor: "#E2E8F0"
+                  borderColor: "#E2E8F0",
                 }}
               >
                 <ScrollView>
@@ -872,6 +926,7 @@ ${caseData?.status || "-"}
             {generatedSummary ? (
               <>
                 <TouchableOpacity
+                  activeOpacity={0.7}
                   style={styles.aiActionBtn}
                   onPress={() => {
                     addCaseNote({
@@ -883,7 +938,13 @@ ${caseData?.status || "-"}
                     setShowAiAssistant(false);
                   }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
                     <Ionicons name="save-outline" size={16} color="#1E3A8A" />
                     <Text style={styles.aiActionText}>
                       Save Summary To Notes
@@ -891,13 +952,20 @@ ${caseData?.status || "-"}
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
+                  activeOpacity={0.7}
                   style={styles.aiActionBtn}
                   onPress={async () => {
                     await Clipboard.setStringAsync(generatedSummary);
                     Alert.alert("Copied", "Summary copied.");
                   }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
                     <Ionicons name="copy-outline" size={16} color="#1E3A8A" />
                     <Text style={styles.aiActionText}>Copy Summary</Text>
                   </View>
@@ -906,6 +974,7 @@ ${caseData?.status || "-"}
             ) : null}
 
             <TouchableOpacity
+              activeOpacity={0.7}
               style={styles.modalCancel}
               onPress={() => setShowAiAssistant(false)}
             >
@@ -933,12 +1002,14 @@ ${caseData?.status || "-"}
             </View>
             <View style={styles.modalActionRow}>
               <TouchableOpacity
+                activeOpacity={0.7}
                 style={styles.modalCancel}
                 onPress={() => setAiLinkModalVisible(false)}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                activeOpacity={0.7}
                 style={styles.modalSave}
                 onPress={async () => {
                   try {
@@ -978,6 +1049,7 @@ ${caseData?.status || "-"}
             </View>
             <View style={styles.modalActionRow}>
               <TouchableOpacity
+                activeOpacity={0.7}
                 style={styles.modalCancel}
                 onPress={() => {
                   setPaymentModalVisible(false);
@@ -987,6 +1059,7 @@ ${caseData?.status || "-"}
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                activeOpacity={0.7}
                 style={styles.modalSave}
                 onPress={handleAddPayment}
               >
@@ -1017,6 +1090,7 @@ const Row = ({ label, value, highlight }) => (
 
 const ActionIconButton = ({ color, icon, onPress }) => (
   <TouchableOpacity
+    activeOpacity={0.7}
     style={[styles.actionIconBtn, { backgroundColor: color }]}
     onPress={onPress}
   >
@@ -1092,10 +1166,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   titleRow: {
@@ -1158,7 +1232,7 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
+    borderRadius: 14,
     paddingVertical: 14,
     alignItems: "center",
     justifyContent: "center",
@@ -1166,10 +1240,10 @@ const styles = StyleSheet.create({
     borderColor: "#E2E8F0",
     flexDirection: "row",
     gap: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   actionBtnFull: {
@@ -1192,10 +1266,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   aiInsightsHeader: {
@@ -1232,10 +1306,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   healthTitle: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
@@ -1243,7 +1317,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    borderWidth: 8,
+    borderWidth: 6,
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 16,
@@ -1259,7 +1333,7 @@ const styles = StyleSheet.create({
   clientAvatar: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 16,
     backgroundColor: "#EFF6FF",
     justifyContent: "center",
     alignItems: "center",
@@ -1286,7 +1360,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8FAFC",
     padding: 14,
-    borderRadius: 16,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
@@ -1328,7 +1402,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
     marginTop: 8,
-    paddingHorizontal: 4,
   },
   sectionTitle: {
     fontSize: 12,
@@ -1357,10 +1430,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   timelineHeader: {
@@ -1377,7 +1450,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
-    overflow: "hidden"
+    overflow: "hidden",
   },
   timelineStage: {
     fontSize: 13,
@@ -1412,10 +1485,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   mainActionBtnText: {
@@ -1433,10 +1506,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   aiActionText: {
@@ -1447,9 +1520,9 @@ const styles = StyleSheet.create({
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
     justifyContent: "center",
-    padding: 20,
+    padding: 16,
   },
   modalCard: {
     backgroundColor: "#FFF",
@@ -1458,7 +1531,13 @@ const styles = StyleSheet.create({
     minHeight: 220,
   },
   modalTitle: { fontSize: 18, fontWeight: "700", color: "#0F172A" },
-  modalSub: { color: "#64748B", marginTop: 4, marginBottom: 20, fontSize: 13, fontWeight: "500" },
+  modalSub: {
+    color: "#64748B",
+    marginTop: 4,
+    marginBottom: 20,
+    fontSize: 13,
+    fontWeight: "500",
+  },
   modalActionRow: { flexDirection: "row", gap: 12, marginTop: 16 },
   modalCancel: {
     flex: 1,

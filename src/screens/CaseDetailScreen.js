@@ -7,7 +7,7 @@ import {
 } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -307,42 +307,38 @@ ${profile?.name || "Advocate"}`;
 
   return (
     <View style={styles.mainContainer}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="transparent"
-        translucent
-      />
+      <StatusBar barStyle="light-content" backgroundColor="#1E3A8A" />
 
       {/* HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
+      <View style={[styles.newHeader, { paddingTop: insets.top + 10 }]}>
+        <View style={styles.newHeaderRow}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
+            style={styles.newBackButton}
           >
-            <Text style={styles.backIcon}>‹</Text>
+            <Ionicons name="chevron-back" size={24} color="#FFF" />
           </TouchableOpacity>
 
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Case Details</Text>
-            <TouchableOpacity
-              style={styles.caseNoButton}
-              activeOpacity={0.85}
-              onPress={() => {
-                Clipboard.setString(String(caseData?.caseNo || ""));
-                Alert.alert("Copied", "Case No copied");
-              }}
-            >
-              <Text style={styles.caseNoLabel}>
-                CASE NO: {caseData?.caseNo || "N/A"}
-              </Text>
-              <Text style={styles.caseNoSub}>Tap to copy</Text>
-            </TouchableOpacity>
+          <View style={styles.newHeaderCenter}>
+            <Text style={styles.newHeaderTitle}>Case Details</Text>
+            {caseData?.caseNo && (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  Clipboard.setString(String(caseData.caseNo));
+                  Alert.alert("Copied", "Case No copied");
+                }}
+              >
+                <Text style={styles.newHeaderSubtitle}>
+                  #{caseData.caseNo}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <TouchableOpacity
-            style={styles.aiCopyButton}
-            activeOpacity={0.85}
+            style={styles.newAiCopyBtn}
+            activeOpacity={0.8}
             onPress={async () => {
               try {
                 const aiCaseText = `
@@ -371,7 +367,7 @@ Notes: ${caseData?.notes || "-"}`;
               }
             }}
           >
-            <Text style={styles.aiCopyIcon}>✦</Text>
+            <Ionicons name="sparkles-outline" size={20} color="#FFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -383,36 +379,6 @@ Notes: ${caseData?.notes || "-"}`;
           { paddingBottom: insets.bottom + 40 },
         ]}
       >
-        {/* HERO BANNER */}
-        <View style={styles.caseHeroBanner}>
-          <LinearGradient
-            colors={["#0F172A", "#1E3A8A"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.caseHeroGradient}
-          >
-            <View style={styles.heroTopRow}>
-              <View>
-                <Text style={styles.heroCountry}>
-                  {(caseData?.country || "Pakistan").toUpperCase()}
-                </Text>
-              </View>
-              <View style={styles.liveStatusBadge}>
-                <View style={styles.liveDot} />
-                <Text style={styles.liveStatusText}>
-                  {isArchived ? "ARCHIVED" : "ACTIVE"}
-                </Text>
-              </View>
-            </View>
-            <Text style={styles.heroCaseTitle}>
-              {caseData?.title || "Untitled Case"}
-            </Text>
-            <Text style={styles.heroCourtText}>
-              🏛 {caseData?.court || "Unknown Court"}
-            </Text>
-          </LinearGradient>
-        </View>
-
         {/* SUMMARY CARD */}
         <View style={styles.card}>
           <View style={styles.titleRow}>
@@ -423,13 +389,13 @@ Notes: ${caseData?.notes || "-"}`;
                   style={[
                     styles.priorityBadge,
                     caseData.priority === "urgent" && {
-                      backgroundColor: "#FEE2E2",
+                      backgroundColor: "#FEF2F2",
                     },
                     caseData.priority === "important" && {
-                      backgroundColor: "#FEF9C3",
+                      backgroundColor: "#FFF7ED",
                     },
                     caseData.priority === "normal" && {
-                      backgroundColor: "#E2E8F0",
+                      backgroundColor: "#EFF6FF",
                     },
                   ]}
                 >
@@ -437,8 +403,8 @@ Notes: ${caseData?.notes || "-"}`;
                     style={[
                       styles.priorityText,
                       caseData.priority === "urgent" && { color: "#DC2626" },
-                      caseData.priority === "important" && { color: "#CA8A04" },
-                      caseData.priority === "normal" && { color: "#475569" },
+                      caseData.priority === "important" && { color: "#D97706" },
+                      caseData.priority === "normal" && { color: "#2563EB" },
                     ]}
                   >
                     {caseData.priority?.toUpperCase()}
@@ -462,13 +428,13 @@ Notes: ${caseData?.notes || "-"}`;
             <View
               style={[
                 styles.statusTag,
-                isArchived && { backgroundColor: "#FEE2E2" },
+                isArchived ? { backgroundColor: "#FEF2F2" } : { backgroundColor: "#ECFDF5" }
               ]}
             >
               <Text
                 style={[
                   styles.statusTagText,
-                  isArchived && { color: "#DC2626" },
+                  isArchived ? { color: "#DC2626" } : { color: "#15803D" }
                 ]}
               >
                 {caseData.status?.toUpperCase()}
@@ -520,7 +486,7 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Text style={styles.actionBtnIcon}>📅</Text>
+              <Ionicons name="calendar-outline" size={18} color="#1E3A8A" />
               <Text style={styles.actionBtnLabel}>Add Hearing</Text>
             </TouchableOpacity>
           </View>
@@ -537,7 +503,7 @@ Notes: ${caseData?.notes || "-"}`;
                 }
               }}
             >
-              <Text style={styles.actionBtnIcon}>✦</Text>
+              <Ionicons name="sparkles-outline" size={18} color="#1E3A8A" />
               <Text style={styles.actionBtnLabel}>AI Room</Text>
             </TouchableOpacity>
 
@@ -549,7 +515,7 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Text style={styles.actionBtnIcon}>✨</Text>
+              <Ionicons name="flash-outline" size={18} color="#1E3A8A" />
               <Text style={styles.actionBtnLabel}>Lex AI</Text>
             </TouchableOpacity>
 
@@ -560,7 +526,7 @@ Notes: ${caseData?.notes || "-"}`;
                 navigation.navigate("Timeline", { caseId: caseData.id });
               }}
             >
-              <Text style={styles.actionBtnIcon}>📜</Text>
+              <Ionicons name="time-outline" size={18} color="#1E3A8A" />
               <Text style={styles.actionBtnLabel}>Timeline</Text>
             </TouchableOpacity>
           </View>
@@ -576,7 +542,7 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Text style={styles.actionBtnIcon}>📁</Text>
+              <Ionicons name="folder-open-outline" size={18} color="#1E3A8A" />
               <Text style={styles.actionBtnLabel}>Documents</Text>
             </TouchableOpacity>
 
@@ -584,7 +550,7 @@ Notes: ${caseData?.notes || "-"}`;
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowNotesScreen(true)}
             >
-              <Text style={styles.actionBtnIcon}>📓</Text>
+              <Ionicons name="document-text-outline" size={18} color="#1E3A8A" />
               <Text style={styles.actionBtnLabel}>Notes</Text>
             </TouchableOpacity>
 
@@ -592,7 +558,7 @@ Notes: ${caseData?.notes || "-"}`;
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowCitationsScreen(true)}
             >
-              <Text style={styles.actionBtnIcon}>⚖️</Text>
+              <MaterialCommunityIcons name="scale-balance" size={18} color="#1E3A8A" />
               <Text style={styles.actionBtnLabel}>Citations</Text>
             </TouchableOpacity>
           </View>
@@ -657,18 +623,18 @@ Notes: ${caseData?.notes || "-"}`;
           </View>
           <View style={styles.actionGrid}>
             <ActionIconButton
-              color="#3B82F6"
-              icon="📞"
+              color="#EFF6FF"
+              icon={<Ionicons name="call-outline" size={20} color="#2563EB" />}
               onPress={handleCallClient}
             />
             <ActionIconButton
-              color="#22C55E"
-              icon="💬"
+              color="#ECFDF5"
+              icon={<Ionicons name="logo-whatsapp" size={20} color="#16A34A" />}
               onPress={handleWhatsAppClient}
             />
             <ActionIconButton
-              color="#F59E0B"
-              icon="🔔"
+              color="#FFF7ED"
+              icon={<Ionicons name="notifications-outline" size={20} color="#D97706" />}
               onPress={handleSendReminder}
             />
           </View>
@@ -835,7 +801,10 @@ ${caseData?.status || "-"}
                 );
               }}
             >
-              <Text style={styles.aiActionText}>📄 Summarize Case</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="document-text-outline" size={16} color="#1E3A8A" />
+                <Text style={styles.aiActionText}>Summarize Case</Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -844,7 +813,10 @@ ${caseData?.status || "-"}
                 Alert.alert("Coming Next", "Prepare Arguments AI");
               }}
             >
-              <Text style={styles.aiActionText}>⚖ Prepare Arguments</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <MaterialCommunityIcons name="scale-balance" size={16} color="#1E3A8A" />
+                <Text style={styles.aiActionText}>Prepare Arguments</Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -853,7 +825,10 @@ ${caseData?.status || "-"}
                 Alert.alert("Coming Next", "Cross Examination AI");
               }}
             >
-              <Text style={styles.aiActionText}>❓ Cross Examination</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="help-circle-outline" size={16} color="#1E3A8A" />
+                <Text style={styles.aiActionText}>Cross Examination</Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -862,7 +837,10 @@ ${caseData?.status || "-"}
                 Alert.alert("Coming Next", "Next Hearing Strategy AI");
               }}
             >
-              <Text style={styles.aiActionText}>📅 Next Hearing Strategy</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="calendar-outline" size={16} color="#1E3A8A" />
+                <Text style={styles.aiActionText}>Next Hearing Strategy</Text>
+              </View>
             </TouchableOpacity>
 
             {generatedSummary ? (
@@ -873,6 +851,8 @@ ${caseData?.status || "-"}
                   borderRadius: 14,
                   marginBottom: 12,
                   maxHeight: 220,
+                  borderWidth: 1,
+                  borderColor: "#E2E8F0"
                 }}
               >
                 <ScrollView>
@@ -903,9 +883,12 @@ ${caseData?.status || "-"}
                     setShowAiAssistant(false);
                   }}
                 >
-                  <Text style={styles.aiActionText}>
-                    💾 Save Summary To Notes
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Ionicons name="save-outline" size={16} color="#1E3A8A" />
+                    <Text style={styles.aiActionText}>
+                      Save Summary To Notes
+                    </Text>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.aiActionBtn}
@@ -914,7 +897,10 @@ ${caseData?.status || "-"}
                     Alert.alert("Copied", "Summary copied.");
                   }}
                 >
-                  <Text style={styles.aiActionText}>📋 Copy Summary</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Ionicons name="copy-outline" size={16} color="#1E3A8A" />
+                    <Text style={styles.aiActionText}>Copy Summary</Text>
+                  </View>
                 </TouchableOpacity>
               </>
             ) : null}
@@ -981,13 +967,15 @@ ${caseData?.status || "-"}
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Record Payment</Text>
             <Text style={styles.modalSub}>{caseData.title}</Text>
-            <LegalInput
-              label="Payment Amount"
-              value={paymentAmount}
-              onChangeText={setPaymentAmount}
-              placeholder="0.00"
-              keyboardType="numeric"
-            />
+            <View style={{ marginBottom: 20 }}>
+              <LegalInput
+                label="Payment Amount"
+                value={paymentAmount}
+                onChangeText={setPaymentAmount}
+                placeholder="0.00"
+                keyboardType="numeric"
+              />
+            </View>
             <View style={styles.modalActionRow}>
               <TouchableOpacity
                 style={styles.modalCancel}
@@ -1002,7 +990,7 @@ ${caseData?.status || "-"}
                 style={styles.modalSave}
                 onPress={handleAddPayment}
               >
-                <Text style={styles.modalSaveText}>Confirm Payment</Text>
+                <Text style={styles.modalSaveText}>Confirm</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1032,7 +1020,7 @@ const ActionIconButton = ({ color, icon, onPress }) => (
     style={[styles.actionIconBtn, { backgroundColor: color }]}
     onPress={onPress}
   >
-    <Text style={styles.actionIconText}>{icon}</Text>
+    {icon}
   </TouchableOpacity>
 );
 
@@ -1045,126 +1033,70 @@ const FeeBox = ({ label, val, color }) => (
 
 // ======================== STYLES ========================
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#0A0F1E" },
+  mainContainer: { flex: 1, backgroundColor: "#F8FAFC" },
   loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  premiumHeader: {
-    backgroundColor: "#FFFFFF",
-    paddingBottom: 16,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
-    shadowColor: "#1E3A8A",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
+  newHeader: {
+    backgroundColor: "#1E3A8A",
+    paddingBottom: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
     zIndex: 10,
   },
-  headerRow: {
+  newHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  glassBackButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: "#F1F5F9",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backIcon: {
-    fontSize: 28,
-    color: "#1E3A8A",
-    fontWeight: "300",
-    marginTop: -4,
-  },
-  titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: "#1E3A8A" },
-  caseNoButton: {
-    marginTop: 6,
-    backgroundColor: "#E0E7FF",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-  caseNoLabel: {
-    fontSize: 11,
-    fontWeight: "900",
-    color: "#1E3A8A",
-    letterSpacing: 0.5,
-  },
-  caseNoSub: { fontSize: 9, color: "#475569", marginTop: 2, fontWeight: "600" },
-  aiCopyButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: "#EEF2FF",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  aiCopyIcon: { fontSize: 18, color: "#1E3A8A", fontWeight: "900" },
-
-  scrollContent: { paddingHorizontal: 20, paddingTop: 24 },
-
-  caseHeroBanner: { marginBottom: 24 },
-  caseHeroGradient: { borderRadius: 28, padding: 22 },
-  heroTopRow: {
-    flexDirection: "row",
     justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginTop: 10,
+  },
+  newBackButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    justifyContent: "center",
     alignItems: "center",
   },
-  heroCountry: {
-    color: "#FFF",
-    fontSize: 12,
-    fontWeight: "900",
-    letterSpacing: 1.5,
-  },
-  liveStatusBadge: {
-    flexDirection: "row",
+  newHeaderCenter: {
+    flex: 1,
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.12)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 24,
   },
-  liveDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#22C55E",
-    marginRight: 8,
-  },
-  liveStatusText: {
+  newHeaderTitle: {
+    fontSize: 18,
+    fontWeight: "700",
     color: "#FFF",
-    fontWeight: "900",
-    fontSize: 11,
     letterSpacing: 0.5,
   },
-  heroCaseTitle: {
-    color: "#FFF",
-    fontSize: 26,
-    fontWeight: "900",
-    marginTop: 20,
-    lineHeight: 32,
+  newHeaderSubtitle: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.8)",
+    marginTop: 4,
+    fontWeight: "500",
   },
-  heroCourtText: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: 14,
-    marginTop: 8,
-    fontWeight: "600",
+  newAiCopyBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    justifyContent: "center",
+    alignItems: "center",
   },
+
+  scrollContent: { paddingHorizontal: 20, paddingTop: 20 },
 
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   titleRow: {
     flexDirection: "row",
@@ -1176,28 +1108,29 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  caseTitle: { fontSize: 20, fontWeight: "900", color: "#0F172A", flex: 1 },
+  caseTitle: { fontSize: 18, fontWeight: "700", color: "#0F172A", flex: 1 },
   caseCourt: {
     fontSize: 13,
     color: "#64748B",
-    marginTop: 6,
-    fontWeight: "600",
+    marginTop: 4,
+    fontWeight: "500",
   },
   priorityBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 12,
     marginLeft: 12,
+    overflow: "hidden",
   },
-  priorityText: { fontSize: 9, fontWeight: "900" },
+  priorityText: { fontSize: 10, fontWeight: "600", letterSpacing: 0.5 },
   divider: { height: 1, backgroundColor: "#F1F5F9", marginVertical: 14 },
   row: { flexDirection: "row", alignItems: "flex-start", paddingVertical: 8 },
-  rowLabel: { width: "42%", fontSize: 13, color: "#64748B", fontWeight: "600" },
+  rowLabel: { width: "42%", fontSize: 13, color: "#64748B", fontWeight: "500" },
   rowValue: {
     flex: 1,
     fontSize: 14,
     color: "#1E293B",
-    fontWeight: "800",
+    fontWeight: "600",
     textAlign: "right",
   },
   statusRow: {
@@ -1207,32 +1140,37 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   statusTag: {
-    backgroundColor: "#E0F2FE",
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 12,
+    overflow: "hidden",
   },
-  statusTagText: { fontSize: 11, fontWeight: "800", color: "#0369A1" },
+  statusTagText: { fontSize: 10, fontWeight: "600", letterSpacing: 0.5 },
 
   // ==================== NEW ACTION BUTTONS ====================
   actionSection: {
-    marginBottom: 24,
-    gap: 10,
+    marginBottom: 16,
+    gap: 12,
   },
   actionRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
   },
   actionBtn: {
-    backgroundColor: "#0F172A",
-    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
     paddingVertical: 14,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderColor: "#E2E8F0",
     flexDirection: "row",
     gap: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   actionBtnFull: {
     flex: 1,
@@ -1240,23 +1178,25 @@ const styles = StyleSheet.create({
   actionBtnThird: {
     flex: 1,
   },
-  actionBtnIcon: {
-    fontSize: 18,
-    color: "#38BDF8",
-    fontWeight: "900",
-  },
   actionBtnLabel: {
-    color: "#FFF",
+    color: "#0F172A",
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "600",
     letterSpacing: 0.5,
   },
 
   aiInsightsCard: {
-    backgroundColor: "#0F172A",
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 24,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   aiInsightsHeader: {
     flexDirection: "row",
@@ -1264,27 +1204,39 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  aiInsightsTitle: { color: "#FFF", fontSize: 16, fontWeight: "900" },
+  aiInsightsTitle: { color: "#0F172A", fontSize: 16, fontWeight: "700" },
   aiInsightsBadge: {
-    color: "#22C55E",
-    fontWeight: "900",
-    fontSize: 11,
+    backgroundColor: "#ECFDF5",
+    color: "#15803D",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontWeight: "600",
+    fontSize: 10,
     letterSpacing: 0.5,
+    overflow: "hidden",
   },
   aiInsightItem: {
-    color: "rgba(255,255,255,0.8)",
+    color: "#475569",
     fontSize: 14,
     marginBottom: 12,
-    fontWeight: "600",
+    fontWeight: "500",
     lineHeight: 20,
   },
 
   healthCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 20,
+    borderRadius: 16,
+    padding: 16,
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   healthTitle: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
   healthCircle: {
@@ -1308,27 +1260,26 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: "#EFF6FF",
     justifyContent: "center",
     alignItems: "center",
   },
-  avatarText: { color: "#FFF", fontSize: 20, fontWeight: "800" },
-  clientNameText: { fontSize: 18, fontWeight: "800", color: "#1E293B" },
+  avatarText: { color: "#1E3A8A", fontSize: 20, fontWeight: "700" },
+  clientNameText: { fontSize: 18, fontWeight: "700", color: "#0F172A" },
   clientSubText: {
     fontSize: 13,
     color: "#64748B",
-    fontWeight: "600",
-    marginTop: 2,
+    fontWeight: "500",
+    marginTop: 4,
   },
   actionGrid: { flexDirection: "row", gap: 12 },
   actionIconBtn: {
     flex: 1,
     height: 48,
-    borderRadius: 16,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
   },
-  actionIconText: { fontSize: 20 },
 
   feeGrid: { flexDirection: "row", gap: 12, marginBottom: 16 },
   feeBox: {
@@ -1360,13 +1311,13 @@ const styles = StyleSheet.create({
   },
   balanceLabel: {
     fontSize: 10,
-    fontWeight: "800",
+    fontWeight: "700",
     color: "#64748B",
     letterSpacing: 0.5,
   },
   balanceValue: {
     fontSize: 22,
-    fontWeight: "900",
+    fontWeight: "700",
     color: "#1E3A8A",
     marginTop: 4,
   },
@@ -1380,130 +1331,151 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   sectionTitle: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "rgba(255,255,255,0.7)",
-    letterSpacing: 1.2,
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#475569",
+    letterSpacing: 1.0,
     textTransform: "uppercase",
   },
-  addPaymentLink: { fontSize: 13, fontWeight: "700", color: "#d3e4cf" },
-  viewAllLink: { fontSize: 12, fontWeight: "700", color: "#1E3A8A" },
+  addPaymentLink: { fontSize: 13, fontWeight: "600", color: "#1E3A8A" },
+  viewAllLink: { fontSize: 12, fontWeight: "600", color: "#1E3A8A" },
 
   timelineItem: { flexDirection: "row", marginBottom: 16 },
-  timelineLeft: { alignItems: "center", marginRight: 12 },
+  timelineLeft: { alignItems: "center", marginRight: 16 },
   timelineDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: "#1E3A8A",
-    borderWidth: 3,
-    borderColor: "#DBEAFE",
+    marginTop: 4,
   },
-  timelineLine: { width: 2, flex: 1, backgroundColor: "#CBD5F5", marginTop: 4 },
+  timelineLine: { width: 1, flex: 1, backgroundColor: "#E2E8F0", marginTop: 4 },
   timelineModernCard: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: "#FFFFFF",
     padding: 16,
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   timelineHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  timelineDate: { fontSize: 14, fontWeight: "800", color: "#1E3A8A" },
-  delText: { fontSize: 11, color: "#EF4444", fontWeight: "700" },
+  timelineDate: { fontSize: 14, fontWeight: "600", color: "#1E293B" },
+  delText: {
+    fontSize: 11,
+    color: "#DC2626",
+    fontWeight: "600",
+    backgroundColor: "#FEF2F2",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    overflow: "hidden"
+  },
   timelineStage: {
     fontSize: 13,
-    fontWeight: "700",
-    color: "#334155",
-    marginTop: 4,
+    fontWeight: "500",
+    color: "#475569",
+    marginTop: 6,
   },
   timelineNotes: {
     fontSize: 13,
     color: "#64748B",
-    marginTop: 4,
-    fontStyle: "italic",
+    marginTop: 6,
+    lineHeight: 20,
   },
   viewFullButton: {
     marginTop: 8,
     paddingVertical: 12,
     alignItems: "center",
-    borderRadius: 16,
+    borderRadius: 12,
     backgroundColor: "#EFF6FF",
   },
-  viewFullButtonText: { fontSize: 13, fontWeight: "800", color: "#1E3A8A" },
+  viewFullButtonText: { fontSize: 13, fontWeight: "600", color: "#1E3A8A" },
 
   cardSubtitle: {
     fontSize: 14,
-    fontWeight: "800",
-    color: "#1E3A8A",
+    fontWeight: "700",
+    color: "#1E293B",
     marginBottom: 8,
   },
   descriptionText: { fontSize: 14, color: "#475569", lineHeight: 22 },
 
   mainActionBtn: {
-    paddingVertical: 18,
-    borderRadius: 24,
+    paddingVertical: 16,
+    borderRadius: 16,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   mainActionBtnText: {
     color: "#FFF",
-    fontWeight: "900",
+    fontWeight: "700",
     fontSize: 14,
-    letterSpacing: 1.2,
+    letterSpacing: 0.5,
   },
 
   aiActionBtn: {
-    backgroundColor: "#EEF2FF",
-    paddingVertical: 16,
-    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 14,
+    borderRadius: 12,
     marginBottom: 12,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   aiActionText: {
     color: "#1E3A8A",
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: 14,
+    fontWeight: "600",
   },
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(15,23,42,0.8)",
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
     justifyContent: "center",
     padding: 20,
   },
   modalCard: {
     backgroundColor: "#FFF",
-    borderRadius: 28,
-    padding: 24,
+    borderRadius: 16,
+    padding: 20,
     minHeight: 220,
   },
-  modalTitle: { fontSize: 20, fontWeight: "900", color: "#1E293B" },
-  modalSub: { color: "#64748B", marginTop: 4, marginBottom: 20 },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: "#0F172A" },
+  modalSub: { color: "#64748B", marginTop: 4, marginBottom: 20, fontSize: 13, fontWeight: "500" },
   modalActionRow: { flexDirection: "row", gap: 12, marginTop: 16 },
   modalCancel: {
     flex: 1,
     paddingVertical: 14,
     alignItems: "center",
     backgroundColor: "#F1F5F9",
-    borderRadius: 16,
+    borderRadius: 12,
   },
-  modalCancelText: { color: "#64748B", fontWeight: "700" },
+  modalCancelText: { color: "#475569", fontWeight: "600" },
   modalSave: {
     flex: 1,
     backgroundColor: "#1E3A8A",
     paddingVertical: 14,
-    borderRadius: 16,
+    borderRadius: 12,
     alignItems: "center",
   },
-  modalSaveText: { color: "#FFF", fontWeight: "800" },
+  modalSaveText: { color: "#FFF", fontWeight: "600" },
   emptyText: {
     color: "#94A3B8",
     fontWeight: "600",

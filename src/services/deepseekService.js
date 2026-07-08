@@ -66,7 +66,9 @@ Always be concise, practical, and supportive.
 
     return completion.choices[0]?.message?.content || "";
   } catch (error) {
-    console.log("DeepSeek Error:", JSON.stringify(error, null, 2));
+    if (__DEV__) {
+      console.log("DeepSeek Error:", JSON.stringify(error, null, 2));
+    }
     return JSON.stringify(error, null, 2);
   }
 };

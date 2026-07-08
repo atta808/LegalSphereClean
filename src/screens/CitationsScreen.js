@@ -198,8 +198,10 @@ Format:
   "keywords":""
 }
 `);
-      console.log("RAW AI RESPONSE:");
-      console.log(result);
+      if (__DEV__) {
+        console.log("RAW AI RESPONSE:");
+        console.log(result);
+      }
       const cleaned = result
         .replace(/```json/g, "")
         .replace(/```/g, "")
@@ -216,7 +218,9 @@ Format:
         return;
       }
 
-      console.log("AI Result:", data);
+      if (__DEV__) {
+        console.log("AI Result:", data);
+      }
 
       setCitation(data.citation || citation);
 

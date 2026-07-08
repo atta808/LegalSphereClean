@@ -47,7 +47,9 @@ ${documentText.slice(0, 15000)}
 
     return await askDeepSeek(prompt);
   } catch (error) {
-    console.log("❌ analyzeDocument error:", error);
+    if (__DEV__) {
+      console.log("❌ analyzeDocument error:", error);
+    }
 
     return "Failed to analyze document.";
   }
@@ -73,7 +75,9 @@ ${JSON.stringify(caseData, null, 2)}
 
     return await askDeepSeek(prompt);
   } catch (error) {
-    console.log("❌ analyzeCase error:", error);
+    if (__DEV__) {
+      console.log("❌ analyzeCase error:", error);
+    }
 
     return "Failed to analyze case.";
   }
@@ -98,7 +102,9 @@ ${JSON.stringify(dashboardData, null, 2)}
 
     return await askDeepSeek(prompt);
   } catch (error) {
-    console.log("❌ analyzeDashboard error:", error);
+    if (__DEV__) {
+      console.log("❌ analyzeDashboard error:", error);
+    }
 
     return "Failed to analyze dashboard.";
   }
@@ -108,7 +114,9 @@ const generalAssistant = async ({ question }) => {
   try {
     return await askDeepSeek(question);
   } catch (error) {
-    console.log("❌ generalAssistant error:", error);
+    if (__DEV__) {
+      console.log("❌ generalAssistant error:", error);
+    }
 
     return "Failed to get response.";
   }

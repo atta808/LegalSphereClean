@@ -52,7 +52,9 @@ export const extractTextWithOCR = async (
 
     return "";
   } catch (error) {
-    console.log("❌ OCR Service Engine Exception:", error);
+    if (__DEV__) {
+      console.log("❌ OCR Service Engine Exception:", error);
+    }
     return "";
   }
 };

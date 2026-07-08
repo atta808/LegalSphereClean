@@ -33,8 +33,10 @@ import LegalInput from "../components/LegalInput";
 import {
   generateSQL,
   summarizeSQLResults,
+  buildGeneralPrompt,
 } from "../services/ai/promptTemplates";
 import { extractDocumentText } from "../services/ai/documentReaders";
+import { isOfficeQuery } from "../services/ai/intentDetector";
 
 // Sleek typing animation component
 const TypingIndicator = () => {
@@ -364,54 +366,61 @@ USER QUERY: ${prompt}
     try {
       const dynamicLanguagePrompt = enforceLanguagePolicy(userRawText);
       const systemDate = getSystemDateString();
-
-      const initialPrompt = generateSQL(
-        dynamicLanguagePrompt,
-        caseId,
-        systemDate,
-      );
-      const initialResponse = await askDeepSeek(initialPrompt);
-
-      let intentObject;
-      try {
-        const firstBrace = initialResponse.indexOf("{");
-        const lastBrace = initialResponse.lastIndexOf("}");
-
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          const pureJson = initialResponse.substring(firstBrace, lastBrace + 1);
-          intentObject = JSON.parse(pureJson);
-        } else {
-          intentObject = { type: "answer", text: initialResponse };
-        }
-      } catch (e) {
-        intentObject = {
-          type: "answer",
-          text: initialResponse.replace(/```json|```/g, "").trim(),
-        };
-      }
-
       let ultimateAiResponseText = "";
 
-      if (intentObject.type === "sql" && intentObject.sql) {
-        setLoadingMessage("Querying database...");
+      if (isOfficeQuery(userRawText)) {
+        // Office Question detected -> Route to LegalSphere Engine (generate SQL)
+        const initialPrompt = generateSQL(
+          dynamicLanguagePrompt,
+          caseId,
+          systemDate,
+        );
+        const initialResponse = await askDeepSeek(initialPrompt);
+
+        let intentObject;
         try {
-          const dataset = db.getAllSync(intentObject.sql);
-          setLoadingMessage("Synthesizing findings...");
+          const firstBrace = initialResponse.indexOf("{");
+          const lastBrace = initialResponse.lastIndexOf("}");
 
-          const summaryPrompt = summarizeSQLResults(
-            dynamicLanguagePrompt,
-            JSON.stringify(dataset),
-            systemDate,
-            "Match User's Language (English Default, Urdu if requested)",
-          );
+          if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            const pureJson = initialResponse.substring(firstBrace, lastBrace + 1);
+            intentObject = JSON.parse(pureJson);
+          } else {
+            intentObject = { type: "answer", text: initialResponse };
+          }
+        } catch (e) {
+          intentObject = {
+            type: "answer",
+            text: initialResponse.replace(/```json|```/g, "").trim(),
+          };
+        }
 
-          ultimateAiResponseText = await askDeepSeek(summaryPrompt);
-        } catch (dbError) {
-          ultimateAiResponseText =
-            "⚠️ I encountered an error querying the database. Please refine your query criteria.";
+        if (intentObject.type === "sql" && intentObject.sql) {
+          setLoadingMessage("Querying database...");
+          try {
+            const dataset = db.getAllSync(intentObject.sql);
+            setLoadingMessage("Synthesizing findings...");
+
+            const summaryPrompt = summarizeSQLResults(
+              dynamicLanguagePrompt,
+              JSON.stringify(dataset),
+              systemDate,
+              "Match User's Language (English Default, Urdu if requested)",
+            );
+
+            ultimateAiResponseText = await askDeepSeek(summaryPrompt);
+          } catch (dbError) {
+            ultimateAiResponseText =
+              "⚠️ I encountered an error querying the database. Please refine your query criteria.";
+          }
+        } else {
+          ultimateAiResponseText = intentObject.text || initialResponse;
         }
       } else {
-        ultimateAiResponseText = intentObject.text || initialResponse;
+        // Not an Office Question -> Route directly to DeepSeek via buildGeneralPrompt
+        setLoadingMessage("Thinking...");
+        const generalPrompt = buildGeneralPrompt(dynamicLanguagePrompt);
+        ultimateAiResponseText = await askDeepSeek(generalPrompt);
       }
 
       const aiMessage = {

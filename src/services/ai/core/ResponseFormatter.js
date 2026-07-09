@@ -47,13 +47,19 @@ export class ResponseFormatter {
 
     /**
      * Safely formats an error message.
+     * @param {import('./models/AIError').AIError|Error} error
      */
     static formatError(error) {
+        // If it's a standardized AIError, use its user-friendly message
+        const userFacingMessage = error.userMessage
+            || `I encountered an error processing your request. Please try again later.`;
+
         return {
             // We never expose raw stack traces to the UI
-            userFacing: `I encountered an error processing your request: ${error.message || 'Unknown error'}. Please try again later.`,
+            userFacing: userFacingMessage,
             metadata: {
                 error: true,
+                errorCode: error.code || 'UNKNOWN_ERROR',
                 generatedAt: new Date().toISOString()
             }
         };

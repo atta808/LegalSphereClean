@@ -10,6 +10,12 @@ import { AIConfig } from '../../../config/AIConfig';
  * DeepSeek AI Provider
  */
 export class DeepSeekProvider {
+    static METADATA = {
+        name: 'DeepSeek',
+        version: '1.0',
+        capabilities: ['Chat', 'Summarization']
+    };
+
     /**
      * Executes a prompt against the DeepSeek API with retry and timeout support.
      *

@@ -10,6 +10,12 @@ import { AIConfig } from '../../../config/AIConfig';
  * Google Cloud Vision API Provider
  */
 export class GoogleVisionProvider {
+    static METADATA = {
+        name: 'GoogleVision',
+        version: '1.0',
+        capabilities: ['OCR', 'Vision']
+    };
+
     /**
      * Executes an OCR request against the Google Vision API for an image with retry and timeout.
      *

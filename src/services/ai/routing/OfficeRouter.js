@@ -6,8 +6,10 @@
 import { ContextManager } from '../core/ContextManager';
 import { PromptManager } from '../core/PromptManager';
 import { ProviderRegistry } from '../core/ProviderRegistry';
+import { AIEvents } from '../core/AIEvents';
 import { DocumentReader } from '../document/DocumentReader';
 import { IntentDetector } from './IntentDetector';
+import { AIError } from '../core/models/AIError';
 
 /**
  * Router for Lex AI (Universal Assistant)
@@ -15,30 +17,49 @@ import { IntentDetector } from './IntentDetector';
 export class OfficeRouter {
     /**
      * Executes the Lex AI pipeline.
+     * @param {import('../core/models/Requests').LexAIRequest} request
      */
-    static async route(query, fileParams = null) {
-        // 1. Detect Intent
-        const intent = IntentDetector.detect(query);
+    static async route(request) {
+        try {
+            AIEvents.emitRequestStarted('LexAI');
+            const { query, fileParams } = request;
 
-        // 2. Get Context
-        // For simple greetings or general conversational queries without attachments,
-        // we could potentially skip fetching heavy context. For now, we fetch it.
-        const context = await ContextManager.getOfficeContext();
+            // 1. Detect Intent
+            const intent = IntentDetector.detect(query);
 
-        // 3. Handle Attachments
-        let ocrText = '';
-        if (fileParams) {
-             const docResult = await DocumentReader.read(fileParams);
-             if (docResult) ocrText = docResult.text;
+            // 2. Get Context
+            const context = await ContextManager.getOfficeContext();
+
+            // 3. Handle Attachments
+            let ocrText = '';
+            if (fileParams) {
+                 const docResult = await DocumentReader.read(fileParams);
+                 if (docResult) ocrText = docResult.text;
+            }
+
+            // 4. Build Prompt
+            const prompt = PromptManager.buildLexAI(query, context, ocrText);
+
+            // 5. Execute LLM via Registry
+            const llm = ProviderRegistry.getLLMProvider();
+            AIEvents.emitAIRequestStarted();
+
+            const response = await llm.execute(prompt);
+
+            ProviderRegistry.reportSuccess(llm);
+            AIEvents.emitAIRequestCompleted();
+
+            return response;
+        } catch (error) {
+            const llm = ProviderRegistry.getLLMProvider();
+            ProviderRegistry.reportFailure(llm);
+
+            throw new AIError({
+                code: 'LEX_AI_ROUTER_ERROR',
+                userMessage: 'Lex AI encountered an unexpected issue processing your request.',
+                technicalMessage: error.message,
+                source: 'OfficeRouter'
+            });
         }
-
-        // 4. Build Prompt
-        // Note: We can pass the intent down if we want different prompt builders
-        // based on the intent in the future.
-        const prompt = PromptManager.buildLexAI(query, context, ocrText);
-
-        // 5. Execute LLM via Registry
-        const llm = ProviderRegistry.getLLMProvider();
-        return await llm.execute(prompt);
     }
 }

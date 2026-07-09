@@ -12,15 +12,15 @@ import { DocumentRouter } from '../routing/DocumentRouter';
  * Global AI Router Facade
  */
 export class AIRouter {
-    static async routeLexAI(query, fileParams) {
-        return await OfficeRouter.route(query, fileParams);
+    static async routeLexAI(request) {
+        return await OfficeRouter.route(request);
     }
 
-    static async routeCaseAI(caseId, query, fileParams) {
-        return await CaseRouter.route(caseId, query, fileParams);
+    static async routeCaseAI(request) {
+        return await CaseRouter.route(request);
     }
 
-    static async routeDocumentVault(fileParams) {
-        return await DocumentRouter.route(fileParams);
+    static async routeDocumentVault(request) {
+        return await DocumentRouter.route(request);
     }
 }

@@ -10,6 +10,12 @@ import { AIConfig } from '../../../config/AIConfig';
  * OCR.Space API Provider
  */
 export class OCRSpaceProvider {
+    static METADATA = {
+        name: 'OCRSpace',
+        version: '1.0',
+        capabilities: ['OCR']
+    };
+
     /**
      * Executes an OCR request against the OCR.Space API with retry and timeout support.
      * Uses FormData to support file URIs without loading into memory (important for RN/Expo).

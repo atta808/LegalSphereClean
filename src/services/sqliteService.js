@@ -746,21 +746,6 @@ export const getAllClients = () =>
     "SELECT * FROM clients WHERE isArchived=0 AND isDeleted=0 ORDER BY id DESC LIMIT 100",
   );
 
-export const updateClient = (id, data) => {
-  db.runSync(
-    `UPDATE clients SET name=?, mobile=?, email=?, address=? WHERE id=?`,
-    [data.name, data.mobile, data.email, data.address, id],
-  );
-};
-
-export const deleteClient = (id) => {
-  const now = Date.now();
-
-  db.runSync(
-    "UPDATE clients SET isDeleted=1, syncStatus='pending', updatedAt=? WHERE id=?",
-    [now, id],
-  );
-};
 
 // =============================
 // 🗂 CLIENT ARCHIVE SYSTEM
@@ -774,11 +759,6 @@ export const restoreClient = (id) =>
 
 export const deleteClientPermanently = (id) =>
   db.runSync("DELETE FROM clients WHERE id=?", [id]);
-
-export const getActiveClients = () =>
-  db.getAllSync(
-    "SELECT * FROM clients WHERE isArchived=0 AND isDeleted=0 ORDER BY id DESC LIMIT 100",
-  );
 
 export const getArchivedClients = () =>
   db.getAllSync("SELECT * FROM clients WHERE isArchived=1 ORDER BY id DESC");
@@ -979,82 +959,6 @@ export const getAllCases = (limit = 100) =>
     "SELECT * FROM cases WHERE isDeleted=0 ORDER BY id DESC LIMIT ?",
     [limit],
   );
-export const searchCases = ({
-  search = "",
-  domain = "all",
-  workflow = "all",
-  courtGroup = "all",
-  statusType = "all",
-}) => {
-  try {
-    let query = `
-      SELECT * FROM cases
-      WHERE isDeleted=0
-    `;
-
-    const params = [];
-
-    // 🔍 SEARCH
-    if (search.trim()) {
-      query += `
-        AND (
-          LOWER(title) LIKE ?
-          OR LOWER(court) LIKE ?
-          OR LOWER(caseNo) LIKE ?
-        )
-      `;
-
-      const term = `%${search.toLowerCase()}%`;
-
-      params.push(term, term, term);
-    }
-
-    // ⚖️ DOMAIN
-    if (domain !== "all") {
-      query += `
-        AND litigationDomain=?
-      `;
-      params.push(domain);
-    }
-
-    // 🔥 WORKFLOW
-    if (workflow !== "all") {
-      query += `
-        AND workflowType=?
-      `;
-      params.push(workflow);
-    }
-
-    // 🏛 COURT GROUP
-    if (courtGroup !== "all") {
-      query += `
-        AND courtGroup=?
-      `;
-      params.push(courtGroup);
-    }
-
-    // 📅 STATUS
-    if (statusType === "pipeline") {
-      query += `
-    AND status='pipeline'
-  `;
-    } else {
-      query += `
-    AND status='active'
-  `;
-    }
-
-    query += `
-      ORDER BY nextHearingISO ASC
-    `;
-
-    return db.getAllSync(query, params);
-  } catch (e) {
-    console.log("❌ searchCases error:", e);
-
-    return [];
-  }
-};
 export const getDashboardStats = () => {
   try {
     const activeCases =

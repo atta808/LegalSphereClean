@@ -19,10 +19,6 @@ export const loginUser = async (email, password) => {
   return res.user;
 };
 
-// 🚪 LOGOUT
-export const logoutUser = async () => {
-  await signOut(auth);
-};
 // 🔑 RESET PASSWORD
 export const resetPassword = async (email) => {
   await sendPasswordResetEmail(auth, email);

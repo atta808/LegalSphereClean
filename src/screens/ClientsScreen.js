@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -86,7 +87,7 @@ export default function ClientsScreen({ profile }) {
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
-            <Text style={styles.backIcon}>‹</Text>
+            <Ionicons name="chevron-back" size={24} color="#1A73E8" />
           </TouchableOpacity>
 
           {/* TITLE */}
@@ -104,7 +105,7 @@ export default function ClientsScreen({ profile }) {
               style={styles.archiveBtn}
               onPress={() => navigation.navigate("ClientArchive")}
             >
-              <Text style={styles.archiveBtnIcon}>🗂️</Text>
+              <Ionicons name="archive-outline" size={20} color="#1A73E8" />
             </TouchableOpacity>
 
             {/* ADD BUTTON */}
@@ -112,7 +113,7 @@ export default function ClientsScreen({ profile }) {
               style={styles.addBtn}
               onPress={() => navigation.navigate("AddClient")}
             >
-              <Text style={styles.addText}>＋</Text>
+              <Ionicons name="add" size={24} color="#FFF" />
             </TouchableOpacity>
           </View>
         </View>
@@ -133,11 +134,17 @@ export default function ClientsScreen({ profile }) {
         {loading ? (
           <ActivityIndicator
             size="large"
-            color="#1E3A8A"
+            color="#1A73E8"
             style={{ marginTop: 50 }}
           />
         ) : filteredClients.length === 0 ? (
           <View style={styles.center}>
+            <Ionicons
+              name="people-outline"
+              size={48}
+              color="#94A3B8"
+              style={{ marginBottom: 12 }}
+            />
             <Text style={styles.emptyTitle}>No Clients Found</Text>
           </View>
         ) : (
@@ -157,14 +164,37 @@ export default function ClientsScreen({ profile }) {
                 </View>
                 <View style={{ flex: 1 }}>
                   <View style={styles.nameRow}>
-                    <Text style={styles.name}>{item.name}</Text>
-                    <TouchableOpacity onPress={() => handleArchive(item)}>
-                      <Text style={styles.archiveIcon}>🗑️</Text>
+                    <Text style={styles.name} numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => handleArchive(item)}
+                      style={{ padding: 10, margin: -10 }}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={20}
+                        color="#EF4444"
+                      />
                     </TouchableOpacity>
                   </View>
-                  <Text style={styles.caseCountText}>
-                    {caseCounts[item.id] || 0} Active Matters
-                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 4,
+                    }}
+                  >
+                    <Ionicons
+                      name="briefcase-outline"
+                      size={12}
+                      color="#64748B"
+                      style={{ marginRight: 4 }}
+                    />
+                    <Text style={styles.caseCountText}>
+                      {caseCounts[item.id] || 0} Active Matters
+                    </Text>
+                  </View>
                 </View>
               </View>
 
@@ -175,7 +205,15 @@ export default function ClientsScreen({ profile }) {
                   style={styles.actionBtn}
                   onPress={() => Linking.openURL(`tel:${item.mobile}`)}
                 >
-                  <Text style={styles.actionBtnText}>📞 Call</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Ionicons
+                      name="call"
+                      size={16}
+                      color="#475569"
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text style={styles.actionBtnText}>Call</Text>
+                  </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -186,9 +224,17 @@ export default function ClientsScreen({ profile }) {
                     )
                   }
                 >
-                  <Text style={[styles.actionBtnText, { color: "#FFF" }]}>
-                    💬 WhatsApp
-                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Ionicons
+                      name="logo-whatsapp"
+                      size={16}
+                      color="#FFF"
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text style={[styles.actionBtnText, { color: "#FFF" }]}>
+                      WhatsApp
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
@@ -207,10 +253,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    shadowColor: "#1E3A8A",
-    shadowOpacity: 0.08,
+    shadowColor: "#1A73E8",
+    shadowOpacity: 0.03,
     shadowRadius: 15,
-    elevation: 8,
+    elevation: 2,
   },
   headerRow: {
     flexDirection: "row",
@@ -231,14 +277,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   backIcon: {
-    color: "#1E3A8A",
+    color: "#1A73E8",
     fontSize: 28,
     fontWeight: "300",
     marginTop: -4,
   },
 
   titleContainer: { flex: 1, alignItems: "center" },
-  title: { fontSize: 20, fontWeight: "900", color: "#1E3A8A" },
+  title: { fontSize: 20, fontWeight: "700", color: "#1A73E8" },
   subTitle: {
     fontSize: 10,
     color: "#94A3B8",
@@ -251,7 +297,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: "#1A73E8",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -260,11 +306,11 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 20, paddingBottom: 100 },
   card: {
     backgroundColor: "#FFF",
-    borderRadius: 24,
+    borderRadius: 16,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: "#E2E8F0",
     shadowColor: "#000",
     shadowOpacity: 0.02,
     shadowRadius: 10,
@@ -274,31 +320,30 @@ const styles = StyleSheet.create({
     width: 55,
     height: 55,
     borderRadius: 18,
-    backgroundColor: "#E0E7FF",
+    backgroundColor: "rgba(26, 115, 232, 0.1)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 15,
   },
-  avatarText: { fontWeight: "900", color: "#1E3A8A", fontSize: 20 },
+  avatarText: { fontWeight: "700", color: "#1A73E8", fontSize: 20 },
   nameRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  name: { fontWeight: "900", fontSize: 17, color: "#1E293B" },
+  name: { fontWeight: "700", fontSize: 17, color: "#0F172A" },
   archiveIcon: { fontSize: 16, opacity: 0.5 },
   caseCountText: {
     color: "#64748B",
-    fontSize: 12,
-    fontWeight: "600",
-    marginTop: 2,
+    fontSize: 13,
+    fontWeight: "500",
   },
 
   cardDivider: { height: 1, backgroundColor: "#F8FAFC", marginVertical: 15 },
   actions: { flexDirection: "row", gap: 12 },
   actionBtn: {
     flex: 1,
-    height: 45,
+    height: 48,
     borderRadius: 12,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
@@ -306,11 +351,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
-  waBtn: { backgroundColor: "#10B981", borderColor: "#10B981" },
-  actionBtnText: { fontSize: 13, fontWeight: "800", color: "#475569" },
+  waBtn: { backgroundColor: "#25D366", borderColor: "#25D366" },
+  actionBtnText: { fontSize: 13, fontWeight: "600", color: "#475569" },
 
   center: { alignItems: "center", marginTop: 100 },
-  emptyTitle: { fontWeight: "800", color: "#94A3B8" },
+  emptyTitle: { fontWeight: "600", color: "#94A3B8" },
   archiveBtn: {
     width: 44,
     height: 44,
@@ -322,7 +367,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E2E8F0",
 
-    shadowColor: "#1E3A8A",
+    shadowColor: "#1A73E8",
     shadowOpacity: 0.15,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },

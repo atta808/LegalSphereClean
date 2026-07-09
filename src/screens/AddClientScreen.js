@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { countries } from "../constants/countries";
 import { phoneCodeMap } from "../constants/phoneCodeMap";
@@ -170,7 +171,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
           }}
           style={styles.backBtn}
         >
-          <Text style={styles.backText}>‹</Text>
+          <Ionicons name="chevron-back" size={24} color="#1A73E8" />
         </TouchableOpacity>
 
         <View style={{ flex: 1, alignItems: "center" }}>
@@ -182,94 +183,136 @@ export default function AddClientScreen({ onBack, onSaved }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* NAME */}
-        <View style={styles.inputGroup}>
+        <View style={styles.card}>
           <View style={styles.labelRow}>
-            <Text style={styles.label}>Client Name</Text>
-
-            <TouchableOpacity onPress={handlePickContact} activeOpacity={0.7}>
-              <Text style={styles.contactImportText}>Import from Contacts</Text>
-            </TouchableOpacity>
-          </View>
-          <LegalInput
-            label="Client Name"
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter full name"
-          />
-        </View>
-
-        {/* COUNTRY */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Country</Text>
-
-          <TouchableOpacity
-            style={[styles.input, !isReady && { opacity: 0.5 }]}
-            activeOpacity={0.85}
-            disabled={!isReady}
-            onPress={() => setCountryPickerVisible(true)}
-          >
-            <Text
+            <Text style={styles.sectionTitle}>Personal Information</Text>
+            <TouchableOpacity
+              onPress={handlePickContact}
+              activeOpacity={0.7}
               style={{
-                color: country ? "#0F172A" : "#64748B",
-                fontSize: 15,
+                flexDirection: "row",
+                alignItems: "center",
+                padding: 8,
+                margin: -8,
               }}
             >
-              {countries.find((c) => c.code === country)?.name ||
-                "Select Country"}
+              <Ionicons
+                name="person-add"
+                size={14}
+                color="#1A73E8"
+                style={{ marginRight: 4 }}
+              />
+              <Text style={styles.contactImportText}>Import</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputGroup}>
+            <LegalInput
+              label="Client Name *"
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter full name"
+            />
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Contact Information</Text>
+
+          {/* COUNTRY */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Country</Text>
+            <TouchableOpacity
+              style={[styles.input, !isReady && { opacity: 0.5 }]}
+              activeOpacity={0.85}
+              disabled={!isReady}
+              onPress={() => setCountryPickerVisible(true)}
+            >
+              <Text
+                style={{ color: country ? "#0F172A" : "#64748B", fontSize: 15 }}
+              >
+                {countries.find((c) => c.code === country)?.name ||
+                  "Select Country"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* MOBILE */}
+          <View style={styles.inputGroup}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-end",
+                marginBottom: 8,
+              }}
+            >
+              <Text style={[styles.label, { marginBottom: 0 }]}>
+                Mobile Number *{" "}
+              </Text>
+              <Text style={styles.codeText}>
+                ({phoneCodeMap[country] || "+1"})
+              </Text>
+            </View>
+            <LegalInput
+              label="Mobile Number"
+              value={mobile}
+              placeholder="Enter mobile number"
+              keyboardType="phone-pad"
+              onChangeText={(text) => {
+                let clean = text.replace(/[^\d]/g, "");
+                if (clean.length > 15) return;
+                setMobile(clean);
+              }}
+            />
+            <Text
+              style={{
+                fontSize: 12,
+                color: "#64748B",
+                marginTop: 6,
+                fontStyle: "italic",
+              }}
+            >
+              Used for WhatsApp & Call. Country code added automatically.
             </Text>
-          </TouchableOpacity>
+          </View>
+
+          {/* EMAIL */}
+          <View style={styles.inputGroup}>
+            <LegalInput
+              label="Email (Optional)"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="example@email.com"
+              keyboardType="email-address"
+            />
+          </View>
         </View>
 
-        {/* MOBILE */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>
-            Mobile Number *{"\n"}(Used for WhatsApp & Call)
-          </Text>
-
-          {/* Show country code */}
-          <Text style={styles.codeText}>{phoneCodeMap[country] || "+1"}</Text>
-
-          <LegalInput
-            label="Mobile Number"
-            value={mobile}
-            placeholder="Enter mobile number"
-            keyboardType="phone-pad"
-            onChangeText={(text) => {
-              let clean = text.replace(/[^\d]/g, "");
-
-              if (clean.length > 15) return;
-
-              setMobile(clean);
-            }}
-          />
-        </View>
-        <Text style={{ fontSize: 13, color: "#ab130e", marginTop: 4 }}>
-          Country code is added automatically
-        </Text>
-        {/* EMAIL */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email (Optional)</Text>
-          <LegalInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="example@email.com"
-            keyboardType="email-address"
-          />
-        </View>
-
-        {/* WHATSAPP */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.waBtn} onPress={handleWhatsApp}>
-            <Text style={styles.waText}>💬 WhatsApp Ready</Text>
-          </TouchableOpacity>
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Communication</Text>
+          <View style={styles.quickActions}>
+            <TouchableOpacity style={styles.waBtn} onPress={handleWhatsApp}>
+              <Ionicons
+                name="logo-whatsapp"
+                size={18}
+                color="#FFF"
+                style={{ marginRight: 8 }}
+              />
+              <Text style={styles.waText}>WhatsApp Ready</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* SAVE */}
         <TouchableOpacity style={styles.saveBtn} onPress={handleSaveOnly}>
+          <Ionicons
+            name="save"
+            size={18}
+            color="#FFF"
+            style={{ marginRight: 8 }}
+          />
           <Text style={styles.saveText}>Save Client</Text>
         </TouchableOpacity>
+
         <LegalPicker
           visible={countryPickerVisible}
           title="Select Country"
@@ -305,8 +348,8 @@ const styles = StyleSheet.create({
   },
 
   backBtn: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
@@ -315,23 +358,38 @@ const styles = StyleSheet.create({
 
   backText: {
     fontSize: 26,
-    color: "#1E3A8A",
+    color: "#1A73E8",
   },
 
   title: {
     fontSize: 18,
-    fontWeight: "800",
-    color: "#1E3A8A",
+    fontWeight: "700",
+    color: "#1A73E8",
   },
 
   subtitle: {
     fontSize: 10,
     color: "#64748B",
     marginTop: 2,
+    fontWeight: "500",
   },
 
   container: {
     padding: 20,
+  },
+  card: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 16,
   },
 
   inputGroup: {
@@ -346,8 +404,8 @@ const styles = StyleSheet.create({
 
   contactImportText: {
     fontSize: 11,
-    fontWeight: "800",
-    color: "#1E3A8A",
+    fontWeight: "700",
+    color: "#1A73E8",
   },
   label: {
     fontSize: 12,
@@ -357,19 +415,21 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 48,
     fontSize: 15,
     borderWidth: 1,
     borderColor: "#E2E8F0",
+    justifyContent: "center",
   },
 
   codeText: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginBottom: 5,
-    color: "#1E3A8A",
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#1A73E8",
   },
 
   quickActions: {
@@ -378,10 +438,13 @@ const styles = StyleSheet.create({
   },
 
   waBtn: {
-    backgroundColor: "#10B981",
-    padding: 12,
+    backgroundColor: "#25D366",
+    paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    minHeight: 48,
   },
 
   waText: {
@@ -390,15 +453,23 @@ const styles = StyleSheet.create({
   },
 
   saveBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: "#1A73E8",
     paddingVertical: 18,
-    borderRadius: 20,
+    borderRadius: 16,
     alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    shadowColor: "#1A73E8",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    marginBottom: 40,
   },
 
   saveText: {
     color: "#FFF",
-    fontWeight: "900",
-    fontSize: 14,
+    fontWeight: "700",
+    fontSize: 16,
   },
 });

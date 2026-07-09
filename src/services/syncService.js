@@ -68,7 +68,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM cases WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 CASES TO SYNC:", cases);
+    if (__DEV__) {
+      console.log("📦 CASES TO SYNC:", cases);
+    }
 
     for (let item of cases) {
       try {
@@ -121,7 +123,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ Case sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ Case sync failed:", e);
+        }
 
         db.runSync("UPDATE cases SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -136,7 +140,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM clients WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 CLIENTS TO SYNC:", clients);
+    if (__DEV__) {
+      console.log("📦 CLIENTS TO SYNC:", clients);
+    }
 
     for (let item of clients) {
       try {
@@ -199,7 +205,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ client sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ client sync failed:", e);
+        }
 
         db.runSync("UPDATE clients SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -214,7 +222,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM hearings WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 HEARINGS TO SYNC:", hearings);
+    if (__DEV__) {
+      console.log("📦 HEARINGS TO SYNC:", hearings);
+    }
 
     for (let item of hearings) {
       try {
@@ -296,7 +306,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ hearing sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ hearing sync failed:", e);
+        }
 
         db.runSync("UPDATE hearings SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -311,7 +323,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM processFees WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 PROCESS FEES TO SYNC:", fees);
+    if (__DEV__) {
+      console.log("📦 PROCESS FEES TO SYNC:", fees);
+    }
 
     for (let item of fees) {
       try {
@@ -364,7 +378,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ process fee sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ process fee sync failed:", e);
+        }
 
         db.runSync("UPDATE processFees SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -379,7 +395,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM citations WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 CITATIONS TO SYNC:", citations);
+    if (__DEV__) {
+      console.log("📦 CITATIONS TO SYNC:", citations);
+    }
 
     for (let item of citations) {
       try {
@@ -432,7 +450,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ citation sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ citation sync failed:", e);
+        }
 
         db.runSync("UPDATE citations SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -447,7 +467,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM quick_links WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 QUICK LINKS TO SYNC:", links);
+    if (__DEV__) {
+      console.log("📦 QUICK LINKS TO SYNC:", links);
+    }
 
     for (let item of links) {
       try {
@@ -500,7 +522,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ quick link sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ quick link sync failed:", e);
+        }
 
         db.runSync("UPDATE quick_links SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -515,7 +539,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM case_notes WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 NOTES TO SYNC:", notes);
+    if (__DEV__) {
+      console.log("📦 NOTES TO SYNC:", notes);
+    }
 
     for (let item of notes) {
       try {
@@ -592,9 +618,13 @@ export const syncPendingData = async () => {
           [item.id],
         );
 
-        console.log("AFTER UPDATE:", check);
+        if (__DEV__) {
+          console.log("AFTER UPDATE:", check);
+        }
       } catch (e) {
-        console.log("❌ note sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ note sync failed:", e);
+        }
 
         db.runSync("UPDATE case_notes SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -608,7 +638,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM master_items WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 MASTER ITEMS TO SYNC:", masterItems);
+    if (__DEV__) {
+      console.log("📦 MASTER ITEMS TO SYNC:", masterItems);
+    }
 
     for (let item of masterItems) {
       try {
@@ -661,7 +693,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ master item sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ master item sync failed:", e);
+        }
 
         db.runSync("UPDATE master_items SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -675,7 +709,9 @@ export const syncPendingData = async () => {
       "SELECT * FROM timeline WHERE syncStatus IN ('pending','failed')",
     );
 
-    console.log("📦 TIMELINE TO SYNC:", timeline);
+    if (__DEV__) {
+      console.log("📦 TIMELINE TO SYNC:", timeline);
+    }
 
     for (let item of timeline) {
       try {
@@ -728,7 +764,9 @@ export const syncPendingData = async () => {
           item.id,
         ]);
       } catch (e) {
-        console.log("❌ timeline sync failed:", e);
+        if (__DEV__) {
+          console.log("❌ timeline sync failed:", e);
+        }
 
         db.runSync("UPDATE timeline SET syncStatus='failed' WHERE id=?", [
           item.id,
@@ -757,7 +795,9 @@ export const syncPendingData = async () => {
     }
   } catch (error) {
     setSyncStatus("error");
-    console.log("❌ Sync error:", error);
+    if (__DEV__) {
+      console.log("❌ Sync error:", error);
+    }
   } finally {
     // 🔥 RESET LOCK
     isSyncing = false;

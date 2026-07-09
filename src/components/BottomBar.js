@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { useTheme } from "../contexts/ThemeContext";
 import {
   Animated,
   StyleSheet,
@@ -9,6 +10,7 @@ import {
 } from "react-native";
 
 export default function BottomBar({ currentScreen, setCurrentScreen }) {
+  const { resolvedTheme: theme } = useTheme();
   // ✨ FIX: Explicitly setting the exact active and inactive icon names
   const tabs = [
     {
@@ -60,7 +62,16 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
   };
 
   return (
-    <View style={styles.dockContainer}>
+    <View
+      style={[
+        styles.dockContainer,
+        {
+          backgroundColor: theme.surface,
+          borderColor: theme.border,
+          borderWidth: 1,
+        },
+      ]}
+    >
       {tabs.map((tab) => {
         if (tab.screen === "addCase") {
           return (
@@ -73,7 +84,10 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
               <Animated.View
                 style={[
                   styles.actionButton,
-                  { transform: [{ scale: scaleAnim }] },
+                  {
+                    transform: [{ scale: scaleAnim }],
+                    backgroundColor: theme.primary,
+                  },
                 ]}
               >
                 <Ionicons name="add" size={28} color="#FFFFFF" />
@@ -91,14 +105,24 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
             onPress={() => setCurrentScreen(tab.screen)}
             activeOpacity={0.7}
           >
-            <View style={[styles.iconBox, active && styles.activeIconBox]}>
+            <View
+              style={[
+                styles.iconBox,
+                active && styles.activeIconBox,
+                active && { backgroundColor: theme.softPrimary },
+              ]}
+            >
               <Ionicons
                 // ✨ FIX: Now it cleanly switches between the exact names we defined
                 name={active ? tab.activeIcon : tab.inactiveIcon}
                 size={22}
-                color={active ? "#0F172A" : "#94A3B8"}
+                color={active ? theme.primary : theme.icon}
               />
-              {active && <Text style={styles.activeLabel}>{tab.label}</Text>}
+              {active && (
+                <Text style={[styles.activeLabel, { color: theme.primary }]}>
+                  {tab.label}
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         );

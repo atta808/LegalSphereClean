@@ -1,4 +1,5 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useTheme } from "../contexts/ThemeContext";
 import {
   useFocusEffect,
   useNavigation,
@@ -44,6 +45,7 @@ import {
 } from "../services/sqliteService";
 
 export default function UpdateCaseHearingScreen({ profile }) {
+  const { resolvedTheme: theme } = useTheme();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const locale = currentProfile?.locale || "en-PK";
   const navigation = useNavigation();
@@ -316,7 +318,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
   };
 
   return (
-    <View style={styles.mainWrapper}>
+    <View style={[styles.mainWrapper, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
@@ -358,10 +360,17 @@ export default function UpdateCaseHearingScreen({ profile }) {
         {/* OUTCOME SELECTION */}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Matter Outcome</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Matter Outcome
+          </Text>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.statusRow}>
             <TouchableOpacity
               style={[
@@ -400,10 +409,17 @@ export default function UpdateCaseHearingScreen({ profile }) {
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>CMS Workspace</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            CMS Workspace
+          </Text>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <TouchableOpacity
             style={styles.pickerContainer}
             activeOpacity={0.85}
@@ -443,10 +459,17 @@ export default function UpdateCaseHearingScreen({ profile }) {
         {/* DATE SECTION */}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Scheduling</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Scheduling
+          </Text>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <Text style={styles.fieldLabel}>
             {caseStatus === "disposed"
               ? "Effective Disposal Date"
@@ -484,10 +507,17 @@ export default function UpdateCaseHearingScreen({ profile }) {
         {/* PROCEEDINGS DETAIL */}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Bench & Stage</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Bench & Stage
+          </Text>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Hearing Stage</Text>
 
@@ -601,10 +631,17 @@ export default function UpdateCaseHearingScreen({ profile }) {
         {/* RESULTS / NOTES */}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Proceedings Record</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Proceedings Record
+          </Text>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <TextInput
             style={styles.premiumMultiline}
             placeholder="Record specific court directions or orders passed today..."

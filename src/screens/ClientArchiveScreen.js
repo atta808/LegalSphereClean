@@ -1,4 +1,5 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useTheme } from "../contexts/ThemeContext";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -17,6 +18,7 @@ import {
 } from "../services/sqliteService";
 
 export default function ClientArchiveScreen() {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [clients, setClients] = useState([]);
   const navigation = useNavigation();
@@ -32,7 +34,7 @@ export default function ClientArchiveScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* 🔹 HEADER */}
@@ -46,7 +48,9 @@ export default function ClientArchiveScreen() {
           </TouchableOpacity>
 
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={styles.title}>Archived Clients</Text>
+            <Text style={[styles.title, { color: theme.text }]}>
+              Archived Clients
+            </Text>
             <Text style={styles.subTitle}>Restore deleted clients</Text>
           </View>
 
@@ -69,7 +73,13 @@ export default function ClientArchiveScreen() {
           </View>
         ) : (
           clients.map((item) => (
-            <View key={item.id} style={styles.card}>
+            <View
+              key={item.id}
+              style={[
+                styles.card,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
               <View style={styles.cardHeader}>
                 <View style={styles.avatar}>
                   <Text style={styles.avatarText}>

@@ -1,3 +1,4 @@
+import { useTheme } from "../contexts/ThemeContext";
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import {
   View,
@@ -18,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { askDeepSeek } from "../services/deepseekService";
 import { normalizeCourtJudgeFields } from "../utils/courtJudgeParser";
 export default function LegalBrowserScreen({ route, navigation }) {
+  const { resolvedTheme: theme } = useTheme();
   const { url, title, caseId, aiMode } = route.params;
   console.log("AI MODE =", aiMode);
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
     });
   };
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       {/* PREMIUM HEADER */}
@@ -111,7 +113,10 @@ export default function LegalBrowserScreen({ route, navigation }) {
           </TouchableOpacity>
 
           <View style={styles.titleContainer}>
-            <Text numberOfLines={1} style={styles.title}>
+            <Text
+              numberOfLines={1}
+              style={[styles.title, { color: theme.text }]}
+            >
               {title || "Legal Workflow"}
             </Text>
             <Text numberOfLines={1} style={styles.url}>
@@ -368,7 +373,11 @@ ${payload.text}
 
                 const cmsData = JSON.parse(cmsCleaned);
 
-                if (!cmsData || typeof cmsData !== "object" || Array.isArray(cmsData)) {
+                if (
+                  !cmsData ||
+                  typeof cmsData !== "object" ||
+                  Array.isArray(cmsData)
+                ) {
                   throw new Error("CMS AI returned invalid JSON object.");
                 }
 
@@ -442,7 +451,9 @@ ${payload.text}
                   typeof hearingData !== "object" ||
                   Array.isArray(hearingData)
                 ) {
-                  throw new Error("CMS hearing AI returned invalid JSON object.");
+                  throw new Error(
+                    "CMS hearing AI returned invalid JSON object.",
+                  );
                 }
 
                 const normalizedHearingData = normalizeCourtJudgeFields(

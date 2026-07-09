@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { useTheme } from "../contexts/ThemeContext";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useEffect, useState } from "react";
@@ -28,6 +29,7 @@ import {
 } from "../services/sqliteService";
 
 export default function NotesScreen({ caseId, onBack }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
 
   const [note, setNote] = useState("");
@@ -128,7 +130,7 @@ export default function NotesScreen({ caseId, onBack }) {
   };
 
   return (
-    <View style={styles.mainWrapper}>
+    <View style={[styles.mainWrapper, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" translucent />
 
       {/* HEADER */}
@@ -157,7 +159,7 @@ export default function NotesScreen({ caseId, onBack }) {
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <ScrollView
-          style={styles.container}
+          style={[styles.container, { backgroundColor: theme.background }]}
           contentContainerStyle={{
             paddingBottom: 180,
             paddingTop: 20,

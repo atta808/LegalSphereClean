@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { useTheme } from "../contexts/ThemeContext";
 import LegalPicker from "../components/LegalPicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
@@ -21,6 +22,7 @@ import { getProfile, insertClient } from "../services/sqliteService";
 import { getWhatsAppLink } from "../utils/phone";
 
 export default function AddClientScreen({ onBack, onSaved }) {
+  const { resolvedTheme: theme } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -156,7 +158,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" translucent />
 
       {/* HEADER */}
@@ -175,7 +177,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         </TouchableOpacity>
 
         <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={styles.title}>Add Client</Text>
+          <Text style={[styles.title, { color: theme.text }]}>Add Client</Text>
           <Text style={styles.subtitle}>Client Registration</Text>
         </View>
 
@@ -183,9 +185,16 @@ export default function AddClientScreen({ onBack, onSaved }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.labelRow}>
-            <Text style={styles.sectionTitle}>Personal Information</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Personal Information
+            </Text>
             <TouchableOpacity
               onPress={handlePickContact}
               activeOpacity={0.7}
@@ -215,8 +224,15 @@ export default function AddClientScreen({ onBack, onSaved }) {
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Contact Information</Text>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Contact Information
+          </Text>
 
           {/* COUNTRY */}
           <View style={styles.inputGroup}>
@@ -287,8 +303,15 @@ export default function AddClientScreen({ onBack, onSaved }) {
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Communication</Text>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Communication
+          </Text>
           <View style={styles.quickActions}>
             <TouchableOpacity style={styles.waBtn} onPress={handleWhatsApp}>
               <Ionicons

@@ -1,4 +1,5 @@
 import {
+import { useTheme } from "../contexts/ThemeContext";
   useFocusEffect,
   useNavigation,
   useRoute,
@@ -22,6 +23,7 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 
 export default function ClientProfileScreen({ profile, onBack }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const route = useRoute();
@@ -76,7 +78,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
   }
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" translucent />
 
       {/* PREMIUM HEADER */}
@@ -168,7 +170,9 @@ export default function ClientProfileScreen({ profile, onBack }) {
         </View>
 
         {/* CASE LIST */}
-        <Text style={styles.sectionTitle}>Matter History</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>
+          Matter History
+        </Text>
 
         {loading ? (
           <ActivityIndicator size="large" color="#1A73E8" />

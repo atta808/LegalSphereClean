@@ -1,4 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useTheme } from "../contexts/ThemeContext";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -35,6 +36,7 @@ const TYPES = [
 ];
 
 export default function MasterListScreen({ onBack }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const [selectedType, setSelectedType] = useState("court");
@@ -204,7 +206,7 @@ export default function MasterListScreen({ onBack }) {
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
@@ -263,7 +265,9 @@ export default function MasterListScreen({ onBack }) {
         ]}
       >
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{selectedType} Registry</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            {selectedType} Registry
+          </Text>
           <TouchableOpacity style={styles.addBtn} onPress={openAddModal}>
             <Text style={styles.addBtnText}>+ Add New</Text>
           </TouchableOpacity>

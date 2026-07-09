@@ -1,5 +1,6 @@
 // screens/DocumentVaultScreen.js
 import { extractDocumentText } from "../services/ai/documentReaders";
+import { useTheme } from "../contexts/ThemeContext";
 import { askLegalSphereAI } from "../services/ai/legalSphereAI";
 import {
   useFocusEffect,
@@ -75,6 +76,7 @@ const getFileTypeLabel = (filename) => {
 };
 
 export default function DocumentVaultScreen() {
+  const { resolvedTheme: theme } = useTheme();
   const route = useRoute();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -469,7 +471,7 @@ Case: ${doc.caseTitle || "—"}
   }
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"

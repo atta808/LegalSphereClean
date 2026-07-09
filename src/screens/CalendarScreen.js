@@ -1,4 +1,5 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useTheme } from "../contexts/ThemeContext";
 import { useCallback, useState } from "react";
 import {
   ScrollView,
@@ -15,6 +16,7 @@ import { getAllCases, getProfile } from "../services/sqliteService";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { toYMD } from "../utils/date";
 export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
+  const { resolvedTheme: theme } = useTheme();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const currency = getCurrency(currentProfile);
   const locale = currentProfile?.locale || "en-PK";
@@ -72,7 +74,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
   });
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* PREMIUM HEADER */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <TouchableOpacity
@@ -88,7 +90,9 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
           <Ionicons name="chevron-back" size={24} color="#1A73E8" />
         </TouchableOpacity>
         <View style={{ alignItems: "center" }}>
-          <Text style={styles.title}>Chamber Calendar</Text>
+          <Text style={[styles.title, { color: theme.text }]}>
+            Chamber Calendar
+          </Text>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>OFFICIAL DIARY</Text>
           </View>
@@ -143,7 +147,10 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
             agendaList.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                style={styles.card}
+                style={[
+                  styles.card,
+                  { backgroundColor: theme.card, borderColor: theme.border },
+                ]}
                 onPress={() =>
                   navigation.navigate("CaseDetail", { caseId: item.id })
                 }

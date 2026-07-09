@@ -1,3 +1,4 @@
+import { useTheme } from "../contexts/ThemeContext";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -11,6 +12,7 @@ import { getTimelineByCaseId } from "../services/sqliteService";
 import { toDisplay } from "../utils/date";
 
 export default function TimelineScreen({ route, navigation }) {
+  const { resolvedTheme: theme } = useTheme();
   const { caseId } = route.params;
   const insets = useSafeAreaInsets();
 
@@ -34,10 +36,13 @@ export default function TimelineScreen({ route, navigation }) {
       </View>
 
       {/* Content */}
-      <View style={styles.card}>
-        <Text style={styles.date}>
-          {toDisplay(item.hearingDate)}
-        </Text>
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
+        <Text style={styles.date}>{toDisplay(item.hearingDate)}</Text>
 
         <Text style={styles.label}>Stage</Text>
         <Text style={styles.value}>{item.stage || "-"}</Text>
@@ -60,14 +65,14 @@ export default function TimelineScreen({ route, navigation }) {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* HEADER */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.back}>‹</Text>
         </TouchableOpacity>
 
-        <Text style={styles.title}>Timeline</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Timeline</Text>
 
         <View style={{ width: 30 }} />
       </View>

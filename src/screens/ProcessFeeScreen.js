@@ -1,6 +1,7 @@
 import LegalInput from "../components/LegalInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import LegalPicker from "../components/LegalPicker";
+import { useTheme } from "../contexts/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -28,6 +29,7 @@ import { toDisplay } from "../utils/date";
 import { formatMoney, getCurrency } from "../utils/currency";
 
 export default function ProcessFeeScreen({ profile, onBack }) {
+  const { resolvedTheme: theme } = useTheme();
   const [caseName, setCaseName] = useState("");
   const [casePickerVisible, setCasePickerVisible] = useState(false);
   const [courtName, setCourtName] = useState("");
@@ -181,7 +183,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
   const total = fees.reduce((sum, i) => sum + Number(i.amount || 0), 0);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* LOADER */}
@@ -202,7 +204,9 @@ export default function ProcessFeeScreen({ profile, onBack }) {
           </TouchableOpacity>
 
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={styles.title}>Process Fee</Text>
+            <Text style={[styles.title, { color: theme.text }]}>
+              Process Fee
+            </Text>
             <Text style={styles.subTitle}>Manage Case Expenses</Text>
           </View>
 
@@ -293,7 +297,13 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         {/* LIST */}
         {fees?.length > 0 &&
           fees.map((item) => (
-            <View key={item.id} style={styles.card}>
+            <View
+              key={item.id}
+              style={[
+                styles.card,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
               <Text style={styles.amount}>
                 {formatMoney(item.amount, currency, locale)}
               </Text>

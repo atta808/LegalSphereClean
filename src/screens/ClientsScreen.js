@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { useTheme } from "../contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useMemo, useState } from "react";
@@ -21,6 +22,7 @@ import {
 } from "../services/sqliteService";
 
 export default function ClientsScreen({ profile }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [clients, setClients] = useState([]);
@@ -76,7 +78,7 @@ export default function ClientsScreen({ profile }) {
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" translucent />
 
       {/* PREMIUM HEADER WITH BACK BUTTON */}
@@ -92,7 +94,9 @@ export default function ClientsScreen({ profile }) {
 
           {/* TITLE */}
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Client Directory</Text>
+            <Text style={[styles.title, { color: theme.text }]}>
+              Client Directory
+            </Text>
             <Text style={styles.subTitle}>
               {clients.length} Total Verified Clients
             </Text>
@@ -151,7 +155,10 @@ export default function ClientsScreen({ profile }) {
           filteredClients.map((item) => (
             <TouchableOpacity
               key={item.id}
-              style={styles.card}
+              style={[
+                styles.card,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
               onPress={() =>
                 navigation.navigate("ClientProfile", { client: item })
               }

@@ -3,6 +3,7 @@ import LegalInput from "../components/LegalInput";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTheme } from "../contexts/ThemeContext";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -19,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getProfile, saveProfile } from "../services/sqliteService";
 
 export default function LawyerProfileScreen({ navigation }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
 
   const [profile, setProfile] = useState({
@@ -111,7 +113,7 @@ export default function LawyerProfileScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
-      <View style={styles.mainWrapper}>
+      <View style={[styles.mainWrapper, { backgroundColor: theme.background }]}>
         {/* HEADER */}
         <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
           <View style={styles.headerRow}>
@@ -155,7 +157,12 @@ export default function LawyerProfileScreen({ navigation }) {
           </View>
 
           {/* PERSONAL DETAILS */}
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
             <Text style={styles.cardLabel}>Personal Details</Text>
 
             <LegalInput
@@ -199,7 +206,12 @@ export default function LawyerProfileScreen({ navigation }) {
           </View>
 
           {/* SOCIAL LINKS */}
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
             <Text style={styles.cardLabel}>Professional Links</Text>
 
             <SocialInput

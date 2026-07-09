@@ -1,6 +1,7 @@
 // CaseDetailScreen.js – Clean, Premium, Action-Ready
 
 import {
+import { useTheme } from "../contexts/ThemeContext";
   useFocusEffect,
   useNavigation,
   useRoute,
@@ -42,6 +43,7 @@ import CitationsScreen from "./CitationsScreen";
 import NotesScreen from "./NotesScreen";
 
 export default function CaseDetailScreen({ profile }) {
+  const { resolvedTheme: theme } = useTheme();
   const route = useRoute();
   const navigation = useNavigation();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
@@ -306,7 +308,7 @@ ${profile?.name || "Advocate"}`;
   const recentHearings = hearings.slice(0, 2);
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
@@ -414,7 +416,12 @@ Notes: ${caseData?.notes || "-"}`;
         </View>
 
         {/* SUMMARY CARD */}
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.titleRow}>
             <View style={{ flex: 1 }}>
               <View style={styles.summaryHeaderRow}>
@@ -479,9 +486,16 @@ Notes: ${caseData?.notes || "-"}`;
 
         {/* CASE INFORMATION */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Case Information</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Case Information
+          </Text>
         </View>
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           {!!caseData?.judge && <Row label="Judge" value={caseData.judge} />}
           {!!caseData?.caseType && (
             <Row label="Case Type" value={caseData.caseType} />
@@ -639,9 +653,16 @@ Notes: ${caseData?.notes || "-"}`;
 
         {/* CLIENT RELATIONS */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Client Relations</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Client Relations
+          </Text>
         </View>
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.clientProfileRow}>
             <View style={styles.clientAvatar}>
               <Text style={styles.avatarText}>C</Text>
@@ -676,12 +697,19 @@ Notes: ${caseData?.notes || "-"}`;
 
         {/* FINANCIAL SUMMARY */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Financial Summary</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Financial Summary
+          </Text>
           <TouchableOpacity onPress={() => setPaymentModalVisible(true)}>
             <Text style={styles.addPaymentLink}>+ Add Payment</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.feeGrid}>
             <FeeBox
               label="Decided"
@@ -703,7 +731,9 @@ Notes: ${caseData?.notes || "-"}`;
 
         {/* HEARING TIMELINE PREVIEW */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Hearings</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Recent Hearings
+          </Text>
           {hearings.length > 2 && (
             <TouchableOpacity
               onPress={() =>
@@ -714,7 +744,12 @@ Notes: ${caseData?.notes || "-"}`;
             </TouchableOpacity>
           )}
         </View>
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           {recentHearings.length === 0 ? (
             <Text style={styles.emptyText}>No hearing records found.</Text>
           ) : (

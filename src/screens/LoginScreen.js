@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { useTheme } from "../contexts/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
 import {
@@ -27,6 +28,7 @@ import {
 import { createUserProfile, getUserProfile } from "../services/userService";
 
 export default function LoginScreen({ onLoginSuccess }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
 
   const [isRegister, setIsRegister] = useState(false);
@@ -140,7 +142,7 @@ export default function LoginScreen({ onLoginSuccess }) {
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="light-content" backgroundColor="#1E3A8A" />
 
       {/* HEADER */}

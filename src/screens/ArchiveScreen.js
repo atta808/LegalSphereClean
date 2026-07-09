@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { useTheme } from "../contexts/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -22,6 +23,7 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 
 export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
+  const { resolvedTheme: theme } = useTheme();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const insets = useSafeAreaInsets();
   const currency = getCurrency(currentProfile);
@@ -109,7 +111,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
   }, [cases, search]);
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"

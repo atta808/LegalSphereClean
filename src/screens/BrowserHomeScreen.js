@@ -1,5 +1,6 @@
 import { getProfile, saveProfile } from "../services/sqliteService";
 import { getLegalSystemByCountry } from "../constants/legalSystems";
+import { useTheme } from "../contexts/ThemeContext";
 import React, { useRef, useState } from "react";
 import {
   View,
@@ -48,6 +49,7 @@ const PremiumPressable = ({ onPress, children, style }) => {
 };
 
 export default function BrowserHomeScreen() {
+  const { resolvedTheme: theme } = useTheme();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   useFocusEffect(
@@ -159,7 +161,12 @@ export default function BrowserHomeScreen() {
       key={item.title}
       onPress={() => openBrowser(item.title, item.url)}
     >
-      <View style={styles.card}>
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
         <View style={styles.cardHeader}>
           <View
             style={[
@@ -211,7 +218,7 @@ export default function BrowserHomeScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* SYSTEM HEADER */}
@@ -244,7 +251,9 @@ export default function BrowserHomeScreen() {
                 style={{ marginRight: 6 }}
               />
 
-              <Text style={styles.sectionTitle}>Favorites</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                Favorites
+              </Text>
             </View>
 
             <View style={styles.grid}>
@@ -267,7 +276,9 @@ export default function BrowserHomeScreen() {
                 style={{ marginRight: 6 }}
               />
 
-              <Text style={styles.sectionTitle}>{section.title}</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                {section.title}
+              </Text>
             </View>
 
             {section.id === "ai" ? (

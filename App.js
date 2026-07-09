@@ -3,6 +3,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ThemeProvider } from "./src/contexts/ThemeContext";
 import { COLORS } from "./src/constants/colors";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { startAutoSync } from "./src/services/autoSyncService";
@@ -138,8 +139,10 @@ useEffect(() => {
 
   return (
     <SafeAreaProvider>
+      <ThemeProvider>
       <SyncIndicator />
       <AppNavigator user={user} profile={profile} onLogout={handleLogout} />
+          </ThemeProvider>
     </SafeAreaProvider>
   );
 }

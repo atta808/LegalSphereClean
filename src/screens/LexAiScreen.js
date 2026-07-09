@@ -1,4 +1,5 @@
 // screens/LexAiScreen.js
+import { useTheme } from "../contexts/ThemeContext";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   ActivityIndicator,
@@ -136,6 +137,7 @@ const QUICK_ACTIONS = [
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 export default function LexAiScreen() {
+  const { resolvedTheme: theme } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -550,7 +552,10 @@ USER QUERY: ${prompt}
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      edges={["top"]}
+    >
       <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" />
 
       {/* Clean Header */}

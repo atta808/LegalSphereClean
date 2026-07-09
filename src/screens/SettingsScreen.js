@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "../contexts/ThemeContext";
 import { countries } from "../constants/countries";
 import { countryCurrencyMap } from "../constants/currencyMap";
 import { CMS_SYSTEMS } from "../constants/cmsSystems";
@@ -28,6 +29,7 @@ import {
   saveProfile,
 } from "../services/sqliteService";
 export default function SettingsScreen({ navigation }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [profileReady, setProfileReady] = useState(false);
   const [countryPickerVisible, setCountryPickerVisible] = useState(false);
@@ -239,8 +241,17 @@ export default function SettingsScreen({ navigation }) {
     Alert.alert("Success", "Research source added.");
   };
   return (
-    <View style={styles.container}>
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <View
+        style={[
+          styles.premiumHeader,
+          {
+            paddingTop: insets.top + 10,
+            backgroundColor: theme.surface,
+            borderColor: theme.border,
+          },
+        ]}
+      >
         <View style={styles.headerRow}>
           <TouchableOpacity
             onPress={() => {
@@ -250,13 +261,18 @@ export default function SettingsScreen({ navigation }) {
                 navigation.navigate("Dashboard");
               }
             }}
-            style={styles.glassBackButton}
+            style={[
+              styles.glassBackButton,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
           >
             <Text style={styles.backIcon}>‹</Text>
           </TouchableOpacity>
 
           <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Settings</Text>
+            <Text style={[styles.headerTitleText, { color: theme.text }]}>
+              Settings
+            </Text>
             <View style={styles.jurisdictionPill}>
               <Text style={styles.jurisdictionText}>App Preferences</Text>
             </View>
@@ -279,9 +295,11 @@ export default function SettingsScreen({ navigation }) {
             />
           </TouchableOpacity>
 
-          <Text style={styles.name}>{profile.name || "Your Name"}</Text>
+          <Text style={[styles.name, { color: theme.text }]}>
+            {profile.name || "Your Name"}
+          </Text>
 
-          <Text style={styles.sub}>
+          <Text style={[styles.sub, { color: theme.secondaryText }]}>
             {profile.jurisdiction || "Add Jurisdiction"}
           </Text>
 
@@ -295,7 +313,9 @@ export default function SettingsScreen({ navigation }) {
 
         {/* 🌍 GLOBAL SETTINGS */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Settings</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            App Settings
+          </Text>
 
           {/* COUNTRY */}
           <View style={styles.item}>
@@ -322,7 +342,9 @@ export default function SettingsScreen({ navigation }) {
             </TouchableOpacity>
           </View>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Court CMS Systems</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Court CMS Systems
+            </Text>
             <View style={{ marginTop: 20 }}>
               <Text
                 style={{
@@ -402,7 +424,9 @@ export default function SettingsScreen({ navigation }) {
             })}
           </View>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Legal Research Sources</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Legal Research Sources
+            </Text>
 
             <LegalInput
               label="Source Name"
@@ -532,21 +556,91 @@ export default function SettingsScreen({ navigation }) {
 
         {/* HELP */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Help</Text>
 
           <TouchableOpacity
-            style={styles.item}
+            style={[styles.item, { backgroundColor: theme.card }]}
             onPress={() => Linking.openURL("mailto:support@technaam.com")}
           >
             <Text>Contact Us</Text>
           </TouchableOpacity>
         </View>
+
+        {/* 🎨 APPEARANCE */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Appearance
+          </Text>
+          <View
+            style={[
+              styles.themeCard,
+              {
+                backgroundColor: theme.card,
+                borderColor: theme.border,
+                borderWidth: 1,
+                borderRadius: 16,
+                overflow: "hidden",
+              },
+            ]}
+          >
+            <TouchableOpacity
+              style={[
+                styles.themeItem,
+                { borderBottomWidth: 1, borderBottomColor: theme.divider },
+              ]}
+              onPress={() => setTheme("light")}
+            >
+              <Text
+                style={{ color: theme.text, fontSize: 16, fontWeight: "600" }}
+              >
+                ☀️ Light
+              </Text>
+              {currentTheme === "light" && (
+                <Ionicons name="checkmark" size={20} color={theme.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.themeItem,
+                { borderBottomWidth: 1, borderBottomColor: theme.divider },
+              ]}
+              onPress={() => setTheme("dark")}
+            >
+              <Text
+                style={{ color: theme.text, fontSize: 16, fontWeight: "600" }}
+              >
+                🌙 Dark
+              </Text>
+              {currentTheme === "dark" && (
+                <Ionicons name="checkmark" size={20} color={theme.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.themeItem}
+              onPress={() => setTheme("system")}
+            >
+              <Text
+                style={{ color: theme.text, fontSize: 16, fontWeight: "600" }}
+              >
+                📱 System (Recommended)
+              </Text>
+              {currentTheme === "system" && (
+                <Ionicons name="checkmark" size={20} color={theme.primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* ☁️ CLOUD & BACKUP */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cloud & Backup</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Cloud & Backup
+          </Text>
 
           <TouchableOpacity
-            style={styles.item}
+            style={[styles.item, { backgroundColor: theme.card }]}
             onPress={() =>
               Alert.alert(
                 "Restore Data",
@@ -571,17 +665,19 @@ export default function SettingsScreen({ navigation }) {
               )
             }
           >
-            <Text style={{ color: "#1E3A8A", fontWeight: "600" }}>
+            <Text style={{ color: theme.primary, fontWeight: "600" }}>
               🔄 Restore from Cloud
             </Text>
           </TouchableOpacity>
         </View>
         {/* DANGER */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Danger Zone</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Danger Zone
+          </Text>
 
           <TouchableOpacity
-            style={styles.item}
+            style={[styles.item, { backgroundColor: theme.card }]}
             onPress={() =>
               Alert.alert(
                 "Delete Account",
@@ -649,12 +745,14 @@ export default function SettingsScreen({ navigation }) {
               )
             }
           >
-            <Text style={{ color: "red" }}>Delete Account</Text>
+            <Text style={{ color: theme.error }}>Delete Account</Text>
           </TouchableOpacity>
         </View>
         {/* 🔐 SIGN OUT */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            Account
+          </Text>
 
           <TouchableOpacity
             style={styles.logoutBtn}
@@ -876,6 +974,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
+  themeItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+  },
   item: {
     backgroundColor: "#fff",
     borderRadius: 12,

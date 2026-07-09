@@ -1,4 +1,5 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useTheme } from "../contexts/ThemeContext";
 import * as Clipboard from "expo-clipboard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Copy, FileText, Fingerprint, Share2 } from "lucide-react-native";
@@ -50,6 +51,7 @@ const PremiumExportButton = ({ item, openExportOptions }) => {
 };
 
 export default function DiaryScreen({ profile }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
@@ -175,7 +177,7 @@ export default function DiaryScreen({ profile }) {
   }, [cases, pipelineCases, search]);
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
@@ -271,7 +273,9 @@ export default function DiaryScreen({ profile }) {
             {filteredCases.pipeline.length > 0 && (
               <View style={styles.sectionContainer}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Pipeline</Text>
+                  <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                    Pipeline
+                  </Text>
                 </View>
                 {filteredCases.pipeline.map((item) => (
                   <View
@@ -303,7 +307,9 @@ export default function DiaryScreen({ profile }) {
             {/* ACTIVE DIARY */}
             <View style={styles.sectionContainer}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Active Diary</Text>
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                  Active Diary
+                </Text>
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>
                     {filteredCases.active.length}

@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "../contexts/ThemeContext";
 import {
   getAllCases,
   getProfile,
@@ -57,6 +58,8 @@ export default function DashboardScreen({ profile, onLogout }) {
   const [imageKey, setImageKey] = useState(Date.now());
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const locale = currentProfile?.locale || "en-PK";
+  const { resolvedTheme } = useTheme();
+  const theme = resolvedTheme;
   const currency = getCurrency(currentProfile);
   const navigation = useNavigation();
   const loadStats = useCallback(async () => {
@@ -194,11 +197,16 @@ export default function DashboardScreen({ profile, onLogout }) {
   };
 
   return (
-    <View style={styles.mainWrapper}>
+    <View style={[styles.mainWrapper, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="light-content" backgroundColor="#1E3A8A" />
 
       {/* HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
+      <View
+        style={[
+          styles.premiumHeader,
+          { paddingTop: insets.top + 10, backgroundColor: theme.surface },
+        ]}
+      >
         <View style={styles.headerRow}>
           <View style={styles.profileSection}>
             <View style={styles.avatarGlow}>
@@ -207,8 +215,12 @@ export default function DashboardScreen({ profile, onLogout }) {
               </Text>
             </View>
             <View>
-              <Text style={styles.welcomeLabel}>LegalSphere Diary</Text>
-              <Text style={styles.lawyerName}>
+              <Text
+                style={[styles.welcomeLabel, { color: theme.secondaryText }]}
+              >
+                LegalSphere Diary
+              </Text>
+              <Text style={[styles.lawyerName, { color: theme.text }]}>
                 {currentProfile?.name || "Advocate"}
               </Text>
             </View>
@@ -244,9 +256,20 @@ export default function DashboardScreen({ profile, onLogout }) {
         contentContainerStyle={styles.scrollContent}
       >
         {/* FLOATING STATS */}
-        <View style={styles.floatingStats}>
+        <View
+          style={[
+            styles.floatingStats,
+            {
+              backgroundColor: theme.card,
+              borderColor: theme.border,
+              borderWidth: 1,
+            },
+          ]}
+        >
           <View style={styles.statMini}>
-            <Text style={styles.statMiniVal}>{stats.activeCases}</Text>
+            <Text style={[styles.statMiniVal, { color: theme.text }]}>
+              {stats.activeCases}
+            </Text>
             <Text style={styles.statMiniLabel}>Active</Text>
           </View>
           <View style={styles.statDivider} />
@@ -258,7 +281,9 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statMini}>
-            <Text style={styles.statMiniVal}>{todayHearings.length}</Text>
+            <Text style={[styles.statMiniVal, { color: theme.text }]}>
+              {todayHearings.length}
+            </Text>
             <Text style={styles.statMiniLabel}>Today</Text>
           </View>
         </View>
@@ -266,8 +291,15 @@ export default function DashboardScreen({ profile, onLogout }) {
         <Text style={{ marginBottom: 10, color: "#64748B", fontWeight: "600" }}>
           Total Cases: {totalCases}
         </Text>
-        <View style={styles.litigationCard}>
-          <Text style={styles.litigationTitle}>Litigation Intelligence</Text>
+        <View
+          style={[
+            styles.litigationCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <Text style={[styles.litigationTitle, { color: theme.text }]}>
+            Litigation Intelligence
+          </Text>
 
           <View style={styles.litigationRow}>
             <View style={styles.litigationItem}>
@@ -299,8 +331,15 @@ export default function DashboardScreen({ profile, onLogout }) {
             </View>
           </View>
         </View>
-        <View style={styles.workflowCard}>
-          <Text style={styles.workflowTitle}>Top Litigation Workflows</Text>
+        <View
+          style={[
+            styles.workflowCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <Text style={[styles.workflowTitle, { color: theme.text }]}>
+            Top Litigation Workflows
+          </Text>
 
           {workflowStats.length === 0 ? (
             <Text style={styles.workflowEmpty}>
@@ -319,9 +358,16 @@ export default function DashboardScreen({ profile, onLogout }) {
           )}
         </View>
         {/* DAILY CARD */}
-        <View style={styles.dailyTaskCard}>
+        <View
+          style={[
+            styles.dailyTaskCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.taskHeader}>
-            <Text style={styles.taskTitle}>Daily Completion</Text>
+            <Text style={[styles.taskTitle, { color: theme.text }]}>
+              Daily Completion
+            </Text>
             <Text style={styles.taskCount}>
               {completedTasks}/{totalTasks}
             </Text>
@@ -375,7 +421,9 @@ export default function DashboardScreen({ profile, onLogout }) {
                       navigation.navigate("CaseDetail", { caseId: item.id })
                     }
                   >
-                    <Text style={styles.caseName}>{item.title}</Text>
+                    <Text style={[styles.caseName, { color: theme.text }]}>
+                      {item.title}
+                    </Text>
                     <Text style={styles.caseCourt}>
                       {item.court || "No Court"}
                     </Text>
@@ -444,7 +492,9 @@ export default function DashboardScreen({ profile, onLogout }) {
                       navigation.navigate("CaseDetail", { caseId: item.id })
                     }
                   >
-                    <Text style={styles.caseName}>{item.title}</Text>
+                    <Text style={[styles.caseName, { color: theme.text }]}>
+                      {item.title}
+                    </Text>
                     <Text style={styles.caseCourt}>
                       {item.court || "No Court"}
                     </Text>
@@ -489,7 +539,12 @@ export default function DashboardScreen({ profile, onLogout }) {
         )}
 
         {/* LAWYER PROFILE CARD */}
-        <View style={styles.profileCard}>
+        <View
+          style={[
+            styles.profileCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <TouchableOpacity
             style={styles.profileLeft}
             onPress={() => navigation.navigate("LawyerProfile")}
@@ -507,7 +562,7 @@ export default function DashboardScreen({ profile, onLogout }) {
               </View>
             )}
             <View>
-              <Text style={styles.profileName}>
+              <Text style={[styles.profileName, { color: theme.text }]}>
                 {currentProfile?.name || "Advocate"}
               </Text>
               <Text style={styles.profileSub}>
@@ -524,12 +579,17 @@ export default function DashboardScreen({ profile, onLogout }) {
         </View>
 
         {/* ACTION GRID */}
-        <Text style={styles.sectionHeading}>Practice Management</Text>
+        <Text style={[styles.sectionHeading, { color: theme.text }]}>
+          Practice Management
+        </Text>
         <View style={styles.actionGrid}>
           {quickActions.map((item) => (
             <TouchableOpacity
               key={item.label}
-              style={styles.actionCard}
+              style={[
+                styles.actionCard,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
               onPress={() => handleQuickAction(item.action)}
             >
               <View style={styles.iconCircle}>

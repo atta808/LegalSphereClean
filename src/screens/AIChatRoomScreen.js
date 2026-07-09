@@ -1,3 +1,4 @@
+import { useTheme } from "../contexts/ThemeContext";
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -74,6 +75,7 @@ const formatTime = (timestamp) => {
 };
 
 export default function AIChatRoomScreen({ route, navigation }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const flatListRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -372,7 +374,10 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      edges={["top", "left", "right"]}
+    >
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView
         style={{ flex: 1 }}

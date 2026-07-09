@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { useTheme } from "../contexts/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -92,6 +93,7 @@ const defaultLinks = [
 ];
 
 export default function QuickLinksScreen({ onBack }) {
+  const { resolvedTheme: theme } = useTheme();
   const [search, setSearch] = useState("");
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -195,7 +197,7 @@ export default function QuickLinksScreen({ onBack }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="dark-content" translucent />
 
       {/* HEADER */}
@@ -254,7 +256,12 @@ export default function QuickLinksScreen({ onBack }) {
         </ScrollView>
 
         {/* ADD FORM */}
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <LegalInput
             label="Link Title"
             value={title}
@@ -408,7 +415,6 @@ const styles = StyleSheet.create({
     padding: 18,
     paddingBottom: 120,
   },
-
 
   // ================= FILTER =================
   filterBtn: {

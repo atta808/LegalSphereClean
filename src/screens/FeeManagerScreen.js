@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { useTheme } from "../contexts/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -21,6 +22,7 @@ import {
 
 import { formatMoney, getCurrency } from "../utils/currency";
 export default function FeeManagerScreen({ profile, onBack }) {
+  const { resolvedTheme: theme } = useTheme();
   const insets = useSafeAreaInsets();
 
   const [saving, setSaving] = useState(false);
@@ -133,7 +135,7 @@ export default function FeeManagerScreen({ profile, onBack }) {
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"

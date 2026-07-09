@@ -1,4 +1,5 @@
 import LegalInput from "../components/LegalInput";
+import { useTheme } from "../contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import LegalPicker from "../components/LegalPicker";
@@ -27,6 +28,7 @@ import {
 import { formatMoney, getCurrency, getLocale } from "../utils/currency";
 import { normalizeDateInput, toDatePickerDate, toISO } from "../utils/date";
 export default function AddCaseScreen({ route, profile }) {
+  const { resolvedTheme: theme } = useTheme();
   const [court, setCourt] = useState("");
   const [courtPickerVisible, setCourtPickerVisible] = useState(false);
   const [judgePickerVisible, setJudgePickerVisible] = useState(false);
@@ -450,7 +452,7 @@ export default function AddCaseScreen({ route, profile }) {
     return unsubscribe;
   }, [navigation]);
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -501,8 +503,15 @@ export default function AddCaseScreen({ route, profile }) {
                 : "Select Client (Required)"}
             </Text>
           </TouchableOpacity>
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Case Information</Text>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Case Information
+            </Text>
             <View style={styles.aiCard}>
               <Text style={styles.aiTitle}>Import Case From CMS</Text>
 
@@ -747,8 +756,15 @@ export default function AddCaseScreen({ route, profile }) {
 
             {/* ✅ DESCRIPTION PICKER */}
           </View>
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Case Priority</Text>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Case Priority
+            </Text>
 
             <View style={styles.statusRow}>
               <TouchableOpacity
@@ -782,8 +798,15 @@ export default function AddCaseScreen({ route, profile }) {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Fee Details</Text>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Fee Details
+            </Text>
             <LegalInput
               label="Fee Decided"
               value={feeDecided}
@@ -807,8 +830,15 @@ export default function AddCaseScreen({ route, profile }) {
             </View>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Case Controls</Text>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Case Controls
+            </Text>
             <View style={styles.rowBetween}></View>
             <Text style={styles.statusLabel}>Status</Text>
             {/* ERROR WAS HERE: Changed <div> to <View> */}

@@ -14,7 +14,7 @@ const isValidDateParts = (year, month, day) => {
   );
 };
 
-export const getDateParts = (value) => {
+const getDateParts = (value) => {
   if (!value) return null;
 
   if (value instanceof Date) {

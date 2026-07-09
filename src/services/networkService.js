@@ -52,10 +52,3 @@ export const startNetworkListener = () => {
     }
   });
 };
-
-export const stopNetworkListener = () => {
-  if (unsubscribe) {
-    unsubscribe();
-    unsubscribe = null;
-  }
-};

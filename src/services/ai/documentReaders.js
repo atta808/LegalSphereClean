@@ -112,20 +112,3 @@ const extractImageText = async (document, language) => {
     return "";
   }
 };
-
-export const getDocumentType = (fileName = "") => {
-  const extension = fileName.split(".").pop()?.toLowerCase() || "";
-  switch (extension) {
-    case "pdf":
-      return "PDF";
-    case "docx":
-      return "DOCX";
-    case "png":
-    case "jpg":
-    case "jpeg":
-    case "webp":
-      return "IMAGE";
-    default:
-      return "TXT";
-  }
-};

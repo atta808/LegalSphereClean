@@ -23,21 +23,6 @@ export const setSyncStatus = (status) => {
 };
 
 // =========================
-// 📊 SET PROGRESS
-// =========================
-export const setSyncProgress = (current, total) => {
-  progress = { current, total };
-
-  listeners.forEach((cb) => {
-    try {
-      cb(currentStatus, progress);
-    } catch (e) {
-      console.log("Progress listener error:", e);
-    }
-  });
-};
-
-// =========================
 // 📡 SUBSCRIBE
 // =========================
 export const subscribeSyncStatus = (cb) => {
@@ -52,16 +37,3 @@ export const subscribeSyncStatus = (cb) => {
 // 📊 GETTERS
 // =========================
 export const getSyncStatus = () => currentStatus;
-
-export const getSyncProgress = () => progress;
-
-// =========================
-// 🎯 STATUS CONSTANTS
-// =========================
-export const SYNC_STATUS = {
-  IDLE: "idle",
-  SYNCING: "syncing",
-  SUCCESS: "success",
-  ERROR: "error",
-  OFFLINE: "offline",
-};

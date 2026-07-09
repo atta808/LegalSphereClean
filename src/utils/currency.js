@@ -32,22 +32,3 @@ export const formatMoney = (
     return `${amount} ${currency}`;
   }
 };
-
-// ⚡ Compact version (for dashboard cards)
-export const formatMoneyCompact = (
-  amount,
-  currency = "PKR",
-  locale = "en-PK"
-) => {
-  if (amount === null || amount === undefined) return "";
-
-  try {
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: currency,
-      notation: "compact",
-    }).format(amount);
-  } catch (_e) {
-    return `${amount} ${currency}`;
-  }
-};

@@ -48,7 +48,11 @@ export const startNetworkListener = () => {
     console.log("🚀 Internet restored → triggering sync...");
 
     if (typeof syncPendingData === "function") {
-      syncPendingData().catch((e) => console.log("❌ Sync crash:", e));
+      syncPendingData().catch((e) => {
+        if (__DEV__) {
+          console.error("❌ Sync crash:", e);
+        }
+      });
     }
   });
 };

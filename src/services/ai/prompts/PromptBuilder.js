@@ -4,7 +4,11 @@
  * Ensures the generated strings are optimized and standardized for the AI provider.
  */
 
-import { PromptTemplates } from './PromptTemplates';
+import { SystemPrompts } from './SystemPrompts';
+import { OfficePrompts } from './OfficePrompts';
+import { CasePrompts } from './CasePrompts';
+import { DocumentPrompts } from './DocumentPrompts';
+import { GeneralPrompts } from './GeneralPrompts';
 
 /**
  * Prompt Builder Utility
@@ -31,8 +35,8 @@ export class PromptBuilder {
             contextString = String(context);
         }
 
-        const systemInstruction = PromptTemplates.LEX_AI_SYSTEM;
-        const userInstruction = PromptTemplates.formatUserQuery(contextString, ocrText, userMessage);
+        const systemInstruction = `${OfficePrompts.ROLE}\n\n${SystemPrompts.BASE_GUIDELINES}`;
+        const userInstruction = GeneralPrompts.formatUserQuery(contextString, ocrText, userMessage);
 
         // Combine into a single string for standard DeepSeek input
         return `${systemInstruction}\n\n${userInstruction}`;
@@ -56,8 +60,8 @@ export class PromptBuilder {
             }
         }
 
-        const systemInstruction = PromptTemplates.CHATROOM_SYSTEM;
-        const userInstruction = PromptTemplates.formatUserQuery(contextString, ocrText, userMessage);
+        const systemInstruction = `${CasePrompts.ROLE}\n\n${CasePrompts.RESTRICTIONS}`;
+        const userInstruction = GeneralPrompts.formatUserQuery(contextString, ocrText, userMessage);
 
         return `${systemInstruction}\n\n${userInstruction}`;
     }
@@ -80,7 +84,7 @@ export class PromptBuilder {
             }
         }
 
-        const systemInstruction = PromptTemplates.DOCUMENT_ANALYZER_SYSTEM;
+        const systemInstruction = `${DocumentPrompts.ROLE}\n\n${DocumentPrompts.JSON_STRUCTURE}\n\n${SystemPrompts.JSON_OUTPUT_RULES}`;
         const userInstruction = `Analyze the following document and extract the required information in the exact JSON format specified.\n\n${metaString}--- Document Text ---\n${ocrText}\n---------------------\n`;
 
         return `${systemInstruction}\n\n${userInstruction}`;

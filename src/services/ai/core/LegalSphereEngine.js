@@ -18,7 +18,7 @@ export class LegalSphereEngine {
      *
      * @param {string} query - The user's message.
      * @param {Object} [fileParams=null] - Optional file attachment (uri, type, name, base64).
-     * @returns {Promise<string>} The formatted markdown response.
+     * @returns {Promise<Object>} An object with `userFacing` (Markdown) and `metadata`.
      */
     static async processLexAI(query, fileParams = null) {
         try {
@@ -37,15 +37,15 @@ export class LegalSphereEngine {
      * @param {number|string} caseId - The ID of the current case.
      * @param {string} query - The user's message.
      * @param {Object} [fileParams=null] - Optional file attachment.
-     * @returns {Promise<string>} The formatted markdown response.
+     * @returns {Promise<Object>} An object with `userFacing` (Markdown) and `metadata`.
      */
-    static async processCaseAI(caseId, query, fileParams = null) {
+    static async processAIChatRoom(caseId, query, fileParams = null) {
         try {
-            if (!caseId) throw new Error('caseId is required for Case AI.');
+            if (!caseId) throw new Error('caseId is required for AI ChatRoom.');
             const rawResponse = await AIRouter.routeCaseAI(caseId, query, fileParams);
             return ResponseFormatter.formatChatResponse(rawResponse);
         } catch (error) {
-            if (__DEV__) console.error('Engine processCaseAI Error:', error);
+            if (__DEV__) console.error('Engine processAIChatRoom Error:', error);
             return ResponseFormatter.formatError(error);
         }
     }
@@ -55,20 +55,16 @@ export class LegalSphereEngine {
      * Automatically analyzes a document and returns structured metadata.
      *
      * @param {Object} fileParams - The document to analyze (must contain uri, type).
-     * @param {boolean} [returnMarkdown=false] - Whether to return raw JSON or formatted markdown.
-     * @returns {Promise<Object|string>} Structured JS object, or Markdown string if requested.
+     * @returns {Promise<Object>} An object containing `structuredData`, `userFacing` (Markdown), and `metadata`.
      */
-    static async processDocumentAnalysis(fileParams, returnMarkdown = false) {
+    static async processDocumentVault(fileParams) {
         try {
-            if (!fileParams) throw new Error('fileParams are required for Document Analysis.');
+            if (!fileParams) throw new Error('fileParams are required for Document Vault.');
             const structuredData = await AIRouter.routeDocumentVault(fileParams);
 
-            if (returnMarkdown) {
-                return ResponseFormatter.formatDocumentVaultResponse(structuredData);
-            }
-            return structuredData;
+            return ResponseFormatter.formatDocumentVaultResponse(structuredData);
         } catch (error) {
-            if (__DEV__) console.error('Engine processDocumentAnalysis Error:', error);
+            if (__DEV__) console.error('Engine processDocumentVault Error:', error);
             throw error; // Let the UI handle document errors directly (e.g. showing an alert)
         }
     }

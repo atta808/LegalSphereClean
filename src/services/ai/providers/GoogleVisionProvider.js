@@ -4,7 +4,7 @@
  * Responsible only for making requests to Google Vision for image OCR.
  */
 
-import { CONFIG } from '../../../../config';
+import { AIConfig } from '../../../config/AIConfig';
 
 /**
  * Google Cloud Vision API Provider
@@ -43,7 +43,7 @@ export class GoogleVisionProvider {
                     ]
                 };
 
-                const url = `https://vision.googleapis.com/v1/images:annotate?key=${CONFIG.GOOGLE_VISION_API_KEY}`;
+                const url = `https://vision.googleapis.com/v1/images:annotate?key=${AIConfig.getGoogleVisionKey()}`;
 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeout);

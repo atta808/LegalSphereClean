@@ -5,8 +5,8 @@
 
 import { ContextManager } from '../core/ContextManager';
 import { PromptManager } from '../core/PromptManager';
+import { ProviderRegistry } from '../core/ProviderRegistry';
 import { DocumentReader } from '../document/DocumentReader';
-import { DeepSeekProvider } from '../providers/DeepSeekProvider';
 
 /**
  * Router for AI ChatRoom (Case Intelligence)
@@ -31,7 +31,8 @@ export class CaseRouter {
         // 3. Build Prompt
         const prompt = PromptManager.buildCaseAI(query, context, ocrText);
 
-        // 4. Execute LLM
-        return await DeepSeekProvider.execute(prompt);
+        // 4. Execute LLM via Registry
+        const llm = ProviderRegistry.getLLMProvider();
+        return await llm.execute(prompt);
     }
 }

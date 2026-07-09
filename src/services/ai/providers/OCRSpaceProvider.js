@@ -4,7 +4,7 @@
  * Responsible for handling PDF and Image OCR using OCR.Space.
  */
 
-import { CONFIG } from '../../../../config';
+import { AIConfig } from '../../../config/AIConfig';
 
 /**
  * OCR.Space API Provider
@@ -39,7 +39,7 @@ export class OCRSpaceProvider {
                 });
 
                 // Append settings
-                formData.append('apikey', CONFIG.OCR_SPACE_API_KEY);
+                formData.append('apikey', AIConfig.getOCRSpaceKey());
                 formData.append('language', 'eng'); // Default to English, could be made configurable
                 formData.append('isOverlayRequired', 'false');
                 formData.append('detectOrientation', 'true');

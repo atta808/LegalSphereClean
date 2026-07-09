@@ -5,7 +5,7 @@
  */
 
 import { OCRPipeline } from './OCRPipeline';
-import { LanguageDetector } from './LanguageDetector';
+import { LanguagePipeline } from './language/LanguagePipeline';
 
 /**
  * Document Reader
@@ -28,8 +28,8 @@ export class DocumentReader {
                 throw new Error('No text could be extracted from the document.');
             }
 
-            // 2. Detect Language and Normalize Text
-            const { language, normalizedText } = LanguageDetector.process(rawText);
+            // 2. Process Text through Language Pipeline
+            const { language, normalizedText } = LanguagePipeline.process(rawText);
 
             return {
                 language,

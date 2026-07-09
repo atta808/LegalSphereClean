@@ -5,8 +5,8 @@
 
 import { ContextManager } from '../core/ContextManager';
 import { PromptManager } from '../core/PromptManager';
+import { ProviderRegistry } from '../core/ProviderRegistry';
 import { DocumentReader } from '../document/DocumentReader';
-import { DeepSeekProvider } from '../providers/DeepSeekProvider';
 import { IntentDetector } from './IntentDetector';
 
 /**
@@ -37,7 +37,8 @@ export class OfficeRouter {
         // based on the intent in the future.
         const prompt = PromptManager.buildLexAI(query, context, ocrText);
 
-        // 5. Execute LLM
-        return await DeepSeekProvider.execute(prompt);
+        // 5. Execute LLM via Registry
+        const llm = ProviderRegistry.getLLMProvider();
+        return await llm.execute(prompt);
     }
 }

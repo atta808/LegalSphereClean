@@ -4,7 +4,7 @@
  * Responsible only for making requests to DeepSeek and handling basic API errors.
  */
 
-import { CONFIG } from '../../../../config';
+import { AIConfig } from '../../../config/AIConfig';
 
 /**
  * DeepSeek AI Provider
@@ -38,11 +38,11 @@ export class DeepSeekProvider {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-                const response = await fetch(CONFIG.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1/chat/completions', {
+                const response = await fetch(AIConfig.getDeepSeekUrl(), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${CONFIG.DEEPSEEK_API_KEY}`
+                        'Authorization': `Bearer ${AIConfig.getDeepSeekKey()}`
                     },
                     body: JSON.stringify({
                         model: 'deepseek-chat',

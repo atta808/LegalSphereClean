@@ -5,8 +5,7 @@
  * Never duplicates OCR logic; this is the single source of truth for text extraction.
  */
 
-import { GoogleVisionProvider } from '../providers/GoogleVisionProvider';
-import { OCRSpaceProvider } from '../providers/OCRSpaceProvider';
+import { ProviderRegistry } from '../core/ProviderRegistry';
 
 /**
  * Unified OCR Pipeline
@@ -35,18 +34,21 @@ export class OCRPipeline {
      * PDF Workflow: Primary = OCR.Space, Fallback = Google Vision.
      */
     static async _executePdfWorkflow(fileParams) {
+        const primary = ProviderRegistry.getPdfOCRProvider();
+        const fallback = ProviderRegistry.getImageOCRProvider();
+
         try {
-            if (__DEV__) console.log('OCRPipeline: Starting PDF workflow with OCR.Space');
-            const result = await OCRSpaceProvider.executeOCR(fileParams);
+            if (__DEV__) console.log('OCRPipeline: Starting PDF workflow');
+            const result = await primary.executeOCR(fileParams);
             if (result) return result;
-            throw new Error('OCR.Space returned empty result.');
+            throw new Error('Primary PDF OCR provider returned empty result.');
         } catch (error) {
-            if (__DEV__) console.warn('OCRPipeline: OCR.Space failed, falling back to Google Vision.', error.message);
-            // Note: Google Vision requires base64. If base64 is missing, fallback cannot proceed.
+            if (__DEV__) console.warn('OCRPipeline: Primary PDF OCR failed, falling back.', error.message);
+            // Note: Google Vision (fallback here) requires base64. If base64 is missing, fallback cannot proceed.
             if (!fileParams.base64) {
-                 throw new Error('OCRPipeline: Fallback to Google Vision failed. Base64 data missing.');
+                 throw new Error('OCRPipeline: Fallback OCR failed. Base64 data missing.');
             }
-            return await GoogleVisionProvider.executeOCR(fileParams.base64);
+            return await fallback.executeOCR(fileParams.base64);
         }
     }
 
@@ -54,17 +56,20 @@ export class OCRPipeline {
      * Image Workflow: Primary = Google Vision, Fallback = OCR.Space.
      */
     static async _executeImageWorkflow(fileParams) {
+        const primary = ProviderRegistry.getImageOCRProvider();
+        const fallback = ProviderRegistry.getPdfOCRProvider();
+
         try {
-             if (__DEV__) console.log('OCRPipeline: Starting Image workflow with Google Vision');
+             if (__DEV__) console.log('OCRPipeline: Starting Image workflow');
              if (!fileParams.base64) {
-                 throw new Error('Google Vision requires base64 data.');
+                 throw new Error('Image OCR primary provider requires base64 data.');
              }
-             const result = await GoogleVisionProvider.executeOCR(fileParams.base64);
+             const result = await primary.executeOCR(fileParams.base64);
              if (result) return result;
-             throw new Error('Google Vision returned empty result.');
+             throw new Error('Primary Image OCR provider returned empty result.');
         } catch (error) {
-             if (__DEV__) console.warn('OCRPipeline: Google Vision failed, falling back to OCR.Space.', error.message);
-             return await OCRSpaceProvider.executeOCR(fileParams);
+             if (__DEV__) console.warn('OCRPipeline: Primary Image OCR failed, falling back.', error.message);
+             return await fallback.executeOCR(fileParams);
         }
     }
 }

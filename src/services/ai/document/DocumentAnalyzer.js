@@ -5,9 +5,9 @@
  */
 
 import { OCRPipeline } from './OCRPipeline';
-import { LanguageDetector } from './LanguageDetector';
+import { LanguagePipeline } from './language/LanguagePipeline';
 import { PromptManager } from '../core/PromptManager';
-import { DeepSeekProvider } from '../providers/DeepSeekProvider';
+import { ProviderRegistry } from '../core/ProviderRegistry';
 
 /**
  * Document Analyzer
@@ -29,14 +29,15 @@ export class DocumentAnalyzer {
                  throw new Error('Analysis failed: No text extracted.');
             }
 
-            // 2. Normalization
-            const { normalizedText } = LanguageDetector.process(rawText);
+            // 2. Process Text through Language Pipeline
+            const { normalizedText } = LanguagePipeline.process(rawText);
 
             // 3. Prompt Building
             const prompt = PromptManager.buildDocumentVault(normalizedText, documentContext);
 
-            // 4. Execution (force temperature 0 for strictly structured output)
-            const rawResponse = await DeepSeekProvider.execute(prompt, { temperature: 0.1 });
+            // 4. Execution (force temperature 0 for strictly structured output) via Registry
+            const llm = ProviderRegistry.getLLMProvider();
+            const rawResponse = await llm.execute(prompt, { temperature: 0.1 });
 
             // 5. Parse JSON (Removing potential markdown wrappers)
             return this._parseJsonResponse(rawResponse);

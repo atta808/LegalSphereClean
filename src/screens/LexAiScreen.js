@@ -1,5 +1,6 @@
 // screens/LexAiScreen.js
 import React, { useRef, useState, useEffect, useCallback } from "react";
+import { useTheme } from '../theme/ThemeContext';
 import {
   ActivityIndicator,
   FlatList,
@@ -39,7 +40,7 @@ import { extractDocumentText } from "../services/ai/documentReaders";
 import { isOfficeQuery } from "../services/ai/intentDetector";
 
 // Sleek typing animation component
-const TypingIndicator = () => {
+const TypingIndicator = ({ styles, colors }) => {
   const [dot1] = useState(new Animated.Value(0));
   const [dot2] = useState(new Animated.Value(0));
   const [dot3] = useState(new Animated.Value(0));
@@ -90,7 +91,7 @@ const TypingIndicator = () => {
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#94A3B8",
+    backgroundColor: colors.placeholder,
     marginHorizontal: 3,
     opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }),
     transform: [
@@ -138,6 +139,8 @@ const QUICK_ACTIONS = [
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 export default function LexAiScreen() {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -471,7 +474,7 @@ USER QUERY: ${prompt}
           {!isUser && (
             <View style={styles.avatarContainer}>
               <View style={styles.aiAvatar}>
-                <Ionicons name="sparkles" size={14} color="#0F172A" />
+                <Ionicons name="sparkles" size={14} color={colors.text} />
               </View>
             </View>
           )}
@@ -514,7 +517,7 @@ USER QUERY: ${prompt}
                   <Ionicons
                     name={isCopied ? "checkmark" : "copy-outline"}
                     size={12}
-                    color={isCopied ? "#10B981" : "#94A3B8"}
+                    color={isCopied ? colors.success : colors.placeholder}
                   />
                   <Text
                     style={[styles.copyText, isCopied && styles.copyTextActive]}
@@ -544,7 +547,7 @@ USER QUERY: ${prompt}
             <MaterialCommunityIcons
               name={action.icon}
               size={16}
-              color="#0F172A"
+              color={colors.text}
             />
             <Text style={styles.quickActionLabel}>{action.label}</Text>
           </TouchableOpacity>
@@ -560,7 +563,7 @@ USER QUERY: ${prompt}
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       {/* Clean Header */}
       <View style={styles.header}>
@@ -570,7 +573,7 @@ USER QUERY: ${prompt}
             style={styles.iconButton}
             activeOpacity={0.7}
           >
-            <Ionicons name="arrow-back" size={20} color="#0F172A" />
+            <Ionicons name="arrow-back" size={20} color={colors.text} />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <Text style={styles.headerTitle}>Lex Workspace</Text>
@@ -582,7 +585,7 @@ USER QUERY: ${prompt}
           style={styles.iconButton}
           activeOpacity={0.7}
         >
-          <Ionicons name="trash-outline" size={18} color="#94A3B8" />
+          <Ionicons name="trash-outline" size={18} color={colors.placeholder} />
         </TouchableOpacity>
       </View>
 
@@ -616,7 +619,7 @@ USER QUERY: ${prompt}
         {isTyping && (
           <View style={styles.typingWrapper}>
             <View style={styles.typingBubble}>
-              <TypingIndicator />
+              <TypingIndicator styles={styles} colors={colors} />
             </View>
           </View>
         )}
@@ -639,9 +642,9 @@ USER QUERY: ${prompt}
                 disabled={loading || isAttaching}
               >
                 {isAttaching ? (
-                  <ActivityIndicator size="small" color="#0F172A" />
+                  <ActivityIndicator size="small" color={colors.text} />
                 ) : (
-                  <Ionicons name="add" size={24} color="#64748B" />
+                  <Ionicons name="add" size={24} color={colors.secondaryText} />
                 )}
               </TouchableOpacity>
 
@@ -650,7 +653,7 @@ USER QUERY: ${prompt}
                 value={input}
                 onChangeText={setInput}
                 placeholder="Ask Lex anything..."
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={colors.placeholder}
                 multiline
                 style={styles.textInputModifier}
                 returnKeyType="default"
@@ -666,7 +669,7 @@ USER QUERY: ${prompt}
                     : styles.sendDisabled,
                 ]}
               >
-                <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
+                <Ionicons name="arrow-up" size={18} color={colors.surface} />
               </TouchableOpacity>
             </View>
           </View>
@@ -682,7 +685,7 @@ USER QUERY: ${prompt}
             style={StyleSheet.absoluteFill}
           />
           <View style={styles.loadingPill}>
-            <ActivityIndicator size="small" color="#0F172A" />
+            <ActivityIndicator size="small" color={colors.text} />
             <Text style={styles.loadingText}>{loadingMessage}</Text>
           </View>
         </View>
@@ -691,10 +694,10 @@ USER QUERY: ${prompt}
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
@@ -702,7 +705,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: colors.background,
     zIndex: 10,
   },
   headerLeft: {
@@ -716,7 +719,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
   },
   headerTitleContainer: {
     flexDirection: "row",
@@ -726,14 +729,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#0F172A",
+    color: colors.text,
     letterSpacing: -0.3,
   },
   statusDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#10B981",
+    backgroundColor: colors.success,
   },
   messageContainer: {
     flexDirection: "row",
@@ -755,9 +758,9 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -773,15 +776,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   userBubble: {
-    backgroundColor: "#0A0A0A",
+    backgroundColor: colors.surface,
     borderBottomRightRadius: 4,
   },
   aiBubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderBottomLeftRadius: 4,
     borderWidth: 0.5,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     shadowRadius: 4,
@@ -793,10 +796,10 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   userText: {
-    color: "#FFFFFF",
+    color: colors.surface,
   },
   aiText: {
-    color: "#1E293B",
+    color: colors.text,
   },
   messageFooter: {
     flexDirection: "row",
@@ -810,7 +813,7 @@ const styles = StyleSheet.create({
   },
   timestamp: {
     fontSize: 11,
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontWeight: "500",
   },
   copyButton: {
@@ -820,11 +823,11 @@ const styles = StyleSheet.create({
   },
   copyText: {
     fontSize: 11,
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontWeight: "600",
   },
   copyTextActive: {
-    color: "#10B981",
+    color: colors.success,
   },
   quickActionsContainer: {
     paddingBottom: 16,
@@ -839,13 +842,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 24,
     borderWidth: 0.5,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     shadowRadius: 3,
@@ -854,20 +857,20 @@ const styles = StyleSheet.create({
   quickActionLabel: {
     fontSize: 13,
     fontWeight: "500",
-    color: "#0F172A",
+    color: colors.text,
   },
   typingWrapper: {
     paddingHorizontal: 16,
     paddingBottom: 8,
   },
   typingBubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 20,
     borderBottomLeftRadius: 4,
     borderWidth: 0.5,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     alignSelf: "flex-start",
   },
   typingContainer: {
@@ -880,13 +883,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 20,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     marginRight: 8,
   },
   textInputModifier: {
     flex: 1,
     fontSize: 15,
-    color: "#0F172A",
+    color: colors.text,
     maxHeight: 100,
     minHeight: 40,
     paddingTop: 10,
@@ -902,10 +905,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   sendActive: {
-    backgroundColor: "#0A0A0A",
+    backgroundColor: colors.surface,
   },
   sendDisabled: {
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -916,12 +919,12 @@ const styles = StyleSheet.create({
   loadingPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 30,
     gap: 12,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
     shadowRadius: 16,
@@ -929,7 +932,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: "#0F172A",
+    color: colors.text,
     fontWeight: "500",
   },
   scrollWindow: {
@@ -942,16 +945,16 @@ const styles = StyleSheet.create({
   bottomInputWrapper: {
     paddingHorizontal: 16,
     paddingTop: 8,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: colors.background,
     borderTopWidth: 0,
     // Removed absolute positioning
   },
   inputGlass: {
     borderRadius: 32,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 12,

@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -35,6 +37,8 @@ const TYPES = [
 ];
 
 export default function MasterListScreen({ onBack }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const [selectedType, setSelectedType] = useState("court");
@@ -271,7 +275,7 @@ export default function MasterListScreen({ onBack }) {
 
         {loading ? (
           <View style={styles.loaderWrap}>
-            <ActivityIndicator size="large" color="#1E3A8A" />
+            <ActivityIndicator size="large" color={colors.primaryDark} />
             <Text style={styles.loaderText}>Syncing Master Data...</Text>
           </View>
         ) : items.length === 0 ? (
@@ -369,16 +373,16 @@ export default function MasterListScreen({ onBack }) {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#F1F5F9" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.border },
 
   // Header & Tab System
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 25,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -393,22 +397,22 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   backIcon: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "300",
     marginTop: -4,
   },
   titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: "#1E3A8A" },
+  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
   jurisdictionPill: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
@@ -417,18 +421,18 @@ const styles = StyleSheet.create({
   jurisdictionText: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#4338CA",
+    color: colors.primary,
     textTransform: "uppercase",
   },
 
   tabContainer: { paddingHorizontal: 20, marginTop: 25 },
   tabTrack: {
     flexDirection: "row",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderRadius: 18,
     padding: 6,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   tabItem: {
     flex: 1,
@@ -437,14 +441,14 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   tabActive: {
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
+    backgroundColor: colors.surface,
+    shadowColor: colors.shadow,
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 2,
   },
-  tabLabel: { fontSize: 12, fontWeight: "700", color: "#94A3B8" },
-  tabLabelActive: { color: "#1E3A8A" },
+  tabLabel: { fontSize: 12, fontWeight: "700", color: colors.placeholder },
+  tabLabelActive: { color: colors.primary },
 
   scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
   sectionHeader: {
@@ -456,48 +460,48 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#64748B",
+    color: colors.secondaryText,
     textTransform: "uppercase",
     letterSpacing: 1.2,
   },
   addBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
   },
-  addBtnText: { color: "#FFF", fontSize: 12, fontWeight: "900" },
+  addBtnText: { color: colors.surface, fontSize: 12, fontWeight: "900" },
 
   // List Cards
   itemCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 20,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOpacity: 0.02,
     shadowRadius: 10,
   },
   itemValueText: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#1E293B",
+    color: colors.text,
     lineHeight: 22,
   },
   cardActions: {
     flexDirection: "row",
     borderTopWidth: 1,
-    borderTopColor: "#F8FAFC",
+    borderTopColor: colors.background,
     marginTop: 15,
     paddingTop: 12,
     gap: 15,
   },
   editAction: { paddingVertical: 4 },
-  editActionText: { fontSize: 13, fontWeight: "800", color: "#3B82F6" },
+  editActionText: { fontSize: 13, fontWeight: "800", color: colors.primary },
   deleteAction: { paddingVertical: 4 },
-  deleteActionText: { fontSize: 13, fontWeight: "800", color: "#EF4444" },
+  deleteActionText: { fontSize: 13, fontWeight: "800", color: colors.danger },
 
   // Empty & Loader
   emptyBox: { alignItems: "center", marginTop: 80, paddingHorizontal: 40 },
@@ -505,22 +509,22 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
   emptyEmoji: { fontSize: 32 },
-  emptyTitle: { fontSize: 18, fontWeight: "800", color: "#1E293B" },
+  emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
   emptySub: {
     fontSize: 14,
-    color: "#94A3B8",
+    color: colors.placeholder,
     marginTop: 8,
     textAlign: "center",
     lineHeight: 22,
   },
   loaderWrap: { paddingVertical: 80, alignItems: "center" },
-  loaderText: { marginTop: 15, color: "#1E3A8A", fontWeight: "700" },
+  loaderText: { marginTop: 15, color: colors.primary, fontWeight: "700" },
 
   // Modal (Bottom Sheet Style)
   modalOverlay: {
@@ -529,7 +533,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
     paddingHorizontal: 25,
@@ -538,7 +542,7 @@ const styles = StyleSheet.create({
   modalHandle: {
     width: 40,
     height: 4,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     borderRadius: 2,
     alignSelf: "center",
     marginBottom: 20,
@@ -549,48 +553,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 25,
   },
-  modalTitle: { fontSize: 20, fontWeight: "900", color: "#1E293B" },
+  modalTitle: { fontSize: 20, fontWeight: "900", color: colors.text },
   closeBtn: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
-  closeX: { fontSize: 12, color: "#94A3B8", fontWeight: "900" },
+  closeX: { fontSize: 12, color: colors.placeholder, fontWeight: "900" },
   inputGroup: { marginBottom: 30 },
   inputLabel: {
     fontSize: 11,
     fontWeight: "800",
-    color: "#64748B",
+    color: colors.secondaryText,
     textTransform: "uppercase",
     marginBottom: 10,
     letterSpacing: 1,
   },
   modalInput: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 18,
     padding: 18,
     fontSize: 15,
     fontWeight: "600",
-    color: "#1E293B",
+    color: colors.text,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   multilineInput: { minHeight: 120, textAlignVertical: "top" },
   saveBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingVertical: 20,
     borderRadius: 22,
     alignItems: "center",
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOpacity: 0.3,
     shadowRadius: 15,
     elevation: 5,
   },
   saveBtnText: {
-    color: "#FFF",
+    color: colors.surface,
     fontWeight: "900",
     fontSize: 15,
     letterSpacing: 1.5,

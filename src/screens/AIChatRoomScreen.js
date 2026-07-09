@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTheme } from '../theme/ThemeContext';
 import {
   View,
   Text,
@@ -51,17 +52,19 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const THEME = {
-  bg: "#FCFCFD",
-  surface: "#FFFFFF",
-  border: "#F3F4F6",
-  userBubble: "#0F172A",
-  aiBubble: "#FFFFFF",
-  textUser: "#FFFFFF",
-  textAI: "#111827",
-  muted: "#6B7280",
-  accent: "#2563EB",
-};
+const getThemeConfig = (colors) => ({
+
+  bg: colors.text,
+  surface: colors.surface,
+  border: colors.border,
+  userBubble: colors.text,
+  aiBubble: colors.surface,
+  textUser: colors.surface,
+  textAI: colors.text,
+  muted: colors.text,
+  accent: colors.primary,
+
+});
 
 const generateId = () =>
   Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -74,6 +77,10 @@ const formatTime = (timestamp) => {
 };
 
 export default function AIChatRoomScreen({ route, navigation }) {
+  const { colors, resolvedTheme } = useTheme();
+  const THEME = React.useMemo(() => getThemeConfig(colors), [colors]);
+  const markdownStyles = React.useMemo(() => getMarkdownStyles(THEME, colors), [THEME]);
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const flatListRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -291,7 +298,7 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
       >
         {!isUser && (
           <View style={styles.aiAvatar}>
-            <Feather name="layers" size={12} color="#FFFFFF" />
+            <Feather name="layers" size={12} color={colors.surface} />
           </View>
         )}
         <View
@@ -305,12 +312,12 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
               <Feather
                 name="file-text"
                 size={12}
-                color={isUser ? "#94A3B8" : "#64748B"}
+                color={isUser ? colors.placeholder : colors.secondaryText}
               />
               <Text
                 style={[
                   styles.attachmentPillText,
-                  isUser && { color: "#CBD5E1" },
+                  isUser && { color: colors.disabled },
                 ]}
                 numberOfLines={1}
               >
@@ -341,13 +348,13 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
                   onPress={() => handleAction("copy", item.text)}
                   style={styles.actionIcon}
                 >
-                  <Feather name="copy" size={14} color="#94A3B8" />
+                  <Feather name="copy" size={14} color={colors.placeholder} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleAction("save", item.text)}
                   style={styles.actionIcon}
                 >
-                  <Feather name="bookmark" size={14} color="#94A3B8" />
+                  <Feather name="bookmark" size={14} color={colors.placeholder} />
                 </TouchableOpacity>
               </View>
             )}
@@ -394,7 +401,7 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
             onPress={() => navigation.goBack()}
             style={styles.iconButton}
           >
-            <Feather name="chevron-left" size={24} color="#0F172A" />
+            <Feather name="chevron-left" size={24} color={colors.text} />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <Text style={styles.headerTitle}>Lex AI</Text>
@@ -407,7 +414,7 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
             onPress={() => setMessages([])}
             style={styles.iconButton}
           >
-            <Feather name="trash-2" size={18} color="#64748B" />
+            <Feather name="trash-2" size={18} color={colors.secondaryText} />
           </TouchableOpacity>
         </BlurView>
 
@@ -437,7 +444,7 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
           ListFooterComponent={
             loading && (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#2563EB" />
+                <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={styles.loadingText}>Lex is analyzing...</Text>
               </View>
             )
@@ -458,7 +465,7 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
                   style={styles.qrPill}
                   onPress={() => sendMessage(qr.action)}
                 >
-                  <Feather name={qr.icon} size={14} color="#2563EB" />
+                  <Feather name={qr.icon} size={14} color={colors.primary} />
                   <Text style={styles.qrText}>{qr.label}</Text>
                 </TouchableOpacity>
               ))}
@@ -475,12 +482,12 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
         >
           {attachedFile && (
             <Animated.View style={styles.attachedFileToast}>
-              <Feather name="paperclip" size={14} color="#0F172A" />
+              <Feather name="paperclip" size={14} color={colors.text} />
               <Text style={styles.attachedFileToastText} numberOfLines={1}>
                 {attachedFile.name}
               </Text>
               <TouchableOpacity onPress={() => setAttachedFile(null)}>
-                <Feather name="x-circle" size={16} color="#94A3B8" />
+                <Feather name="x-circle" size={16} color={colors.placeholder} />
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -490,14 +497,14 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
               onPress={handleAttachDocument}
               style={styles.attachBtn}
             >
-              <Ionicons name="add-circle-outline" size={24} color="#64748B" />
+              <Ionicons name="add-circle-outline" size={24} color={colors.secondaryText} />
             </TouchableOpacity>
 
             <LegalInput
               value={inputText}
               onChangeText={setInputText}
               placeholder="Message Lex AI..."
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.placeholder}
               multiline
               style={styles.textInput}
             />
@@ -511,10 +518,10 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
               ]}
             >
               <LinearGradient
-                colors={["#2563EB", "#1D4ED8"]}
+                colors={[colors.primary, "#1D4ED8"]}
                 style={styles.sendGradient}
               >
-                <Feather name="arrow-up" size={18} color="#FFFFFF" />
+                <Feather name="arrow-up" size={18} color={colors.surface} />
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -529,7 +536,7 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
 // ------------------------------
 
 // SaaS-Grade Custom Markdown Styles
-const markdownStyles = StyleSheet.create({
+const getMarkdownStyles = (THEME, colors) => StyleSheet.create({
   body: {
     color: THEME.textAI,
     fontSize: 15,
@@ -583,26 +590,26 @@ const markdownStyles = StyleSheet.create({
     lineHeight: 24,
   },
   code_inline: {
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
     fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
     fontSize: 13,
-    color: "#0F172A",
+    color: colors.text,
     overflow: "hidden",
   },
   code_block: {
-    backgroundColor: "#0F172A",
+    backgroundColor: colors.text,
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,
     fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
     fontSize: 13,
-    color: "#E2E8F0",
+    color: colors.border,
   },
   fence: {
-    backgroundColor: "#0F172A",
+    backgroundColor: colors.text,
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,
@@ -622,7 +629,7 @@ const markdownStyles = StyleSheet.create({
   },
 });
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: THEME.bg },
   header: {
     flexDirection: "row",
@@ -638,7 +645,7 @@ const styles = StyleSheet.create({
     width: "100%",
     zIndex: 10,
   },
-  iconButton: { padding: 8, borderRadius: 12, backgroundColor: "#F8FAFC" },
+  iconButton: { padding: 8, borderRadius: 12, backgroundColor: colors.background },
   headerTitleContainer: { alignItems: "center" },
   headerTitle: {
     fontSize: 17,
@@ -650,7 +657,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 4,
-    backgroundColor: "#ECFDF5",
+    backgroundColor: colors.surface,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -659,21 +666,21 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#10B981",
+    backgroundColor: colors.success,
     marginRight: 4,
   },
-  statusText: { fontSize: 10, fontWeight: "700", color: "#065F46" },
+  statusText: { fontSize: 10, fontWeight: "700", color: colors.text },
 
   chatScroll: { paddingHorizontal: 16, paddingTop: 100, paddingBottom: 24 },
   contextBanner: {
     alignSelf: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
     marginBottom: 20,
   },
-  contextBannerText: { fontSize: 11, color: "#64748B", fontWeight: "500" },
+  contextBannerText: { fontSize: 11, color: colors.secondaryText, fontWeight: "500" },
 
   messageWrapper: {
     flexDirection: "row",
@@ -698,7 +705,7 @@ const styles = StyleSheet.create({
     maxWidth: "85%",
     padding: 16,
     borderRadius: 20,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
     shadowRadius: 8,
@@ -749,7 +756,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#EFF6FF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     alignSelf: "flex-start",
     marginLeft: 34,
@@ -757,7 +764,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginLeft: 8,
     fontSize: 13,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "600",
   },
 
@@ -766,13 +773,13 @@ const styles = StyleSheet.create({
   qrPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     shadowRadius: 4,
@@ -793,14 +800,14 @@ const styles = StyleSheet.create({
   attachedFileToast: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 12,
     marginBottom: 12,
     alignSelf: "flex-start",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   attachedFileToastText: {
     fontSize: 13,
@@ -817,7 +824,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     paddingHorizontal: 6,
     paddingVertical: 6,
-    shadowColor: "#0F172A",
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.06,
     shadowRadius: 24,

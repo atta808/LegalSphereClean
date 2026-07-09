@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import {
   useFocusEffect,
   useNavigation,
@@ -22,6 +24,8 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 
 export default function ClientProfileScreen({ profile, onBack }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const route = useRoute();
@@ -69,7 +73,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
       <View style={styles.center}>
         <Text>Client data not found.</Text>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={{ color: "#1A73E8", marginTop: 10 }}>Go Back</Text>
+          <Text style={{ color: colors.primary, marginTop: 10 }}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -85,7 +89,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
           onPress={() => (onBack ? onBack() : navigation.goBack())}
           style={styles.glassBackButton}
         >
-          <Ionicons name="chevron-back" size={24} color="#1A73E8" />
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitleText}>Client Profile</Text>
         <View style={{ width: 42 }} />
@@ -121,7 +125,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 <Ionicons
                   name="call"
                   size={18}
-                  color="#FFF"
+                  color={colors.surface}
                   style={{ marginRight: 6 }}
                 />
                 <Text style={styles.btnText}>Call</Text>
@@ -139,7 +143,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 <Ionicons
                   name="logo-whatsapp"
                   size={18}
-                  color="#FFF"
+                  color={colors.surface}
                   style={{ marginRight: 6 }}
                 />
                 <Text style={styles.btnText}>WhatsApp</Text>
@@ -157,11 +161,11 @@ export default function ClientProfileScreen({ profile, onBack }) {
           <View
             style={[
               styles.statBox,
-              { borderLeftWidth: 1, borderColor: "#F1F5F9" },
+              { borderLeftWidth: 1, borderColor: colors.border },
             ]}
           >
             <Text style={styles.statLabel}>Urgent</Text>
-            <Text style={[styles.statVal, { color: "#EF4444" }]}>
+            <Text style={[styles.statVal, { color: colors.danger }]}>
               {cases.filter((c) => c.priority === "urgent").length}
             </Text>
           </View>
@@ -171,13 +175,13 @@ export default function ClientProfileScreen({ profile, onBack }) {
         <Text style={styles.sectionTitle}>Matter History</Text>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#1A73E8" />
+          <ActivityIndicator size="large" color={colors.primary} />
         ) : cases.length === 0 ? (
           <View style={styles.emptyCard}>
             <Ionicons
               name="folder-open-outline"
               size={48}
-              color="#94A3B8"
+              color={colors.placeholder}
               style={{ marginBottom: 12 }}
             />
             <Text style={styles.emptyText}>
@@ -215,7 +219,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 <Ionicons
                   name="business-outline"
                   size={14}
-                  color="#64748B"
+                  color={colors.secondaryText}
                   style={{ marginRight: 4 }}
                 />
                 <Text style={styles.caseCourt}>
@@ -230,7 +234,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                   <Ionicons
                     name="calendar-outline"
                     size={14}
-                    color="#64748B"
+                    color={colors.secondaryText}
                     style={{ marginRight: 4 }}
                   />
                   <Text style={styles.metaLabel}>
@@ -242,7 +246,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                     styles.metaValue,
                     {
                       color:
-                        Number(item.feeBalance) > 0 ? "#EF4444" : "#10B981",
+                        Number(item.feeBalance) > 0 ? colors.danger : colors.success,
                     },
                   ]}
                 >
@@ -257,37 +261,37 @@ export default function ClientProfileScreen({ profile, onBack }) {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#F8FAFC" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.background },
   premiumHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 20,
     paddingBottom: 15,
     borderBottomWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: colors.border,
   },
   glassBackButton: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
-  backIcon: { fontSize: 30, color: "#1A73E8", marginTop: -4 },
-  headerTitleText: { fontSize: 18, fontWeight: "700", color: "#1A73E8" },
+  backIcon: { fontSize: 30, color: colors.primary, marginTop: -4 },
+  headerTitleText: { fontSize: 18, fontWeight: "700", color: colors.primary },
   scrollContent: { padding: 20 },
   identityCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   avatarCircle: {
     width: 70,
@@ -298,17 +302,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  avatarText: { color: "#1A73E8", fontSize: 28, fontWeight: "600" },
+  avatarText: { color: colors.primary, fontSize: 28, fontWeight: "600" },
   clientName: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#0F172A",
+    color: colors.text,
   },
-  clientSub: { fontSize: 13, color: "#64748B", marginTop: 4 },
+  clientSub: { fontSize: 13, color: colors.secondaryText, marginTop: 4 },
   actionHub: { flexDirection: "row", gap: 12, marginTop: 20 },
   callBtn: {
     flex: 1,
-    backgroundColor: "#1A73E8",
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     minHeight: 48,
     borderRadius: 14,
@@ -316,44 +320,44 @@ const styles = StyleSheet.create({
   },
   waBtn: {
     flex: 1,
-    backgroundColor: "#25D366",
+    backgroundColor: colors.success,
     paddingVertical: 14,
     minHeight: 48,
     borderRadius: 14,
     alignItems: "center",
   },
-  btnText: { color: "#FFF", fontWeight: "600" },
+  btnText: { color: colors.surface, fontWeight: "600" },
   statsRow: {
     flexDirection: "row",
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   statBox: { flex: 1, alignItems: "center" },
   statLabel: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#94A3B8",
+    color: colors.placeholder,
     textTransform: "uppercase",
   },
-  statVal: { fontSize: 20, fontWeight: "700", color: "#1A73E8", marginTop: 2 },
+  statVal: { fontSize: 20, fontWeight: "700", color: colors.primary, marginTop: 2 },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#0F172A",
+    color: colors.text,
     marginBottom: 16,
     marginLeft: 4,
   },
   caseCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   caseHeader: {
     flexDirection: "row",
@@ -363,7 +367,7 @@ const styles = StyleSheet.create({
   caseTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#0F172A",
+    color: colors.text,
     flex: 1,
     marginRight: 10,
   },
@@ -373,24 +377,24 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 6,
   },
-  statusText: { fontSize: 10, fontWeight: "600", color: "#1A73E8" },
-  caseCourt: { fontSize: 13, color: "#64748B" },
-  divider: { height: 1, backgroundColor: "#F8FAFC", marginVertical: 12 },
+  statusText: { fontSize: 10, fontWeight: "600", color: colors.primary },
+  caseCourt: { fontSize: 13, color: colors.secondaryText },
+  divider: { height: 1, backgroundColor: colors.background, marginVertical: 12 },
   rowBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  metaLabel: { fontSize: 12, color: "#64748B", fontWeight: "600" },
+  metaLabel: { fontSize: 12, color: colors.secondaryText, fontWeight: "600" },
   metaValue: { fontSize: 14, fontWeight: "600" },
   emptyCard: {
     padding: 40,
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
-  emptyText: { color: "#94A3B8", fontWeight: "600" },
+  emptyText: { color: colors.placeholder, fontWeight: "600" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

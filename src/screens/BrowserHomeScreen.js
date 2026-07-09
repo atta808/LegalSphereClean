@@ -1,6 +1,7 @@
 import { getProfile, saveProfile } from "../services/sqliteService";
 import { getLegalSystemByCountry } from "../constants/legalSystems";
 import React, { useRef, useState } from "react";
+import { useTheme } from '../theme/ThemeContext';
 import {
   View,
   Text,
@@ -48,6 +49,8 @@ const PremiumPressable = ({ onPress, children, style }) => {
 };
 
 export default function BrowserHomeScreen() {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   useFocusEffect(
@@ -170,7 +173,7 @@ export default function BrowserHomeScreen() {
             <Ionicons
               name={item.icon || "globe-outline"}
               size={22}
-              color={item.color || "#2563EB"}
+              color={item.color || colors.primary}
             />
           </View>
           <View style={styles.cardActions}>
@@ -187,7 +190,7 @@ export default function BrowserHomeScreen() {
               <Ionicons
                 name={favoriteTools.includes(item.id) ? "star" : "star-outline"}
                 size={18}
-                color={favoriteTools.includes(item.id) ? "#F59E0B" : "#94A3B8"}
+                color={favoriteTools.includes(item.id) ? "#F59E0B" : colors.placeholder}
               />
             </TouchableOpacity>
           </View>
@@ -204,7 +207,7 @@ export default function BrowserHomeScreen() {
 
         <View style={styles.cardFooter}>
           <Text style={styles.openText}>Launch Workspace</Text>
-          <Ionicons name="arrow-forward" size={14} color="#2563EB" />
+          <Ionicons name="arrow-forward" size={14} color={colors.primary} />
         </View>
       </View>
     </PremiumPressable>
@@ -212,7 +215,7 @@ export default function BrowserHomeScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
 
       {/* SYSTEM HEADER */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
@@ -240,7 +243,7 @@ export default function BrowserHomeScreen() {
               <Ionicons
                 name="star"
                 size={18}
-                color="#F59E0B"
+                color={colors.text}
                 style={{ marginRight: 6 }}
               />
 
@@ -263,7 +266,7 @@ export default function BrowserHomeScreen() {
               <Ionicons
                 name={section.icon}
                 size={18}
-                color="#64748B"
+                color={colors.secondaryText}
                 style={{ marginRight: 6 }}
               />
 
@@ -302,7 +305,7 @@ export default function BrowserHomeScreen() {
           <View style={styles.quickLinksCard}>
             <View style={styles.quickLinksLeft}>
               <View style={styles.quickLinksIconContainer}>
-                <Ionicons name="apps-outline" size={20} color="#2563EB" />
+                <Ionicons name="apps-outline" size={20} color={colors.primary} />
               </View>
               <View style={{ marginLeft: 14 }}>
                 <Text style={styles.quickLinksTitle}>Saved Extensions</Text>
@@ -311,7 +314,7 @@ export default function BrowserHomeScreen() {
                 </Text>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+            <Ionicons name="chevron-forward" size={18} color={colors.placeholder} />
           </View>
         </PremiumPressable>
 
@@ -322,17 +325,17 @@ export default function BrowserHomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: colors.background,
   },
   header: {
     paddingHorizontal: 24,
     paddingBottom: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: colors.border,
   },
   headerTopRow: {
     flexDirection: "row",
@@ -342,20 +345,20 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontWeight: "800",
-    color: "#0F172A",
+    color: colors.text,
     letterSpacing: -0.5,
   },
   headerSubtitle: {
     marginTop: 2,
     fontSize: 13,
-    color: "#64748B",
+    color: colors.secondaryText,
     fontWeight: "500",
     letterSpacing: -0.1,
   },
   statusIndicator: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 99,
@@ -364,13 +367,13 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#10B981",
+    backgroundColor: colors.success,
     marginRight: 6,
   },
   statusText: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#475569",
+    color: colors.secondaryText,
     letterSpacing: 0.5,
   },
   scrollContent: {
@@ -392,7 +395,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#475569",
+    color: colors.secondaryText,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -408,13 +411,13 @@ const styles = StyleSheet.create({
   card: {
     minHeight: 165,
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     // Premium soft micro-shadowing
-    shadowColor: "#0F172A",
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
     shadowRadius: 4,
@@ -432,20 +435,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: colors.border,
   },
   tagBadge: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   tagText: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#64748B",
+    color: colors.secondaryText,
   },
   cardBody: {
     marginTop: 16,
@@ -454,13 +457,13 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#0F172A",
+    color: colors.text,
     letterSpacing: -0.2,
   },
   cardUrl: {
     marginTop: 2,
     fontSize: 11,
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontWeight: "400",
   },
   cardFooter: {
@@ -469,11 +472,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#F1F5F9",
+    borderTopColor: colors.border,
   },
   openText: {
     fontSize: 11,
-    color: "#2563EB",
+    color: colors.primary,
     fontWeight: "600",
   },
   quickLinksWrapper: {
@@ -481,15 +484,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   quickLinksCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
+    borderColor: colors.border,
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
     shadowRadius: 4,
@@ -503,20 +506,20 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: "#2563EB0A",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
   },
   quickLinksTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0F172A",
+    color: colors.text,
     letterSpacing: -0.2,
   },
   quickLinksSub: {
     marginTop: 1,
     fontSize: 12,
-    color: "#64748B",
+    color: colors.secondaryText,
   },
   cardActions: {
     flexDirection: "row",

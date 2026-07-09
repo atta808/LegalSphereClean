@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 // screens/DocumentVaultScreen.js
 import { extractDocumentText } from "../services/ai/documentReaders";
 import { askLegalSphereAI } from "../services/ai/legalSphereAI";
@@ -75,6 +77,8 @@ const getFileTypeLabel = (filename) => {
 };
 
 export default function DocumentVaultScreen() {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const route = useRoute();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -463,7 +467,7 @@ Case: ${doc.caseTitle || "—"}
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#1E3A8A" />
+        <ActivityIndicator size="large" color={colors.primaryDark} />
       </View>
     );
   }
@@ -539,7 +543,7 @@ Case: ${doc.caseTitle || "—"}
           <TextInput
             style={styles.searchInput}
             placeholder="Search documents..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.placeholder}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -702,14 +706,14 @@ Case: ${doc.caseTitle || "—"}
               value={editName}
               onChangeText={setEditName}
               placeholder="Document name"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.placeholder}
             />
             <TextInput
               style={[styles.modalInput, styles.modalTextArea]}
               value={editDescription}
               onChangeText={setEditDescription}
               placeholder="Description"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.placeholder}
               multiline
               numberOfLines={3}
             />
@@ -761,7 +765,7 @@ Case: ${doc.caseTitle || "—"}
             {insightsLoading ? (
               <ActivityIndicator
                 size="large"
-                color="#1E3A8A"
+                color={colors.primaryDark}
                 style={{ marginVertical: 30 }}
               />
             ) : (
@@ -817,22 +821,22 @@ Case: ${doc.caseTitle || "—"}
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#0A0F1E" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.surface },
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#0A0F1E",
+    backgroundColor: colors.surface,
   },
 
   // Header
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 16,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.04,
     shadowRadius: 12,
@@ -847,21 +851,21 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
   backIcon: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "300",
     marginTop: -4,
   },
   titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: "#1E3A8A" },
+  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
   caseContext: {
     fontSize: 11,
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 2,
     fontWeight: "500",
   },
@@ -869,11 +873,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: "#EEF2FF",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
   },
-  aiCopyIcon: { fontSize: 18, color: "#1E3A8A", fontWeight: "900" },
+  aiCopyIcon: { fontSize: 18, color: colors.primary, fontWeight: "900" },
 
   scrollContent: { paddingHorizontal: 20, paddingTop: 24 },
 
@@ -886,17 +890,17 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    backgroundColor: "#0F172A",
+    backgroundColor: colors.text,
     borderRadius: 20,
     paddingVertical: 16,
     alignItems: "center",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
   },
-  actionIcon: { fontSize: 28, color: "#38BDF8", fontWeight: "900" },
+  actionIcon: { fontSize: 28, color: colors.text, fontWeight: "900" },
   actionLabel: {
     marginTop: 8,
-    color: "#FFF",
+    color: colors.surface,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 0.5,
@@ -906,16 +910,16 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 20,
     paddingHorizontal: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
-  searchIcon: { fontSize: 16, marginRight: 12, color: "#94A3B8" },
-  searchInput: { flex: 1, paddingVertical: 14, fontSize: 16, color: "#1E293B" },
-  clearIcon: { fontSize: 16, color: "#94A3B8", padding: 4 },
+  searchIcon: { fontSize: 16, marginRight: 12, color: colors.placeholder },
+  searchInput: { flex: 1, paddingVertical: 14, fontSize: 16, color: colors.text },
+  clearIcon: { fontSize: 16, color: colors.placeholder, padding: 4 },
 
   // Category Filter
   categoryScroll: { flexDirection: "row", marginBottom: 20 },
@@ -923,22 +927,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     marginRight: 10,
   },
-  categoryChipActive: { backgroundColor: "#1E3A8A" },
-  categoryChipText: { fontSize: 14, fontWeight: "600", color: "#475569" },
-  categoryChipTextActive: { color: "#FFFFFF" },
+  categoryChipActive: { backgroundColor: colors.primary },
+  categoryChipText: { fontSize: 14, fontWeight: "600", color: colors.secondaryText },
+  categoryChipTextActive: { color: colors.surface },
 
   // Count
   countContainer: { marginBottom: 16, paddingHorizontal: 4 },
-  countText: { fontSize: 13, fontWeight: "600", color: "#64748B" },
+  countText: { fontSize: 13, fontWeight: "600", color: colors.secondaryText },
 
   // Empty State
   emptyContainer: {
     alignItems: "center",
     paddingVertical: 60,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 24,
     marginTop: 20,
   },
@@ -946,23 +950,23 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#1E293B",
+    color: colors.text,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: "#64748B",
+    color: colors.secondaryText,
     textAlign: "center",
     paddingHorizontal: 40,
   },
 
   // Document Card
   documentCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 20,
     marginBottom: 16,
     padding: 16,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -976,7 +980,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 14,
@@ -986,27 +990,27 @@ const styles = StyleSheet.create({
   documentName: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#1E293B",
+    color: colors.text,
     marginBottom: 2,
   },
-  documentMeta: { fontSize: 12, color: "#64748B", marginBottom: 2 },
-  documentDescription: { fontSize: 13, color: "#475569", marginTop: 2 },
+  documentMeta: { fontSize: 12, color: colors.secondaryText, marginBottom: 2 },
+  documentDescription: { fontSize: 13, color: colors.secondaryText, marginTop: 2 },
   categoryBadge: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 12,
     alignSelf: "flex-start",
     marginTop: 6,
   },
-  categoryBadgeText: { fontSize: 10, fontWeight: "700", color: "#1E3A8A" },
+  categoryBadgeText: { fontSize: 10, fontWeight: "700", color: colors.primary },
   documentActions: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#F1F5F9",
+    borderTopColor: colors.border,
   },
   actionIconBtn: { padding: 8 },
   actionIconSmall: { fontSize: 18, opacity: 0.7 },
@@ -1022,7 +1026,7 @@ const styles = StyleSheet.create({
   previewContainer: {
     width: "100%",
     height: "80%",
-    backgroundColor: "#000",
+    backgroundColor: colors.shadow,
     borderRadius: 24,
     overflow: "hidden",
     position: "relative",
@@ -1039,11 +1043,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  closePreviewText: { color: "#FFF", fontSize: 18, fontWeight: "bold" },
+  closePreviewText: { color: colors.surface, fontSize: 18, fontWeight: "bold" },
   previewImage: { width: "100%", height: "100%" },
 
   modalCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 28,
     padding: 24,
     width: "100%",
@@ -1052,17 +1056,17 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontWeight: "900",
-    color: "#1E293B",
+    color: colors.text,
     marginBottom: 20,
   },
   modalInput: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 16,
     padding: 16,
     fontSize: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   modalTextArea: { minHeight: 80, textAlignVertical: "top" },
   modalCategoryRow: {
@@ -1075,38 +1079,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
   },
-  modalCategoryChipActive: { backgroundColor: "#1E3A8A" },
-  modalCategoryChipText: { fontSize: 13, fontWeight: "600", color: "#475569" },
-  modalCategoryChipTextActive: { color: "#FFF" },
+  modalCategoryChipActive: { backgroundColor: colors.primary },
+  modalCategoryChipText: { fontSize: 13, fontWeight: "600", color: colors.secondaryText },
+  modalCategoryChipTextActive: { color: colors.surface },
   modalActionRow: { flexDirection: "row", gap: 12, marginTop: 8 },
   modalCancel: {
     flex: 1,
     paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderRadius: 16,
   },
-  modalCancelText: { color: "#64748B", fontWeight: "700" },
+  modalCancelText: { color: colors.secondaryText, fontWeight: "700" },
   modalSave: {
     flex: 2,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: "center",
   },
-  modalSaveText: { color: "#FFF", fontWeight: "800" },
+  modalSaveText: { color: colors.surface, fontWeight: "800" },
 
   // AI Insights
   aiSectionTitle: {
     fontSize: 14,
     fontWeight: "800",
-    color: "#1E3A8A",
+    color: colors.primary,
     marginTop: 16,
     marginBottom: 8,
   },
-  aiText: { fontSize: 14, color: "#475569", lineHeight: 20 },
+  aiText: { fontSize: 14, color: colors.secondaryText, lineHeight: 20 },
   aiKeywordsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -1114,15 +1118,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   aiKeywordChip: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
-  aiKeywordText: { fontSize: 12, fontWeight: "600", color: "#1E3A8A" },
+  aiKeywordText: { fontSize: 12, fontWeight: "600", color: colors.primary },
   aiPrimaryButton: {
     flex: 1.4,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     height: 56,
     borderRadius: 18,
     justifyContent: "center",
@@ -1130,24 +1134,24 @@ const styles = StyleSheet.create({
   },
 
   aiPrimaryText: {
-    color: "#FFFFFF",
+    color: colors.surface,
     fontSize: 16,
     fontWeight: "800",
   },
 
   aiSecondaryButton: {
     flex: 1,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     height: 56,
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   aiSecondaryText: {
-    color: "#475569",
+    color: colors.secondaryText,
     fontSize: 14,
     fontWeight: "700",
   },

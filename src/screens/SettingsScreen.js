@@ -27,7 +27,12 @@ import {
   getProfile,
   saveProfile,
 } from "../services/sqliteService";
+import { useTheme } from "../theme/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 export default function SettingsScreen({ navigation }) {
+
+  const { currentTheme, setTheme, colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const [profileReady, setProfileReady] = useState(false);
   const [countryPickerVisible, setCountryPickerVisible] = useState(false);
@@ -311,7 +316,7 @@ export default function SettingsScreen({ navigation }) {
             >
               <Text
                 style={{
-                  color: "#1E293B",
+                  color: colors.text,
                   fontSize: 15,
                   fontWeight: "600",
                 }}
@@ -329,7 +334,7 @@ export default function SettingsScreen({ navigation }) {
                   fontSize: 16,
                   fontWeight: "700",
                   marginBottom: 12,
-                  color: "#1E293B",
+                  color: colors.text,
                 }}
               >
                 Add Custom CMS
@@ -352,7 +357,7 @@ export default function SettingsScreen({ navigation }) {
               <TouchableOpacity
                 onPress={addCustomCMS}
                 style={{
-                  backgroundColor: "#2563EB",
+                  backgroundColor: colors.primary,
                   paddingVertical: 14,
                   borderRadius: 14,
                   alignItems: "center",
@@ -361,7 +366,7 @@ export default function SettingsScreen({ navigation }) {
               >
                 <Text
                   style={{
-                    color: "#fff",
+                    color: colors.surface,
                     fontWeight: "700",
                     fontSize: 15,
                   }}
@@ -391,7 +396,7 @@ export default function SettingsScreen({ navigation }) {
 
                   <Text
                     style={{
-                      color: enabled ? "#16A34A" : "#94A3B8",
+                      color: enabled ? colors.success : colors.placeholder,
                       fontWeight: "700",
                     }}
                   >
@@ -421,7 +426,7 @@ export default function SettingsScreen({ navigation }) {
             <TouchableOpacity
               onPress={addResearchSource}
               style={{
-                backgroundColor: "#1E3A8A",
+                backgroundColor: colors.primary,
                 paddingVertical: 14,
                 borderRadius: 14,
                 alignItems: "center",
@@ -430,7 +435,7 @@ export default function SettingsScreen({ navigation }) {
             >
               <Text
                 style={{
-                  color: "#fff",
+                  color: colors.surface,
                   fontWeight: "700",
                 }}
               >
@@ -443,7 +448,7 @@ export default function SettingsScreen({ navigation }) {
                 <Text>{source.name}</Text>
                 <Text
                   style={{
-                    color: "#64748B",
+                    color: colors.secondaryText,
                     fontSize: 12,
                   }}
                 >
@@ -466,7 +471,7 @@ export default function SettingsScreen({ navigation }) {
             >
               <Text
                 style={{
-                  color: "#1E293B",
+                  color: colors.text,
                   fontSize: 15,
                   fontWeight: "600",
                 }}
@@ -490,7 +495,7 @@ export default function SettingsScreen({ navigation }) {
             >
               <Text
                 style={{
-                  color: "#1E293B",
+                  color: colors.text,
                   fontSize: 15,
                   fontWeight: "600",
                 }}
@@ -514,7 +519,7 @@ export default function SettingsScreen({ navigation }) {
             >
               <Text
                 style={{
-                  color: "#1E293B",
+                  color: colors.text,
                   fontSize: 15,
                   fontWeight: "600",
                 }}
@@ -526,6 +531,46 @@ export default function SettingsScreen({ navigation }) {
                   "en-US": "USA (MM/DD/YYYY)",
                 }[profile.locale] || "Select Date Format"}
               </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* APPEARANCE */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Appearance</Text>
+          <View style={styles.item}>
+            <TouchableOpacity
+              style={styles.themeRow}
+              onPress={() => setTheme("light")}
+            >
+              <Text style={styles.themeRowText}>☀️ Light</Text>
+              {currentTheme === "light" && (
+                <Ionicons name="checkmark" size={20} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.themeDivider} />
+
+            <TouchableOpacity
+              style={styles.themeRow}
+              onPress={() => setTheme("dark")}
+            >
+              <Text style={styles.themeRowText}>🌙 Dark</Text>
+              {currentTheme === "dark" && (
+                <Ionicons name="checkmark" size={20} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.themeDivider} />
+
+            <TouchableOpacity
+              style={styles.themeRow}
+              onPress={() => setTheme("system")}
+            >
+              <Text style={styles.themeRowText}>📱 System (Recommended)</Text>
+              {currentTheme === "system" && (
+                <Ionicons name="checkmark" size={20} color={colors.primary} />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -571,7 +616,7 @@ export default function SettingsScreen({ navigation }) {
               )
             }
           >
-            <Text style={{ color: "#1E3A8A", fontWeight: "600" }}>
+            <Text style={{ color: colors.primary, fontWeight: "600" }}>
               🔄 Restore from Cloud
             </Text>
           </TouchableOpacity>
@@ -771,13 +816,13 @@ export default function SettingsScreen({ navigation }) {
     </View>
   );
 }
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -794,16 +839,16 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   backIcon: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "300",
     marginTop: -4,
   },
@@ -816,11 +861,11 @@ const styles = StyleSheet.create({
   headerTitleText: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   jurisdictionPill: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
@@ -830,10 +875,10 @@ const styles = StyleSheet.create({
   jurisdictionText: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#4338CA",
+    color: colors.primary,
     textTransform: "uppercase",
   },
-  container: { flex: 1, backgroundColor: "#F8FAFC" },
+  container: { flex: 1, backgroundColor: colors.background },
 
   header: {
     alignItems: "center",
@@ -853,18 +898,18 @@ const styles = StyleSheet.create({
   },
 
   sub: {
-    color: "#64748B",
+    color: colors.secondaryText,
     marginBottom: 10,
   },
 
   editBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 10,
   },
 
-  editText: { color: "#fff" },
+  editText: { color: colors.surface },
 
   section: {
     marginTop: 20,
@@ -877,7 +922,7 @@ const styles = StyleSheet.create({
   },
 
   item: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: 10,
     paddingHorizontal: 10,
@@ -885,12 +930,26 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 12,
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 10,
     marginLeft: 5,
   },
+  themeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 5,
+  },
+  themeRowText: {
+    fontSize: 15,
+  },
+  themeDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+  },
   logoutBtn: {
-    backgroundColor: "#EF4444",
+    backgroundColor: colors.danger,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
@@ -898,7 +957,7 @@ const styles = StyleSheet.create({
   },
 
   logoutBtnText: {
-    color: "#FFF",
+    color: colors.surface,
     fontWeight: "700",
     fontSize: 15,
   },

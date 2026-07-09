@@ -4,6 +4,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
+import { useTheme } from '../theme/ThemeContext';
 import {
   Alert,
   Image,
@@ -19,6 +20,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getProfile, saveProfile } from "../services/sqliteService";
 
 export default function LawyerProfileScreen({ navigation }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
 
   const [profile, setProfile] = useState({
@@ -110,7 +113,7 @@ export default function LawyerProfileScreen({ navigation }) {
   );
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.mainWrapper}>
         {/* HEADER */}
         <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
@@ -145,11 +148,11 @@ export default function LawyerProfileScreen({ navigation }) {
                 />
               ) : (
                 <View style={styles.placeholderImg}>
-                  <Ionicons name="person" size={50} color="#CBD5E1" />
+                  <Ionicons name="person" size={50} color={colors.disabled} />
                 </View>
               )}
               <View style={styles.editBadge}>
-                <Ionicons name="camera" size={18} color="#fff" />
+                <Ionicons name="camera" size={18} color={colors.surface} />
               </View>
             </TouchableOpacity>
           </View>
@@ -166,7 +169,7 @@ export default function LawyerProfileScreen({ navigation }) {
             />
 
             <View style={styles.inputWrapper}>
-              <Ionicons name="business-outline" size={20} color="#64748B" />
+              <Ionicons name="business-outline" size={20} color={colors.secondaryText} />
               <LegalInput
                 label="Legal Title"
                 value={profile.court}
@@ -176,7 +179,7 @@ export default function LawyerProfileScreen({ navigation }) {
             </View>
 
             <View style={styles.inputWrapper}>
-              <Ionicons name="call-outline" size={20} color="#64748B" />
+              <Ionicons name="call-outline" size={20} color={colors.secondaryText} />
               <LegalInput
                 label="Phone Number"
                 value={profile.phone}
@@ -187,7 +190,7 @@ export default function LawyerProfileScreen({ navigation }) {
             </View>
 
             <View style={styles.inputWrapper}>
-              <Ionicons name="mail-outline" size={20} color="#64748B" />
+              <Ionicons name="mail-outline" size={20} color={colors.secondaryText} />
               <LegalInput
                 label="Email Address"
                 value={profile.email}
@@ -207,7 +210,7 @@ export default function LawyerProfileScreen({ navigation }) {
               label="Google Map Location"
               keyName="map"
               value={profile.links?.map}
-              color="#EA4335"
+              color={colors.danger}
             />
 
             <SocialInput
@@ -215,7 +218,7 @@ export default function LawyerProfileScreen({ navigation }) {
               label="Website"
               keyName="website"
               value={profile.links?.website}
-              color="#2563EB"
+              color={colors.primary}
             />
 
             <SocialInput
@@ -223,7 +226,7 @@ export default function LawyerProfileScreen({ navigation }) {
               label="Facebook"
               keyName="facebook"
               value={profile.links?.facebook}
-              color="#1877F2"
+              color={colors.text}
             />
 
             <SocialInput
@@ -231,7 +234,7 @@ export default function LawyerProfileScreen({ navigation }) {
               label="Instagram"
               keyName="instagram"
               value={profile.links?.instagram}
-              color="#E1306C"
+              color={colors.text}
             />
 
             <SocialInput
@@ -239,7 +242,7 @@ export default function LawyerProfileScreen({ navigation }) {
               label="LinkedIn"
               keyName="linkedin"
               value={profile.links?.linkedin}
-              color="#0A66C2"
+              color={colors.text}
             />
 
             <SocialInput
@@ -247,14 +250,14 @@ export default function LawyerProfileScreen({ navigation }) {
               label="WhatsApp"
               keyName="whatsapp"
               value={profile.links?.whatsapp}
-              color="#25D366"
+              color={colors.success}
             />
           </View>
 
           {/* SAVE BUTTON */}
           <TouchableOpacity onPress={save}>
             <LinearGradient
-              colors={["#1E3A8A", "#1E40AF"]}
+              colors={[colors.primaryDark, "#1E40AF"]}
               style={styles.saveBtn}
             >
               <Text style={styles.saveBtnText}>Save Changes</Text>
@@ -266,11 +269,11 @@ export default function LawyerProfileScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  mainWrapper: { flex: 1, backgroundColor: "#F1F5F9" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainWrapper: { flex: 1, backgroundColor: colors.border },
 
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -286,16 +289,16 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   backIcon: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: colors.primary,
     marginTop: -4,
   },
 
@@ -304,11 +307,11 @@ const styles = StyleSheet.create({
   headerTitleText: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   jurisdictionPill: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
@@ -318,7 +321,7 @@ const styles = StyleSheet.create({
   jurisdictionText: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#4338CA",
+    color: colors.primary,
   },
 
   scrollContent: {
@@ -336,8 +339,8 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 55,
     borderWidth: 4,
-    borderColor: "#fff",
-    backgroundColor: "#fff",
+    borderColor: colors.surface,
+    backgroundColor: colors.surface,
     elevation: 10,
   },
 
@@ -351,7 +354,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 55,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -360,7 +363,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#3B82F6",
+    backgroundColor: colors.primary,
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -369,7 +372,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: 20,
     marginBottom: 15,
@@ -378,7 +381,7 @@ const styles = StyleSheet.create({
   cardLabel: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1E3A8A",
+    color: colors.primary,
     marginBottom: 15,
   },
   saveBtn: {
@@ -389,7 +392,7 @@ const styles = StyleSheet.create({
   },
 
   saveBtnText: {
-    color: "#fff",
+    color: colors.surface,
     fontSize: 17,
     fontWeight: "700",
   },

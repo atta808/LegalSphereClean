@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -37,6 +39,8 @@ const quickActions = [
 ];
 
 export default function DashboardScreen({ profile, onLogout }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const [stats, setStats] = useState({
     activeCases: 0,
@@ -195,7 +199,7 @@ export default function DashboardScreen({ profile, onLogout }) {
 
   return (
     <View style={styles.mainWrapper}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E3A8A" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
 
       {/* HEADER */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
@@ -251,7 +255,7 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statMini}>
-            <Text style={[styles.statMiniVal, { color: "#FCA5A5" }]}>
+            <Text style={[styles.statMiniVal, { color: colors.text }]}>
               {stats.urgentCases}
             </Text>
             <Text style={styles.statMiniLabel}>Urgent</Text>
@@ -263,7 +267,7 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
         </View>
 
-        <Text style={{ marginBottom: 10, color: "#64748B", fontWeight: "600" }}>
+        <Text style={{ marginBottom: 10, color: colors.secondaryText, fontWeight: "600" }}>
           Total Cases: {totalCases}
         </Text>
         <View style={styles.litigationCard}>
@@ -281,7 +285,7 @@ export default function DashboardScreen({ profile, onLogout }) {
             <View style={styles.litigationDivider} />
 
             <View style={styles.litigationItem}>
-              <Text style={[styles.litigationValue, { color: "#DC2626" }]}>
+              <Text style={[styles.litigationValue, { color: colors.danger }]}>
                 {litigationStats.criminal}
               </Text>
 
@@ -291,7 +295,7 @@ export default function DashboardScreen({ profile, onLogout }) {
             <View style={styles.litigationDivider} />
 
             <View style={styles.litigationItem}>
-              <Text style={[styles.litigationValue, { color: "#9333EA" }]}>
+              <Text style={[styles.litigationValue, { color: colors.text }]}>
                 {litigationStats.family}
               </Text>
 
@@ -358,7 +362,7 @@ export default function DashboardScreen({ profile, onLogout }) {
                 setActiveSection(activeSection === "pending" ? null : "pending")
               }
             >
-              <Text style={[styles.alertTitle, { color: "#BE123C" }]}>
+              <Text style={[styles.alertTitle, { color: colors.text }]}>
                 ⚠️ Pending ({pendingHearings.length})
               </Text>
               <Text style={{ fontWeight: "900" }}>
@@ -427,7 +431,7 @@ export default function DashboardScreen({ profile, onLogout }) {
                 setActiveSection(activeSection === "today" ? null : "today")
               }
             >
-              <Text style={[styles.alertTitle, { color: "#B45309" }]}>
+              <Text style={[styles.alertTitle, { color: colors.text }]}>
                 🔔 Today ({todayHearings.length})
               </Text>
               <Text style={{ fontWeight: "900" }}>
@@ -519,7 +523,7 @@ export default function DashboardScreen({ profile, onLogout }) {
             style={styles.shareBtn}
             onPress={handleShareProfile}
           >
-            <Text style={{ color: "#fff", fontWeight: "700" }}>Share</Text>
+            <Text style={{ color: colors.surface, fontWeight: "700" }}>Share</Text>
           </TouchableOpacity>
         </View>
 
@@ -544,10 +548,10 @@ export default function DashboardScreen({ profile, onLogout }) {
   );
 }
 
-const styles = StyleSheet.create({
-  mainWrapper: { flex: 1, backgroundColor: "#F8FAFC" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainWrapper: { flex: 1, backgroundColor: colors.background },
   premiumHeader: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingBottom: 50,
     borderBottomLeftRadius: 35,
@@ -567,49 +571,49 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  avatarText: { color: "#FFF", fontSize: 20, fontWeight: "800" },
-  welcomeLabel: { color: "#C7D2FE", fontSize: 11 },
-  lawyerName: { color: "#FFF", fontSize: 17, fontWeight: "900" },
+  avatarText: { color: colors.surface, fontSize: 20, fontWeight: "800" },
+  welcomeLabel: { color: colors.text, fontSize: 11 },
+  lawyerName: { color: colors.surface, fontSize: 17, fontWeight: "900" },
   glassLogout: {
     backgroundColor: "rgba(255,255,255,0.15)",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
   },
-  logoutText: { color: "#FFF", fontSize: 12, fontWeight: "600" },
+  logoutText: { color: colors.surface, fontSize: 12, fontWeight: "600" },
   jurisdictionContainer: {
     marginTop: 15,
     backgroundColor: "rgba(255,255,255,0.1)",
     padding: 8,
     borderRadius: 10,
   },
-  jurisdictionText: { color: "#E0E7FF", fontSize: 12 },
+  jurisdictionText: { color: colors.text, fontSize: 12 },
   scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 120 },
   floatingStats: {
     flexDirection: "row",
-    backgroundColor: "#1E293B",
+    backgroundColor: colors.text,
     borderRadius: 24,
     padding: 20,
     justifyContent: "space-between",
     marginTop: -35,
     marginBottom: 20,
     elevation: 4,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
   },
   statMini: { flex: 1, alignItems: "center" },
-  statMiniVal: { color: "#FFF", fontSize: 20, fontWeight: "900" },
-  statMiniLabel: { color: "#94A3B8", fontSize: 11, marginTop: 2 },
+  statMiniVal: { color: colors.surface, fontSize: 20, fontWeight: "900" },
+  statMiniLabel: { color: colors.placeholder, fontSize: 11, marginTop: 2 },
   statDivider: {
     width: 1,
-    backgroundColor: "#334155",
+    backgroundColor: colors.text,
     height: "70%",
     alignSelf: "center",
   },
   litigationCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 22,
     padding: 20,
     marginBottom: 15,
@@ -619,7 +623,7 @@ const styles = StyleSheet.create({
   litigationTitle: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#1E293B",
+    color: colors.text,
     marginBottom: 18,
   },
 
@@ -637,23 +641,23 @@ const styles = StyleSheet.create({
   litigationValue: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   litigationLabel: {
     marginTop: 6,
     fontSize: 12,
     fontWeight: "700",
-    color: "#64748B",
+    color: colors.secondaryText,
   },
 
   litigationDivider: {
     width: 1,
     height: 40,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
   },
   workflowCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 22,
     padding: 20,
     marginBottom: 15,
@@ -663,7 +667,7 @@ const styles = StyleSheet.create({
   workflowTitle: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#1E293B",
+    color: colors.text,
     marginBottom: 15,
   },
 
@@ -673,34 +677,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: colors.border,
   },
 
   workflowName: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#334155",
+    color: colors.text,
   },
 
   workflowCount: {
-    backgroundColor: "#DBEAFE",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 999,
   },
 
   workflowCountText: {
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "900",
     fontSize: 12,
   },
 
   workflowEmpty: {
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontSize: 13,
   },
   dailyTaskCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 22,
     padding: 20,
     marginBottom: 15,
@@ -711,29 +715,29 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  taskTitle: { fontWeight: "800", fontSize: 15, color: "#1E293B" },
-  taskCount: { color: "#2B6EF2", fontWeight: "700" },
+  taskTitle: { fontWeight: "800", fontSize: 15, color: colors.text },
+  taskCount: { color: colors.text, fontWeight: "700" },
   statValue: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#1E3A8A",
+    color: colors.primary,
     marginTop: 10,
   },
   progressBarBg: {
     height: 8,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderRadius: 4,
     marginTop: 12,
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: "#2B6EF2",
+    backgroundColor: colors.surface,
     borderRadius: 4,
   },
-  taskHint: { marginTop: 10, fontSize: 13, color: "#64748B" },
+  taskHint: { marginTop: 10, fontSize: 13, color: colors.secondaryText },
   alertRibbon: { padding: 15, borderRadius: 18, marginBottom: 12 },
-  pendingBox: { backgroundColor: "#FFF1F2" },
-  todayBox: { backgroundColor: "#FFFBEB" },
+  pendingBox: { backgroundColor: colors.surface },
+  todayBox: { backgroundColor: colors.surface },
   alertHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -744,15 +748,15 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingLeft: 12,
     borderLeftWidth: 3,
-    borderLeftColor: "#CBD5F5",
+    borderLeftColor: colors.border,
   },
-  caseName: { fontSize: 15, fontWeight: "800", color: "#1E293B" },
-  caseCourt: { fontSize: 13, color: "#64748B", marginTop: 2 },
+  caseName: { fontSize: 15, fontWeight: "800", color: colors.text },
+  caseCourt: { fontSize: 13, color: colors.secondaryText, marginTop: 2 },
   sectionHeading: {
     fontSize: 20,
     fontWeight: "900",
     marginVertical: 15,
-    color: "#1E293B",
+    color: colors.text,
   },
 
   actionGrid: {
@@ -763,16 +767,16 @@ const styles = StyleSheet.create({
   actionCard: {
     width: "48.5%",
     height: 80,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 18,
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -781,13 +785,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: "#EFF6FF",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   actionIcon: { fontSize: 20 },
-  actionLabel: { fontWeight: "700", fontSize: 15, color: "#1E3A8A", flex: 1 },
+  actionLabel: { fontWeight: "700", fontSize: 15, color: colors.primary, flex: 1 },
 
   glassButton: {
     backgroundColor: "rgba(255,255,255,0.15)",
@@ -797,9 +801,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  iconText: { fontSize: 18, color: "#FFF" },
+  iconText: { fontSize: 18, color: colors.surface },
   profileCard: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 22,
     padding: 16,
     flexDirection: "row",
@@ -814,15 +818,15 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
-  profileAvatarText: { color: "#fff", fontWeight: "800", fontSize: 20 },
-  profileName: { fontSize: 17, fontWeight: "800", color: "#1E293B" },
-  profileSub: { fontSize: 13, color: "#64748B" },
+  profileAvatarText: { color: colors.surface, fontWeight: "800", fontSize: 20 },
+  profileName: { fontSize: 17, fontWeight: "800", color: colors.text },
+  profileSub: { fontSize: 13, color: colors.secondaryText },
   shareBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
@@ -836,22 +840,22 @@ const styles = StyleSheet.create({
   },
 
   civilBadge: {
-    backgroundColor: "#DBEAFE",
+    backgroundColor: colors.surface,
   },
 
   criminalBadge: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: colors.danger,
   },
 
   familyBadge: {
-    backgroundColor: "#FCE7F3",
+    backgroundColor: colors.surface,
   },
 
   domainBadgeText: {
     fontSize: 10,
     fontWeight: "900",
     letterSpacing: 0.5,
-    color: "#1E293B",
+    color: colors.text,
   },
   alertItemRow: {
     flexDirection: "row",
@@ -859,11 +863,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingLeft: 12,
     borderLeftWidth: 3,
-    borderLeftColor: "#CBD5F5",
+    borderLeftColor: colors.border,
   },
 
   updateBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 10,
@@ -871,7 +875,7 @@ const styles = StyleSheet.create({
   },
 
   updateBtnText: {
-    color: "#fff",
+    color: colors.surface,
     fontWeight: "700",
     fontSize: 12,
   },

@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
+import { useTheme } from '../theme/ThemeContext';
 import {
   View,
   Text,
@@ -18,6 +19,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { askDeepSeek } from "../services/deepseekService";
 import { normalizeCourtJudgeFields } from "../utils/courtJudgeParser";
 export default function LegalBrowserScreen({ route, navigation }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const { url, title, caseId, aiMode } = route.params;
   console.log("AI MODE =", aiMode);
   useEffect(() => {
@@ -89,7 +92,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
   };
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
 
       {/* PREMIUM HEADER */}
       <View
@@ -107,7 +110,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
             style={styles.iconButton}
             accessibilityLabel="Close Browser"
           >
-            <Ionicons name="close" size={22} color="#1e3a8a" />
+            <Ionicons name="close" size={22} color={colors.primaryDark} />
           </TouchableOpacity>
 
           <View style={styles.titleContainer}>
@@ -125,7 +128,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
             style={styles.iconButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="remove-outline" size={22} color="#1e3a8a" />
+            <Ionicons name="remove-outline" size={22} color={colors.primaryDark} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
@@ -135,7 +138,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
             <Ionicons
               name={showMenu ? "ellipsis-vertical" : "ellipsis-horizontal"}
               size={20}
-              color="#1e3a8a"
+              color={colors.primaryDark}
             />
           </TouchableOpacity>
         </View>
@@ -155,17 +158,17 @@ export default function LegalBrowserScreen({ route, navigation }) {
             style={styles.menuItem}
             onPress={() => webViewRef.current?.reload()}
           >
-            <Ionicons name="refresh-outline" size={18} color="#374151" />
+            <Ionicons name="refresh-outline" size={18} color={colors.icon} />
             <Text style={styles.menuText}>Reload Page</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem} onPress={handleCopyLink}>
-            <Ionicons name="copy-outline" size={18} color="#374151" />
+            <Ionicons name="copy-outline" size={18} color={colors.icon} />
             <Text style={styles.menuText}>Copy Link</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
-            <Ionicons name="share-social-outline" size={18} color="#374151" />
+            <Ionicons name="share-social-outline" size={18} color={colors.icon} />
             <Text style={styles.menuText}>Share Resource</Text>
           </TouchableOpacity>
 
@@ -173,7 +176,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
             style={styles.menuItem}
             onPress={handleOpenExternal}
           >
-            <Ionicons name="open-outline" size={18} color="#374151" />
+            <Ionicons name="open-outline" size={18} color={colors.icon} />
             <Text style={styles.menuText}>Open in Chrome/Safari</Text>
           </TouchableOpacity>
 
@@ -184,7 +187,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
             style={styles.menuItem}
             onPress={triggerScreenshotOCR}
           >
-            <Ionicons name="scan-outline" size={18} color="#2563eb" />
+            <Ionicons name="scan-outline" size={18} color={colors.primary} />
             <Text style={[styles.menuText, styles.premiumText]}>
               Screenshot OCR (Soon)
             </Text>
@@ -206,7 +209,7 @@ true;
 `);
             }}
           >
-            <Ionicons name="sparkles-outline" size={18} color="#2563eb" />
+            <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
             <Text style={[styles.menuText, styles.premiumText]}>
               Analyze Current Page
             </Text>
@@ -229,7 +232,7 @@ true;
       `);
               }}
             >
-              <Ionicons name="sparkles-outline" size={18} color="#2563eb" />
+              <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
               <Text style={[styles.menuText, styles.premiumText]}>
                 AI Fill Add Case
               </Text>
@@ -253,7 +256,7 @@ true;
       `);
               }}
             >
-              <Ionicons name="sparkles-outline" size={18} color="#2563eb" />
+              <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
               <Text style={[styles.menuText, styles.premiumText]}>
                 Sync Hearing From CMS
               </Text>
@@ -263,7 +266,7 @@ true;
             style={styles.menuItem}
             onPress={handleSaveCitation}
           >
-            <Ionicons name="document-text-outline" size={18} color="#2563eb" />
+            <Ionicons name="document-text-outline" size={18} color={colors.primary} />
             <Text style={[styles.menuText, styles.premiumText]}>
               Save Citation
             </Text>
@@ -273,7 +276,7 @@ true;
       {analyzing && (
         <View style={styles.aiOverlay}>
           <View style={styles.aiCard}>
-            <ActivityIndicator size="large" color="#1E3A8A" />
+            <ActivityIndicator size="large" color={colors.primaryDark} />
             <Text style={styles.aiTitle}>
               {aiMode === "autofillCase"
                 ? "LegalSphere CMS AI"
@@ -645,7 +648,7 @@ ${payload.text}
           <Ionicons
             name="chevron-back"
             size={24}
-            color={canGoBack ? "#1e3a8a" : "#cbd5e1"}
+            color={canGoBack ? colors.primaryDark : colors.disabled}
           />
         </TouchableOpacity>
 
@@ -657,7 +660,7 @@ ${payload.text}
           <Ionicons
             name="chevron-forward"
             size={24}
-            color={canGoForward ? "#1e3a8a" : "#cbd5e1"}
+            color={canGoForward ? colors.primaryDark : colors.disabled}
           />
         </TouchableOpacity>
 
@@ -665,27 +668,27 @@ ${payload.text}
           onPress={() => webViewRef.current?.reload()}
           style={styles.toolbarButton}
         >
-          <Ionicons name="refresh" size={20} color="#1e3a8a" />
+          <Ionicons name="refresh" size={20} color={colors.primaryDark} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.surface,
   },
   header: {
     height: 60,
     borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
+    borderBottomColor: colors.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.surface,
   },
   leftSection: {
     flexDirection: "row",
@@ -701,7 +704,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 10,
-    backgroundColor: "#f8fafc",
+    backgroundColor: colors.background,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -712,24 +715,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0f172a",
+    color: colors.text,
   },
   url: {
     fontSize: 11,
-    color: "#64748b",
+    color: colors.secondaryText,
     marginTop: 1,
   },
   progressContainer: {
     height: 2,
     width: "100%",
-    backgroundColor: "#f1f5f9",
+    backgroundColor: colors.border,
     position: "absolute",
     top: StatusBar.currentHeight ? StatusBar.currentHeight + 66 : 90,
     zIndex: 30,
   },
   progressBar: {
     height: "100%",
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.primary,
   },
   webviewWrapper: {
     flex: 1,
@@ -743,14 +746,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: StatusBar.currentHeight ? StatusBar.currentHeight + 70 : 95,
     right: 16,
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     paddingVertical: 6,
     width: 220,
     zIndex: 40,
     ...Platform.select({
       ios: {
-        shadowColor: "#0f172a",
+        shadowColor: colors.text,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
@@ -760,7 +763,7 @@ const styles = StyleSheet.create({
       },
     }),
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: colors.border,
   },
   menuItem: {
     flexDirection: "row",
@@ -770,27 +773,27 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 13,
-    color: "#334155",
+    color: colors.text,
     marginLeft: 10,
     fontWeight: "500",
   },
   premiumText: {
-    color: "#2563eb",
+    color: colors.primary,
   },
   menuDivider: {
     height: 1,
-    backgroundColor: "#f1f5f9",
+    backgroundColor: colors.border,
     marginVertical: 4,
   },
   /* Bottom Navigation Toolbar Styles */
   bottomToolbar: {
     height: 52,
     borderTopWidth: 1,
-    borderTopColor: "#f1f5f9",
+    borderTopColor: colors.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.surface,
     paddingBottom: Platform.OS === "ios" ? 4 : 0,
   },
   toolbarButton: {
@@ -816,7 +819,7 @@ const styles = StyleSheet.create({
 
   aiCard: {
     width: 260,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 24,
     alignItems: "center",
@@ -826,12 +829,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     fontWeight: "800",
-    color: "#0F172A",
+    color: colors.text,
   },
 
   aiSubtitle: {
     marginTop: 8,
-    color: "#64748B",
+    color: colors.secondaryText,
     textAlign: "center",
   },
 });

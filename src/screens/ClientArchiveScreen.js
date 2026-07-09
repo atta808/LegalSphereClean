@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import {
@@ -17,6 +19,8 @@ import {
 } from "../services/sqliteService";
 
 export default function ClientArchiveScreen() {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const [clients, setClients] = useState([]);
   const navigation = useNavigation();
@@ -129,19 +133,19 @@ export default function ClientArchiveScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
   },
 
   // 🔹 HEADER
   header: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -158,40 +162,40 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
 
   backIcon: {
     fontSize: 26,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "300",
   },
 
   title: {
     fontSize: 18,
     fontWeight: "900",
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   subTitle: {
     fontSize: 11,
-    color: "#94A3B8",
+    color: colors.placeholder,
     marginTop: 2,
     fontWeight: "600",
   },
 
   // 🧾 CARD
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: 16,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   cardHeader: {
@@ -203,7 +207,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 16,
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -211,25 +215,25 @@ const styles = StyleSheet.create({
 
   avatarText: {
     fontWeight: "900",
-    color: "#1E3A8A",
+    color: colors.primary,
     fontSize: 18,
   },
 
   name: {
     fontWeight: "900",
     fontSize: 16,
-    color: "#1E293B",
+    color: colors.text,
   },
 
   email: {
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontSize: 12,
     marginTop: 2,
   },
 
   phone: {
     marginTop: 10,
-    color: "#475569",
+    color: colors.secondaryText,
     fontWeight: "600",
   },
 
@@ -243,11 +247,11 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 18,
     marginTop: 10,
-    color: "#1E293B",
+    color: colors.text,
   },
 
   emptySub: {
-    color: "#94A3B8",
+    color: colors.placeholder,
     marginTop: 6,
     textAlign: "center",
   },
@@ -259,27 +263,27 @@ const styles = StyleSheet.create({
 
   restoreBtn: {
     flex: 1,
-    backgroundColor: "#10B981",
+    backgroundColor: colors.success,
     padding: 12,
     borderRadius: 12,
     alignItems: "center",
   },
 
   restoreText: {
-    color: "#fff",
+    color: colors.surface,
     fontWeight: "800",
   },
 
   deleteBtn: {
     flex: 1,
-    backgroundColor: "#DC2626",
+    backgroundColor: colors.danger,
     padding: 12,
     borderRadius: 12,
     alignItems: "center",
   },
 
   deleteText: {
-    color: "#fff",
+    color: colors.surface,
     fontWeight: "800",
   },
 });

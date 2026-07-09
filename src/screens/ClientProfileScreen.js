@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getAllCases, getProfile } from "../services/sqliteService";
 import { formatMoney, getCurrency } from "../utils/currency";
@@ -68,7 +69,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
       <View style={styles.center}>
         <Text>Client data not found.</Text>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={{ color: "#1E3A8A", marginTop: 10 }}>Go Back</Text>
+          <Text style={{ color: "#1A73E8", marginTop: 10 }}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -84,7 +85,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
           onPress={() => (onBack ? onBack() : navigation.goBack())}
           style={styles.glassBackButton}
         >
-          <Text style={styles.backIcon}>‹</Text>
+          <Ionicons name="chevron-back" size={24} color="#1A73E8" />
         </TouchableOpacity>
         <Text style={styles.headerTitleText}>Client Profile</Text>
         <View style={{ width: 42 }} />
@@ -104,8 +105,10 @@ export default function ClientProfileScreen({ profile, onBack }) {
               {client?.name?.charAt(0) || "C"}
             </Text>
           </View>
-          <Text style={styles.clientName}>{client?.name}</Text>
-          <Text style={styles.clientSub}>
+          <Text style={styles.clientName} numberOfLines={1}>
+            {client?.name}
+          </Text>
+          <Text style={styles.clientSub} numberOfLines={1}>
             {client?.email || "No Email Provided"}
           </Text>
 
@@ -114,7 +117,15 @@ export default function ClientProfileScreen({ profile, onBack }) {
               style={styles.callBtn}
               onPress={() => Linking.openURL(`tel:${client.mobile}`)}
             >
-              <Text style={styles.btnText}>📞 Call</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons
+                  name="call"
+                  size={18}
+                  color="#FFF"
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={styles.btnText}>Call</Text>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.waBtn}
@@ -124,7 +135,15 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 )
               }
             >
-              <Text style={styles.btnText}>💬 WhatsApp</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons
+                  name="logo-whatsapp"
+                  size={18}
+                  color="#FFF"
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={styles.btnText}>WhatsApp</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -152,9 +171,15 @@ export default function ClientProfileScreen({ profile, onBack }) {
         <Text style={styles.sectionTitle}>Matter History</Text>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#1E3A8A" />
+          <ActivityIndicator size="large" color="#1A73E8" />
         ) : cases.length === 0 ? (
           <View style={styles.emptyCard}>
+            <Ionicons
+              name="folder-open-outline"
+              size={48}
+              color="#94A3B8"
+              style={{ marginBottom: 12 }}
+            />
             <Text style={styles.emptyText}>
               No cases recorded for this client.
             </Text>
@@ -180,16 +205,38 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 </View>
               </View>
 
-              <Text style={styles.caseCourt}>
-                🏛 {item.court || "Pending Court"}
-              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 6,
+                }}
+              >
+                <Ionicons
+                  name="business-outline"
+                  size={14}
+                  color="#64748B"
+                  style={{ marginRight: 4 }}
+                />
+                <Text style={styles.caseCourt}>
+                  {item.court || "Pending Court"}
+                </Text>
+              </View>
 
               <View style={styles.divider} />
 
               <View style={styles.rowBetween}>
-                <Text style={styles.metaLabel}>
-                  📅 {toDisplay(item.nextHearingISO)}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={14}
+                    color="#64748B"
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text style={styles.metaLabel}>
+                    {toDisplay(item.nextHearingISO)}
+                  </Text>
+                </View>
                 <Text
                   style={[
                     styles.metaValue,
@@ -223,88 +270,90 @@ const styles = StyleSheet.create({
     borderColor: "#F1F5F9",
   },
   glassBackButton: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
     alignItems: "center",
   },
-  backIcon: { fontSize: 30, color: "#1E3A8A", marginTop: -4 },
-  headerTitleText: { fontSize: 18, fontWeight: "900", color: "#1E3A8A" },
+  backIcon: { fontSize: 30, color: "#1A73E8", marginTop: -4 },
+  headerTitleText: { fontSize: 18, fontWeight: "700", color: "#1A73E8" },
   scrollContent: { padding: 20 },
   identityCard: {
     backgroundColor: "#FFF",
-    borderRadius: 24,
-    padding: 25,
+    borderRadius: 16,
+    padding: 24,
     alignItems: "center",
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.02,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
   avatarCircle: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: "rgba(26, 115, 232, 0.1)",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 12,
   },
-  avatarText: { color: "#FFF", fontSize: 28, fontWeight: "800" },
+  avatarText: { color: "#1A73E8", fontSize: 28, fontWeight: "600" },
   clientName: {
     fontSize: 22,
-    fontWeight: "900",
-    color: "#1E293B",
-    marginTop: 12,
+    fontWeight: "700",
+    color: "#0F172A",
   },
   clientSub: { fontSize: 13, color: "#64748B", marginTop: 4 },
   actionHub: { flexDirection: "row", gap: 12, marginTop: 20 },
   callBtn: {
     flex: 1,
-    backgroundColor: "#1E3A8A",
-    padding: 14,
+    backgroundColor: "#1A73E8",
+    paddingVertical: 14,
+    minHeight: 48,
     borderRadius: 14,
     alignItems: "center",
   },
   waBtn: {
     flex: 1,
-    backgroundColor: "#10B981",
-    padding: 14,
+    backgroundColor: "#25D366",
+    paddingVertical: 14,
+    minHeight: 48,
     borderRadius: 14,
     alignItems: "center",
   },
-  btnText: { color: "#FFF", fontWeight: "800" },
+  btnText: { color: "#FFF", fontWeight: "600" },
   statsRow: {
     flexDirection: "row",
     backgroundColor: "#FFF",
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 25,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
   statBox: { flex: 1, alignItems: "center" },
   statLabel: {
     fontSize: 10,
-    fontWeight: "800",
+    fontWeight: "600",
     color: "#94A3B8",
     textTransform: "uppercase",
   },
-  statVal: { fontSize: 20, fontWeight: "900", color: "#1E3A8A", marginTop: 2 },
+  statVal: { fontSize: 20, fontWeight: "700", color: "#1A73E8", marginTop: 2 },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: "900",
-    color: "#1E293B",
-    marginBottom: 15,
-    marginLeft: 5,
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 16,
+    marginLeft: 4,
   },
   caseCard: {
     backgroundColor: "#FFF",
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 12,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: "#E2E8F0",
   },
   caseHeader: {
     flexDirection: "row",
@@ -313,19 +362,19 @@ const styles = StyleSheet.create({
   },
   caseTitle: {
     fontSize: 16,
-    fontWeight: "800",
-    color: "#1E293B",
+    fontWeight: "600",
+    color: "#0F172A",
     flex: 1,
     marginRight: 10,
   },
   statusBadge: {
-    backgroundColor: "#E0F2FE",
-    paddingHorizontal: 8,
+    backgroundColor: "rgba(26, 115, 232, 0.1)",
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
   },
-  statusText: { fontSize: 9, fontWeight: "900", color: "#0369A1" },
-  caseCourt: { fontSize: 13, color: "#64748B", marginTop: 4 },
+  statusText: { fontSize: 10, fontWeight: "600", color: "#1A73E8" },
+  caseCourt: { fontSize: 13, color: "#64748B" },
   divider: { height: 1, backgroundColor: "#F8FAFC", marginVertical: 12 },
   rowBetween: {
     flexDirection: "row",
@@ -333,12 +382,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   metaLabel: { fontSize: 12, color: "#64748B", fontWeight: "600" },
-  metaValue: { fontSize: 14, fontWeight: "800" },
+  metaValue: { fontSize: 14, fontWeight: "600" },
   emptyCard: {
-    padding: 30,
+    padding: 40,
     alignItems: "center",
     backgroundColor: "#FFF",
-    borderRadius: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
   emptyText: { color: "#94A3B8", fontWeight: "600" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },

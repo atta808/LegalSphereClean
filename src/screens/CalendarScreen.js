@@ -9,6 +9,7 @@ import {
 } from "react-native";
 // Updated imports for the premium expandable features
 import { CalendarProvider, ExpandableCalendar } from "react-native-calendars";
+import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getAllCases, getProfile } from "../services/sqliteService";
 import { formatMoney, getCurrency } from "../utils/currency";
@@ -32,7 +33,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
       const marks = {};
       data.forEach((c) => {
         if (!c.nextHearingISO || c.status === "archived") return;
-        let color = "#3B82F6";
+        let color = "#1A73E8";
         if (c.priority === "urgent") color = "#EF4444";
         else if (c.priority === "important") color = "#F59E0B";
         else if (c.priority === "normal") color = "#10B981";
@@ -84,7 +85,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
             }
           }}
         >
-          <Text style={styles.backIcon}>‹</Text>
+          <Ionicons name="chevron-back" size={24} color="#1A73E8" />
         </TouchableOpacity>
         <View style={{ alignItems: "center" }}>
           <Text style={styles.title}>Chamber Calendar</Text>
@@ -130,7 +131,12 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
 
           {agendaList.length === 0 ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyIcon}>📅</Text>
+              <Ionicons
+                name="calendar-outline"
+                size={48}
+                color="#94A3B8"
+                style={{ marginBottom: 16 }}
+              />
               <Text style={styles.emptyText}>No hearings for this day</Text>
             </View>
           ) : (
@@ -157,12 +163,42 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
                       {formatMoney(item.feeBalance, currency, locale)}
                     </Text>
                   </View>
-                  <Text style={styles.caseCourt}>
-                    🏛 {item.court || "District Court"}
-                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 6,
+                      marginBottom: 2,
+                    }}
+                  >
+                    <Ionicons
+                      name="business-outline"
+                      size={14}
+                      color="#64748B"
+                      style={{ marginRight: 4 }}
+                    />
+                    <Text style={styles.caseCourt}>
+                      {item.court || "District Court"}
+                    </Text>
+                  </View>
                   <View style={styles.footerRow}>
-                    <View style={styles.tag}>
-                      <Text style={styles.tagText}>
+                    <View
+                      style={[
+                        styles.tag,
+                        {
+                          backgroundColor: getPriorityBackgroundColor(
+                            item.priority,
+                          ),
+                          borderColor: "transparent",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.tagText,
+                          { color: getPriorityColor(item.priority) },
+                        ]}
+                      >
                         {item.priority?.toUpperCase()}
                       </Text>
                     </View>
@@ -178,6 +214,12 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
 }
 
 // Helper for UI colors
+const getPriorityBackgroundColor = (p) => {
+  if (p === "urgent") return "rgba(239, 68, 68, 0.1)";
+  if (p === "important") return "rgba(245, 158, 11, 0.1)";
+  return "rgba(16, 185, 129, 0.1)";
+};
+
 const getPriorityColor = (p) => {
   if (p === "urgent") return "#EF4444";
   if (p === "important") return "#F59E0B";
@@ -188,17 +230,17 @@ const calendarTheme = {
   backgroundColor: "#FFFFFF",
   calendarBackground: "#FFFFFF",
   textSectionTitleColor: "#64748B",
-  selectedDayBackgroundColor: "#1E3A8A",
+  selectedDayBackgroundColor: "#1A73E8",
   selectedDayTextColor: "#ffffff",
-  todayTextColor: "#3B82F6",
+  todayTextColor: "#1A73E8",
   dayTextColor: "#1E293B",
   textDisabledColor: "#CBD5E1",
-  dotColor: "#3B82F6",
+  dotColor: "#1A73E8",
   selectedDotColor: "#ffffff",
-  arrowColor: "#1E3A8A",
-  monthTextColor: "#1E3A8A",
+  arrowColor: "#1A73E8",
+  monthTextColor: "#1A73E8",
   textDayFontWeight: "600",
-  textMonthFontWeight: "900",
+  textMonthFontWeight: "700",
   textDayHeaderFontWeight: "700",
   textDayFontSize: 14,
   textMonthFontSize: 18,
@@ -214,12 +256,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
     backgroundColor: "#FFF",
-    borderBottomWidth: 1,
-    borderColor: "#F1F5F9",
   },
   glassBackButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     backgroundColor: "#F8FAFC",
     borderWidth: 1,
@@ -227,37 +267,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  backIcon: { color: "#1E3A8A", fontSize: 24, fontWeight: "300" },
+  backIcon: { color: "#1A73E8", fontSize: 24, fontWeight: "300" },
   title: {
     fontSize: 18,
-    fontWeight: "900",
-    color: "#1E3A8A",
+    fontWeight: "700",
+    color: "#1A73E8",
     letterSpacing: -0.5,
   },
   badge: {
-    backgroundColor: "#DBEAFE",
+    backgroundColor: "rgba(26, 115, 232, 0.1)",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
     marginTop: 2,
   },
-  badgeText: { fontSize: 8, fontWeight: "800", color: "#1E40AF" },
+  badgeText: { fontSize: 8, fontWeight: "600", color: "#1A73E8" },
   todayBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 10,
     backgroundColor: "#F1F5F9",
   },
-  todayText: { color: "#1E3A8A", fontSize: 12, fontWeight: "700" },
+  todayText: { color: "#1A73E8", fontSize: 12, fontWeight: "700" },
 
   calendarBorder: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 5,
+    borderBottomWidth: 1,
+    borderColor: "#E2E8F0",
+    elevation: 0,
+    shadowOpacity: 0,
   },
 
   content: { padding: 20, paddingBottom: 100 },
@@ -267,22 +308,24 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
     marginBottom: 15,
   },
-  agendaTitle: { fontSize: 20, fontWeight: "900", color: "#0F172A" },
+  agendaTitle: { fontSize: 20, fontWeight: "700", color: "#0F172A" },
   caseCount: { fontSize: 12, color: "#64748B", fontWeight: "600" },
 
   card: {
     flexDirection: "row",
     backgroundColor: "#FFF",
-    borderRadius: 20,
+    borderRadius: 16,
     marginBottom: 12,
-    shadowColor: "#1E293B",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.04,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
     overflow: "hidden",
   },
-  priorityIndicator: { width: 6 },
+  priorityIndicator: { width: 4 },
   cardMain: { flex: 1, padding: 16 },
   cardRow: {
     flexDirection: "row",
@@ -291,16 +334,15 @@ const styles = StyleSheet.create({
   },
   caseTitle: {
     fontSize: 15,
-    fontWeight: "800",
-    color: "#1E293B",
+    fontWeight: "600",
+    color: "#0F172A",
     flex: 1,
     marginRight: 10,
   },
-  caseFee: { fontSize: 14, color: "#10B981", fontWeight: "800" },
+  caseFee: { fontSize: 14, color: "#10B981", fontWeight: "600" },
   caseCourt: {
     fontSize: 13,
     color: "#64748B",
-    marginTop: 4,
     fontWeight: "500",
   },
   footerRow: { marginTop: 10, flexDirection: "row" },

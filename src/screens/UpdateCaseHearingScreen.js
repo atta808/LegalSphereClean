@@ -22,7 +22,12 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { normalizeDateInput, toDatePickerDate, toDisplay, toISO } from "../utils/date";
+import {
+  normalizeDateInput,
+  toDatePickerDate,
+  toDisplay,
+  toISO,
+} from "../utils/date";
 
 // ✅ SQLite services ONLY
 
@@ -326,7 +331,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
-            <Text style={styles.backIcon}>‹</Text>
+            <Ionicons name="chevron-back" size={24} color="#1A73E8" />
           </TouchableOpacity>
 
           <View style={styles.titleCenter}>
@@ -368,7 +373,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               <Text
                 style={[
                   styles.statusBtnText,
-                  caseStatus === "active" && styles.textWhite,
+                  caseStatus === "active" && { color: "#1A73E8" },
                 ]}
               >
                 Active Diary
@@ -385,10 +390,10 @@ export default function UpdateCaseHearingScreen({ profile }) {
               <Text
                 style={[
                   styles.statusBtnText,
-                  caseStatus === "disposed" && styles.textWhite,
+                  caseStatus === "disposed" && { color: "#DC2626" },
                 ]}
               >
-                Disposed
+                Disposed / Finalized
               </Text>
             </TouchableOpacity>
           </View>
@@ -453,7 +458,12 @@ export default function UpdateCaseHearingScreen({ profile }) {
             onPress={() => setShowDatePicker(true)}
           >
             <View style={styles.dateRow}>
-              <Text style={styles.calendarEmoji}>📅</Text>
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color="#1A73E8"
+                style={{ marginRight: 10 }}
+              />
 
               <Text
                 style={[
@@ -819,7 +829,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: "#1E3A8A",
+    shadowColor: "#1A73E8",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -833,8 +843,8 @@ const styles = StyleSheet.create({
   },
 
   glassBackButton: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: 14,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
@@ -845,14 +855,14 @@ const styles = StyleSheet.create({
 
   backIcon: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: "#1A73E8",
     fontWeight: "300",
     marginTop: -4,
   },
 
   titleCenter: { flex: 1, alignItems: "center" },
 
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: "#1E3A8A" },
+  headerTitleText: { fontSize: 18, fontWeight: "700", color: "#1A73E8" },
 
   jurisdictionPill: {
     backgroundColor: "#E0E7FF",
@@ -864,7 +874,7 @@ const styles = StyleSheet.create({
 
   jurisdictionText: {
     fontSize: 9,
-    fontWeight: "800",
+    fontWeight: "700",
     color: "#4338CA",
     textTransform: "uppercase",
   },
@@ -877,7 +887,7 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 11,
-    fontWeight: "800",
+    fontWeight: "700",
     color: "#64748B",
     textTransform: "uppercase",
     letterSpacing: 1.2,
@@ -885,21 +895,21 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
+    borderRadius: 16,
     padding: 20,
-    marginBottom: 25,
-    shadowColor: "#000",
-    shadowOpacity: 0.03,
-    shadowRadius: 12,
-    elevation: 2,
+    marginBottom: 20,
+    elevation: 0,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: "#E2E8F0",
+    shadowColor: "#000",
+    shadowOpacity: 0.02,
+    shadowRadius: 8,
   },
 
   fieldLabel: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#1E3A8A",
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#1A73E8",
     marginBottom: 12,
     opacity: 0.6,
   },
@@ -918,11 +928,17 @@ const styles = StyleSheet.create({
     borderColor: "#E2E8F0",
   },
 
-  btnActive: { backgroundColor: "#1E3A8A", borderColor: "#1E3A8A" },
+  btnActive: {
+    backgroundColor: "rgba(26, 115, 232, 0.1)",
+    borderColor: "#1A73E8",
+  },
 
-  btnDisposed: { backgroundColor: "#EF4444", borderColor: "#EF4444" },
+  btnDisposed: {
+    backgroundColor: "rgba(220, 38, 38, 0.1)",
+    borderColor: "#DC2626",
+  },
 
-  statusBtnText: { color: "#64748B", fontWeight: "800", fontSize: 13 },
+  statusBtnText: { color: "#64748B", fontWeight: "700", fontSize: 13 },
 
   textWhite: { color: "#FFFFFF" },
 
@@ -931,7 +947,9 @@ const styles = StyleSheet.create({
   dateSelector: {
     backgroundColor: "#F8FAFC",
     borderRadius: 16,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 48,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
@@ -955,7 +973,9 @@ const styles = StyleSheet.create({
   premiumMultiline: {
     backgroundColor: "#F8FAFC",
     borderRadius: 18,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 48,
     fontSize: 15,
     color: "#1E293B",
     minHeight: 120,
@@ -966,21 +986,25 @@ const styles = StyleSheet.create({
   // Final Actions
 
   mainSaveBtn: {
-    backgroundColor: "#1E3A8A",
-    borderRadius: 22,
-    paddingVertical: 20,
+    backgroundColor: "#1A73E8",
+    borderRadius: 16,
+    paddingVertical: 18,
     alignItems: "center",
-    shadowColor: "#1E3A8A",
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
-    elevation: 6,
+    justifyContent: "center",
+    flexDirection: "row",
+    marginBottom: 40,
+    shadowColor: "#1A73E8",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
 
   saveBtnText: {
     color: "#FFF",
-    fontWeight: "900",
-    fontSize: 15,
-    letterSpacing: 1.5,
+    fontWeight: "700",
+    fontSize: 16,
+    marginLeft: 8,
   },
 
   discardBtn: {
@@ -999,7 +1023,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAFC",
     borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 14,
+    minHeight: 48,
     fontSize: 15,
     fontWeight: "600",
     color: "#1E293B",

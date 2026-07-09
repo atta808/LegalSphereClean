@@ -14,7 +14,6 @@ import {
   Alert,
   Linking,
   Modal,
-  Platform,
   ScrollView,
   StatusBar,
   StyleSheet,

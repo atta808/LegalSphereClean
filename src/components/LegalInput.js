@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function LegalInput({
   label,
@@ -13,6 +14,9 @@ export default function LegalInput({
   style,
 }) {
   const [focused, setFocused] = useState(false);
+  const { colors, resolvedTheme } = useTheme();
+
+  const styles = useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
 
   return (
     <View style={styles.container}>
@@ -41,15 +45,15 @@ export default function LegalInput({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="rgba(71,85,105,0.55)"
+          placeholderTextColor={colors.placeholder}
           multiline={multiline}
           keyboardType={keyboardType}
           editable={editable}
           secureTextEntry={secureTextEntry}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          selectionColor="#6F89A5"
-          cursorColor="#6F89A5"
+          selectionColor={colors.primary}
+          cursorColor={colors.primary}
           autoCapitalize="none"
           autoCorrect={false}
           style={[styles.input, multiline && styles.multilineInput, style]}
@@ -59,7 +63,7 @@ export default function LegalInput({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: 0,
@@ -76,22 +80,22 @@ const styles = StyleSheet.create({
 
   // Floating Label Pill
   labelPill: {
-    backgroundColor: "#F3EFDF",
+    backgroundColor: resolvedTheme === "dark" ? colors.card : "#F3EFDF",
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.6)",
+    borderColor: colors.border,
   },
 
   focusedLabelPill: {
-    backgroundColor: "#F3EFDF",
-    borderColor: "rgba(111,137,165,0.35)",
+    backgroundColor: resolvedTheme === "dark" ? colors.card : "#F3EFDF",
+    borderColor: colors.primary,
   },
 
   // Label Text
   label: {
-    color: "#5B6470",
+    color: colors.secondaryText,
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 0.4,
@@ -99,21 +103,21 @@ const styles = StyleSheet.create({
   },
 
   focusedLabel: {
-    color: "#6F89A5",
+    color: colors.primary,
   },
 
   // Main Glass Input
   inputWrapper: {
-    backgroundColor: "rgba(255,255,255,0.78)",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.55)",
+    borderColor: colors.border,
     borderRadius: 18,
     paddingHorizontal: 16,
     minHeight: 50,
     maxHeight: 80,
     justifyContent: "center",
 
-    shadowColor: "#94A3B8",
+    shadowColor: colors.shadow,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -125,8 +129,8 @@ const styles = StyleSheet.create({
 
   // Focus State
   focusedWrapper: {
-    borderColor: "rgba(111,137,165,0.45)",
-    shadowColor: "#CBD5E1",
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
       height: 0,
@@ -139,12 +143,12 @@ const styles = StyleSheet.create({
   // Disabled State
   disabledWrapper: {
     opacity: 0.5,
-    backgroundColor: "rgba(226,232,240,0.5)",
+    backgroundColor: resolvedTheme === "dark" ? "#333333" : "rgba(226,232,240,0.5)",
   },
 
   // Input Text
   input: {
-    color: "#1E293B",
+    color: colors.text,
     fontSize: 16,
     fontWeight: "600",
     height: 50,

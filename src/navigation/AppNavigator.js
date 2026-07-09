@@ -30,6 +30,7 @@ import UpdateCaseHearingScreen from "../screens/UpdateCaseHearingScreen";
 import DocumentVaultScreen from "../screens/DocumentVaultScreen";
 import AIChatRoomScreen from "../screens/AIChatRoomScreen";
 import LexAiScreen from "../screens/LexAiScreen";
+import { useTheme } from "../theme/ThemeContext";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -82,8 +83,22 @@ function MainTabs({ profile, onLogout }) {
 // 🧭 ROOT NAVIGATOR
 // =======================
 export default function AppNavigator({ user, profile, onLogout }) {
+  const { colors, resolvedTheme } = useTheme();
+
+  const navigationTheme = {
+    dark: resolvedTheme === 'dark',
+    colors: {
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.card,
+      text: colors.text,
+      border: colors.border,
+      notification: colors.primary,
+    },
+  };
+
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navigationTheme}>
       {user ? (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {/* MAIN */}

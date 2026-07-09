@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -92,6 +94,8 @@ const defaultLinks = [
 ];
 
 export default function QuickLinksScreen({ onBack }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const [search, setSearch] = useState("");
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -336,19 +340,19 @@ export default function QuickLinksScreen({ onBack }) {
 }
 
 // 🎨 STYLES
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
   },
 
   // ================= HEADER =================
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -365,16 +369,16 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
 
   backIcon: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "300",
     marginTop: -4,
   },
@@ -387,11 +391,11 @@ const styles = StyleSheet.create({
   headerTitleText: {
     fontSize: 18,
     fontWeight: "900",
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   jurisdictionPill: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
@@ -401,7 +405,7 @@ const styles = StyleSheet.create({
   jurisdictionText: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#4338CA",
+    color: colors.primary,
     textTransform: "uppercase",
   },
   content: {
@@ -414,33 +418,33 @@ const styles = StyleSheet.create({
   filterBtn: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     borderRadius: 12,
     marginRight: 8,
   },
 
   filterActive: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
   },
 
   filterText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#334155",
+    color: colors.text,
   },
 
   filterTextActive: {
-    color: "#FFFFFF",
+    color: colors.surface,
   },
 
   // ================= FORM =================
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 20,
     marginTop: 16,
 
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
@@ -450,42 +454,42 @@ const styles = StyleSheet.create({
   catBtn: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     borderRadius: 12,
     marginRight: 8,
     marginTop: 8,
   },
 
   catActive: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
   },
 
   catText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#334155",
+    color: colors.text,
   },
 
   catActiveText: {
-    color: "#FFFFFF",
+    color: colors.surface,
   },
 
   // ADD BUTTON
   addBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     padding: 14,
     borderRadius: 14,
     alignItems: "center",
     marginTop: 14,
 
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
 
   addText: {
-    color: "#FFFFFF",
+    color: colors.surface,
     fontWeight: "900",
     fontSize: 13,
   },
@@ -493,12 +497,12 @@ const styles = StyleSheet.create({
   // ================= LINK CARD =================
   linkCard: {
     flexDirection: "row",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     padding: 14,
     borderRadius: 18,
     marginTop: 12,
 
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
@@ -507,18 +511,18 @@ const styles = StyleSheet.create({
   linkTitle: {
     fontWeight: "900",
     fontSize: 14,
-    color: "#0F172A",
+    color: colors.text,
   },
 
   linkUrl: {
     fontSize: 12,
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 2,
   },
 
   category: {
     fontSize: 10,
-    color: "#1E3A8A",
+    color: colors.primary,
     marginTop: 6,
     fontWeight: "700",
   },
@@ -541,7 +545,7 @@ const styles = StyleSheet.create({
   },
 
   delete: {
-    color: "#EF4444",
+    color: colors.danger,
     fontWeight: "800",
     fontSize: 12,
   },
@@ -551,6 +555,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 40,
     fontSize: 13,
-    color: "#64748B",
+    color: colors.secondaryText,
   },
 });

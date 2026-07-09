@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -21,6 +23,8 @@ import {
 } from "../services/sqliteService";
 
 export default function ClientsScreen({ profile }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [clients, setClients] = useState([]);
@@ -87,7 +91,7 @@ export default function ClientsScreen({ profile }) {
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
-            <Ionicons name="chevron-back" size={24} color="#1A73E8" />
+            <Ionicons name="chevron-back" size={24} color={colors.primary} />
           </TouchableOpacity>
 
           {/* TITLE */}
@@ -105,7 +109,7 @@ export default function ClientsScreen({ profile }) {
               style={styles.archiveBtn}
               onPress={() => navigation.navigate("ClientArchive")}
             >
-              <Ionicons name="archive-outline" size={20} color="#1A73E8" />
+              <Ionicons name="archive-outline" size={20} color={colors.primary} />
             </TouchableOpacity>
 
             {/* ADD BUTTON */}
@@ -113,7 +117,7 @@ export default function ClientsScreen({ profile }) {
               style={styles.addBtn}
               onPress={() => navigation.navigate("AddClient")}
             >
-              <Ionicons name="add" size={24} color="#FFF" />
+              <Ionicons name="add" size={24} color={colors.surface} />
             </TouchableOpacity>
           </View>
         </View>
@@ -134,7 +138,7 @@ export default function ClientsScreen({ profile }) {
         {loading ? (
           <ActivityIndicator
             size="large"
-            color="#1A73E8"
+            color={colors.primary}
             style={{ marginTop: 50 }}
           />
         ) : filteredClients.length === 0 ? (
@@ -142,7 +146,7 @@ export default function ClientsScreen({ profile }) {
             <Ionicons
               name="people-outline"
               size={48}
-              color="#94A3B8"
+              color={colors.placeholder}
               style={{ marginBottom: 12 }}
             />
             <Text style={styles.emptyTitle}>No Clients Found</Text>
@@ -174,7 +178,7 @@ export default function ClientsScreen({ profile }) {
                       <Ionicons
                         name="trash-outline"
                         size={20}
-                        color="#EF4444"
+                        color={colors.danger}
                       />
                     </TouchableOpacity>
                   </View>
@@ -188,7 +192,7 @@ export default function ClientsScreen({ profile }) {
                     <Ionicons
                       name="briefcase-outline"
                       size={12}
-                      color="#64748B"
+                      color={colors.secondaryText}
                       style={{ marginRight: 4 }}
                     />
                     <Text style={styles.caseCountText}>
@@ -209,7 +213,7 @@ export default function ClientsScreen({ profile }) {
                     <Ionicons
                       name="call"
                       size={16}
-                      color="#475569"
+                      color={colors.secondaryText}
                       style={{ marginRight: 6 }}
                     />
                     <Text style={styles.actionBtnText}>Call</Text>
@@ -228,10 +232,10 @@ export default function ClientsScreen({ profile }) {
                     <Ionicons
                       name="logo-whatsapp"
                       size={16}
-                      color="#FFF"
+                      color={colors.surface}
                       style={{ marginRight: 6 }}
                     />
-                    <Text style={[styles.actionBtnText, { color: "#FFF" }]}>
+                    <Text style={[styles.actionBtnText, { color: colors.surface }]}>
                       WhatsApp
                     </Text>
                   </View>
@@ -245,15 +249,15 @@ export default function ClientsScreen({ profile }) {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#F8FAFC" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.background },
   header: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 20,
     paddingBottom: 20,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    shadowColor: "#1A73E8",
+    shadowColor: colors.primary,
     shadowOpacity: 0.03,
     shadowRadius: 15,
     elevation: 2,
@@ -270,24 +274,24 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
   backIcon: {
-    color: "#1A73E8",
+    color: colors.primary,
     fontSize: 28,
     fontWeight: "300",
     marginTop: -4,
   },
 
   titleContainer: { flex: 1, alignItems: "center" },
-  title: { fontSize: 20, fontWeight: "700", color: "#1A73E8" },
+  title: { fontSize: 20, fontWeight: "700", color: colors.primary },
   subTitle: {
     fontSize: 10,
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontWeight: "700",
     textTransform: "uppercase",
     marginTop: 2,
@@ -297,21 +301,21 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: "#1A73E8",
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
-  addText: { color: "#FFF", fontSize: 22, fontWeight: "bold" },
+  addText: { color: colors.surface, fontSize: 22, fontWeight: "bold" },
 
   scrollContent: { padding: 20, paddingBottom: 100 },
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOpacity: 0.02,
     shadowRadius: 10,
   },
@@ -325,49 +329,49 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 15,
   },
-  avatarText: { fontWeight: "700", color: "#1A73E8", fontSize: 20 },
+  avatarText: { fontWeight: "700", color: colors.primary, fontSize: 20 },
   nameRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  name: { fontWeight: "700", fontSize: 17, color: "#0F172A" },
+  name: { fontWeight: "700", fontSize: 17, color: colors.text },
   archiveIcon: { fontSize: 16, opacity: 0.5 },
   caseCountText: {
-    color: "#64748B",
+    color: colors.secondaryText,
     fontSize: 13,
     fontWeight: "500",
   },
 
-  cardDivider: { height: 1, backgroundColor: "#F8FAFC", marginVertical: 15 },
+  cardDivider: { height: 1, backgroundColor: colors.background, marginVertical: 15 },
   actions: { flexDirection: "row", gap: 12 },
   actionBtn: {
     flex: 1,
     height: 48,
     borderRadius: 12,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
-  waBtn: { backgroundColor: "#25D366", borderColor: "#25D366" },
-  actionBtnText: { fontSize: 13, fontWeight: "600", color: "#475569" },
+  waBtn: { backgroundColor: colors.success, borderColor: colors.success },
+  actionBtnText: { fontSize: 13, fontWeight: "600", color: colors.secondaryText },
 
   center: { alignItems: "center", marginTop: 100 },
-  emptyTitle: { fontWeight: "600", color: "#94A3B8" },
+  emptyTitle: { fontWeight: "600", color: colors.placeholder },
   archiveBtn: {
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
 
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
 
-    shadowColor: "#1A73E8",
+    shadowColor: colors.primary,
     shadowOpacity: 0.15,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },

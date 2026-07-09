@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Animated,
   StyleSheet,
@@ -7,8 +7,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function BottomBar({ currentScreen, setCurrentScreen }) {
+  const { colors, resolvedTheme } = useTheme();
+
+  const styles = useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   // ✨ FIX: Explicitly setting the exact active and inactive icon names
   const tabs = [
     {
@@ -76,7 +80,7 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
                   { transform: [{ scale: scaleAnim }] },
                 ]}
               >
-                <Ionicons name="add" size={28} color="#FFFFFF" />
+                <Ionicons name="add" size={28} color={resolvedTheme === 'dark' ? '#FFFFFF' : '#FFFFFF'} />
               </Animated.View>
             </TouchableOpacity>
           );
@@ -107,7 +111,7 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   // ☁️ THE DOCK
   dockContainer: {
     position: "absolute",
@@ -118,14 +122,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#E6F0FA",
+    backgroundColor: resolvedTheme === "dark" ? colors.card : "#E6F0FA",
     borderRadius: 24,
     paddingHorizontal: 12,
 
     // Soft, wide diffusion shadow
-    shadowColor: "#8F9BB3",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
+    shadowOpacity: resolvedTheme === "dark" ? 0.4 : 0.15,
     shadowRadius: 20,
     elevation: 10,
   },
@@ -150,7 +154,7 @@ const styles = StyleSheet.create({
   },
 
   activeIconBox: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: resolvedTheme === "dark" ? "#333333" : "#FFFFFF",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -162,7 +166,7 @@ const styles = StyleSheet.create({
   activeLabel: {
     marginLeft: 6,
     fontSize: 12,
-    color: "#0F172A",
+    color: colors.text,
     fontWeight: "700",
   },
 
@@ -177,12 +181,12 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: "#0F172A",
+    backgroundColor: colors.primary,
 
     justifyContent: "center",
     alignItems: "center",
 
-    shadowColor: "#0F172A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

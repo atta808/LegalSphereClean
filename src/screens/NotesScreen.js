@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
@@ -28,6 +30,8 @@ import {
 } from "../services/sqliteService";
 
 export default function NotesScreen({ caseId, onBack }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
 
   const [note, setNote] = useState("");
@@ -235,7 +239,7 @@ export default function NotesScreen({ caseId, onBack }) {
                 colors={["#2A8FEA", "#1E73BE", "#155FA0"]}
                 style={styles.sendBtn}
               >
-                <Feather name="arrow-up" size={20} color="#fff" />
+                <Feather name="arrow-up" size={20} color={colors.surface} />
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -266,7 +270,7 @@ export default function NotesScreen({ caseId, onBack }) {
                 borderRadius: 20,
               }}
             >
-              <Text style={{ color: "#fff", fontSize: 16 }}>✕ Close</Text>
+              <Text style={{ color: colors.surface, fontSize: 16 }}>✕ Close</Text>
             </TouchableOpacity>
           )}
           backgroundColor="rgba(0,0,0,0.95)"
@@ -277,10 +281,10 @@ export default function NotesScreen({ caseId, onBack }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainWrapper: {
     flex: 1,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
   },
 
   container: {
@@ -289,11 +293,11 @@ const styles = StyleSheet.create({
   },
 
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -310,16 +314,16 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   backIcon: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "300",
     marginTop: -4,
   },
@@ -332,13 +336,13 @@ const styles = StyleSheet.create({
   headerTitleText: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#1E3A8A",
+    color: colors.primary,
     textTransform: "uppercase",
     letterSpacing: 1,
   },
 
   jurisdictionPill: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
@@ -348,7 +352,7 @@ const styles = StyleSheet.create({
   jurisdictionText: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#4338CA",
+    color: colors.primary,
     textTransform: "uppercase",
   },
 
@@ -362,7 +366,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -375,27 +379,27 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#1E293B",
+    color: colors.text,
   },
 
   emptySub: {
-    color: "#94A3B8",
+    color: colors.placeholder,
     marginTop: 8,
     textAlign: "center",
     lineHeight: 22,
   },
 
   noteCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 18,
     marginBottom: 16,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOpacity: 0.03,
     shadowRadius: 12,
     elevation: 2,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: colors.border,
   },
 
   imageContainer: {
@@ -410,7 +414,7 @@ const styles = StyleSheet.create({
 
   noteText: {
     fontSize: 15,
-    color: "#334155",
+    color: colors.text,
     lineHeight: 24,
     marginBottom: 15,
     fontWeight: "500",
@@ -418,7 +422,7 @@ const styles = StyleSheet.create({
 
   dateText: {
     fontSize: 11,
-    color: "#64748B",
+    color: colors.secondaryText,
     fontWeight: "800",
     marginTop: 4,
   },
@@ -428,29 +432,29 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 8,
     borderTopWidth: 1,
-    borderTopColor: "#F1F5F9",
+    borderTopColor: colors.border,
     paddingTop: 10,
   },
 
   editText: {
-    color: "#3B82F6",
+    color: colors.primary,
     fontWeight: "800",
     fontSize: 12,
   },
 
   delText: {
-    color: "#EF4444",
+    color: colors.danger,
     fontWeight: "800",
     fontSize: 12,
   },
 
   composer: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 20,
     paddingTop: 12,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 20,
@@ -475,8 +479,8 @@ const styles = StyleSheet.create({
   },
 
   noteInput: {
-    backgroundColor: "#0B0F19",
-    color: "#F8FAFC",
+    backgroundColor: colors.surface,
+    color: colors.background,
     borderWidth: 0,
     borderRadius: 16,
     paddingHorizontal: 14,

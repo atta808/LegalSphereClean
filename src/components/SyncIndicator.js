@@ -13,9 +13,11 @@ import {
   setSyncStatus,
   subscribeSyncStatus,
 } from "../services/syncStatus";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function SyncIndicator() {
   const insets = useSafeAreaInsets();
+  const { colors, resolvedTheme } = useTheme();
 
   // ✅ STATUS + PROGRESS
   const [status, setStatus] = useState(getSyncStatus());
@@ -111,29 +113,29 @@ export default function SyncIndicator() {
   // 🎨 UI STATES
   // =========================
   let message = "Processing...";
-  let accentColor = "#60A5FA";
+  let accentColor = colors.primary;
 
   if (status === "syncing") {
     message =
       progress.total > 0
         ? `Syncing ${progress.current} / ${progress.total}...`
         : "Syncing data...";
-    accentColor = "#60A5FA";
+    accentColor = colors.primary;
   }
 
   if (status === "success") {
     message = "Synced successfully";
-    accentColor = "#34D399";
+    accentColor = colors.success;
   }
 
   if (status === "error") {
     message = "Sync failed";
-    accentColor = "#F87171";
+    accentColor = colors.error;
   }
 
   if (status === "offline") {
     message = "Offline mode";
-    accentColor = "#FBBF24";
+    accentColor = colors.warning;
   }
 
   return (
@@ -148,7 +150,7 @@ export default function SyncIndicator() {
       ]}
       pointerEvents="none"
     >
-      <View style={styles.pill}>
+      <View style={[styles.pill, resolvedTheme === 'dark' ? styles.pillDark : styles.pillLight]}>
         {status === "syncing" ? (
           <ActivityIndicator
             size="small"
@@ -158,7 +160,7 @@ export default function SyncIndicator() {
         ) : (
           <View style={[styles.statusDot, { backgroundColor: accentColor }]} />
         )}
-        <Text style={styles.text}>{message}</Text>
+        <Text style={[styles.text, resolvedTheme === 'dark' ? styles.textDark : styles.textLight]}>{message}</Text>
       </View>
     </Animated.View>
   );
@@ -184,18 +186,29 @@ const styles = StyleSheet.create({
   pill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(24, 24, 27, 0.95)",
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 999,
     borderWidth: 1,
+  },
+  pillLight: {
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderColor: "rgba(0, 0, 0, 0.08)",
+  },
+  pillDark: {
+    backgroundColor: "rgba(24, 24, 27, 0.95)",
     borderColor: "rgba(255, 255, 255, 0.08)",
   },
   text: {
-    color: "#FAFAFA",
     fontWeight: "500",
     fontSize: 14,
     letterSpacing: 0.3,
+  },
+  textLight: {
+    color: "#18181B",
+  },
+  textDark: {
+    color: "#FAFAFA",
   },
   iconSpacing: {
     marginRight: 10,

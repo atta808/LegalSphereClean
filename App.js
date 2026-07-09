@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View, StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { COLORS } from "./src/constants/colors";
 import AppNavigator from "./src/navigation/AppNavigator";
+import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
 import { startAutoSync } from "./src/services/autoSyncService";
 import { auth } from "./src/services/firebaseConfig";
 import { restoreAllData } from "./src/services/restoreService";
@@ -128,19 +128,40 @@ useEffect(() => {
   // =============================
   // ⏳ GLOBAL LOADER
   // =============================
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppContent
+          loading={loading}
+          user={user}
+          profile={profile}
+          handleLogout={handleLogout}
+        />
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function AppContent({ loading, user, profile, handleLogout }) {
+  const { colors, resolvedTheme } = useTheme();
+
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+      <View style={[styles.loaderContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <SafeAreaProvider>
+    <>
+      <StatusBar
+        barStyle={resolvedTheme === "dark" ? "light-content" : "dark-content"}
+        backgroundColor={colors.background}
+      />
       <SyncIndicator />
       <AppNavigator user={user} profile={profile} onLogout={handleLogout} />
-    </SafeAreaProvider>
+    </>
   );
 }
 
@@ -152,6 +173,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: COLORS.lightBg,
+
   },
 });

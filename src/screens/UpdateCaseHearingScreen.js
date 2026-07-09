@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   useFocusEffect,
@@ -44,6 +46,8 @@ import {
 } from "../services/sqliteService";
 
 export default function UpdateCaseHearingScreen({ profile }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const locale = currentProfile?.locale || "en-PK";
   const navigation = useNavigation();
@@ -331,7 +335,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
-            <Ionicons name="chevron-back" size={24} color="#1A73E8" />
+            <Ionicons name="chevron-back" size={24} color={colors.primary} />
           </TouchableOpacity>
 
           <View style={styles.titleCenter}>
@@ -373,7 +377,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               <Text
                 style={[
                   styles.statusBtnText,
-                  caseStatus === "active" && { color: "#1A73E8" },
+                  caseStatus === "active" && { color: colors.primary },
                 ]}
               >
                 Active Diary
@@ -390,7 +394,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               <Text
                 style={[
                   styles.statusBtnText,
-                  caseStatus === "disposed" && { color: "#DC2626" },
+                  caseStatus === "disposed" && { color: colors.danger },
                 ]}
               >
                 Disposed / Finalized
@@ -417,7 +421,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
             >
               <Text
                 style={{
-                  color: selectedCMS ? "#1E293B" : "#94A3B8",
+                  color: selectedCMS ? colors.text : colors.placeholder,
                   fontSize: 15,
                   fontWeight: "600",
                 }}
@@ -435,7 +439,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
             value={editableCaseNo}
             onChangeText={setEditableCaseNo}
             placeholder="e.g. Crl Appeal 245/2026"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.placeholder}
             style={styles.premiumInput}
           />
         </View>
@@ -461,7 +465,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               <Ionicons
                 name="calendar-outline"
                 size={20}
-                color="#1A73E8"
+                color={colors.primary}
                 style={{ marginRight: 10 }}
               />
 
@@ -469,7 +473,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
                 style={[
                   styles.dateValue,
                   !selectedDate && {
-                    color: "#94A3B8",
+                    color: colors.placeholder,
                   },
                 ]}
               >
@@ -504,7 +508,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               >
                 <Text
                   style={{
-                    color: hearingStage ? "#1E293B" : "#94A3B8",
+                    color: hearingStage ? colors.text : colors.placeholder,
                     fontSize: 15,
                     fontWeight: "600",
                   }}
@@ -531,7 +535,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               >
                 <Text
                   style={{
-                    color: hearingDescription ? "#1E293B" : "#94A3B8",
+                    color: hearingDescription ? colors.text : colors.placeholder,
                     fontSize: 15,
                     fontWeight: "600",
                   }}
@@ -558,7 +562,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               >
                 <Text
                   style={{
-                    color: hearingCourt ? "#1E293B" : "#94A3B8",
+                    color: hearingCourt ? colors.text : colors.placeholder,
                     fontSize: 15,
                     fontWeight: "600",
                   }}
@@ -586,7 +590,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               >
                 <Text
                   style={{
-                    color: hearingJudge ? "#1E293B" : "#94A3B8",
+                    color: hearingJudge ? colors.text : colors.placeholder,
                     fontSize: 15,
                     fontWeight: "600",
                   }}
@@ -608,7 +612,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <TextInput
             style={styles.premiumMultiline}
             placeholder="Record specific court directions or orders passed today..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.placeholder}
             value={hearingNotes}
             onChangeText={setHearingNotes}
             multiline
@@ -806,30 +810,30 @@ export default function UpdateCaseHearingScreen({ profile }) {
         ]}
       >
         <LinearGradient
-          colors={["#1e3a8a", "#0f172a"]}
+          colors={[colors.primaryDark, colors.text]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.aiFab}
         >
           <View style={styles.innerBorder} />
-          <Ionicons name="sparkles-outline" size={24} color="#e2e8f0" />
+          <Ionicons name="sparkles-outline" size={24} color={colors.border} />
         </LinearGradient>
       </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  mainWrapper: { flex: 1, backgroundColor: "#F1F5F9" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainWrapper: { flex: 1, backgroundColor: colors.border },
 
   // Header
 
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: "#1A73E8",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -846,26 +850,26 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   backIcon: {
     fontSize: 28,
-    color: "#1A73E8",
+    color: colors.primary,
     fontWeight: "300",
     marginTop: -4,
   },
 
   titleCenter: { flex: 1, alignItems: "center" },
 
-  headerTitleText: { fontSize: 18, fontWeight: "700", color: "#1A73E8" },
+  headerTitleText: { fontSize: 18, fontWeight: "700", color: colors.primary },
 
   jurisdictionPill: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
@@ -875,7 +879,7 @@ const styles = StyleSheet.create({
   jurisdictionText: {
     fontSize: 9,
     fontWeight: "700",
-    color: "#4338CA",
+    color: colors.primary,
     textTransform: "uppercase",
   },
 
@@ -888,20 +892,20 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#64748B",
+    color: colors.secondaryText,
     textTransform: "uppercase",
     letterSpacing: 1.2,
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     elevation: 0,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOpacity: 0.02,
     shadowRadius: 8,
   },
@@ -909,7 +913,7 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#1A73E8",
+    color: colors.primary,
     marginBottom: 12,
     opacity: 0.6,
   },
@@ -923,77 +927,77 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 16,
     alignItems: "center",
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   btnActive: {
     backgroundColor: "rgba(26, 115, 232, 0.1)",
-    borderColor: "#1A73E8",
+    borderColor: colors.primary,
   },
 
   btnDisposed: {
     backgroundColor: "rgba(220, 38, 38, 0.1)",
-    borderColor: "#DC2626",
+    borderColor: colors.danger,
   },
 
-  statusBtnText: { color: "#64748B", fontWeight: "700", fontSize: 13 },
+  statusBtnText: { color: colors.secondaryText, fontWeight: "700", fontSize: 13 },
 
-  textWhite: { color: "#FFFFFF" },
+  textWhite: { color: colors.surface },
 
   // Inputs & Selectors
 
   dateSelector: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     minHeight: 48,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   dateRow: { flexDirection: "row", alignItems: "center" },
 
   calendarEmoji: { fontSize: 18, marginRight: 10 },
 
-  dateValue: { fontSize: 15, fontWeight: "600", color: "#1E293B" },
+  dateValue: { fontSize: 15, fontWeight: "600", color: colors.text },
 
   inputGroup: { marginBottom: 18 },
 
   pickerContainer: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     overflow: "hidden",
   },
 
   premiumMultiline: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 14,
     minHeight: 48,
     fontSize: 15,
-    color: "#1E293B",
+    color: colors.text,
     minHeight: 120,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   // Final Actions
 
   mainSaveBtn: {
-    backgroundColor: "#1A73E8",
+    backgroundColor: colors.primary,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     marginBottom: 40,
-    shadowColor: "#1A73E8",
+    shadowColor: colors.primary,
     shadowOpacity: 0.2,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -1001,7 +1005,7 @@ const styles = StyleSheet.create({
   },
 
   saveBtnText: {
-    color: "#FFF",
+    color: colors.surface,
     fontWeight: "700",
     fontSize: 16,
     marginLeft: 8,
@@ -1011,25 +1015,25 @@ const styles = StyleSheet.create({
     marginTop: 15,
     paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
-  discardBtnText: { color: "#94A3B8", fontSize: 14, fontWeight: "700" },
+  discardBtnText: { color: colors.placeholder, fontSize: 14, fontWeight: "700" },
 
   premiumInput: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     minHeight: 48,
     fontSize: 15,
     fontWeight: "600",
-    color: "#1E293B",
+    color: colors.text,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
 
   fabContainer: {
@@ -1038,7 +1042,7 @@ const styles = StyleSheet.create({
     bottom: 110,
     ...Platform.select({
       ios: {
-        shadowColor: "#0f172a",
+        shadowColor: colors.text,
         shadowOffset: {
           width: 0,
           height: 10,

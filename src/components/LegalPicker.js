@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   FlatList,
   Modal,
@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { BlurView } from "expo-blur";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function LegalPicker({
   visible,
@@ -17,10 +18,13 @@ export default function LegalPicker({
   onSelect,
   onClose,
 }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+
   return (
     <Modal visible={visible} transparent animationType="slide">
       {/* Premium Glass Overlay */}
-      <BlurView intensity={35} tint="light" style={styles.overlay}>
+      <BlurView intensity={resolvedTheme === "dark" ? 60 : 35} tint={resolvedTheme === "dark" ? "dark" : "light"} style={styles.overlay}>
         <TouchableOpacity
           style={StyleSheet.absoluteFill}
           activeOpacity={1}
@@ -88,7 +92,7 @@ export default function LegalPicker({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -96,7 +100,7 @@ const styles = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: resolvedTheme === "dark" ? "rgba(30,30,30,0.92)" : "rgba(255,255,255,0.92)",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     paddingHorizontal: 24,
@@ -104,10 +108,10 @@ const styles = StyleSheet.create({
     maxHeight: "80%",
 
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.65)",
+    borderColor: colors.border,
     borderBottomWidth: 0,
 
-    shadowColor: "#94A3B8",
+    shadowColor: colors.shadow,
     shadowOffset: {
       width: 0,
       height: -8,
@@ -133,7 +137,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "800",
-    color: "#1E293B",
+    color: colors.text,
     marginTop: 6,
     marginBottom: 20,
     letterSpacing: 0.3,
@@ -153,11 +157,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginBottom: 10,
 
-    backgroundColor: "rgba(255,255,255,0.72)",
+    backgroundColor: resolvedTheme === "dark" ? "rgba(36,36,36,0.72)" : "rgba(255,255,255,0.72)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.55)",
+    borderColor: colors.border,
 
-    shadowColor: "#CBD5E1",
+    shadowColor: colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -168,10 +172,10 @@ const styles = StyleSheet.create({
   },
 
   activeItem: {
-    backgroundColor: "rgba(243,239,223,0.95)",
-    borderColor: "rgba(111,137,165,0.35)",
+    backgroundColor: resolvedTheme === "dark" ? "rgba(50,50,50,0.95)" : "rgba(243,239,223,0.95)",
+    borderColor: colors.primary,
 
-    shadowColor: "#CBD5E1",
+    shadowColor: colors.primary,
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 4,
@@ -180,13 +184,13 @@ const styles = StyleSheet.create({
   itemText: {
     flex: 1,
     fontSize: 16,
-    color: "#475569",
+    color: colors.secondaryText,
     fontWeight: "600",
     letterSpacing: 0.1,
   },
 
   activeItemText: {
-    color: "#6F89A5",
+    color: colors.primary,
     fontWeight: "700",
   },
 
@@ -194,32 +198,32 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: "rgba(111,137,165,0.12)",
+    backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#6F89A5",
+    borderColor: colors.primary,
   },
 
   activeInnerDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#6F89A5",
+    backgroundColor: colors.primary,
   },
 
   closeButton: {
     marginTop: 10,
 
-    backgroundColor: "#F3EFDF",
+    backgroundColor: resolvedTheme === "dark" ? colors.card : "#F3EFDF",
     paddingVertical: 16,
     borderRadius: 18,
     alignItems: "center",
 
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.65)",
+    borderColor: colors.border,
 
-    shadowColor: "#CBD5E1",
+    shadowColor: colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -230,7 +234,7 @@ const styles = StyleSheet.create({
   },
 
   closeText: {
-    color: "#475569",
+    color: colors.secondaryText,
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 0.2,

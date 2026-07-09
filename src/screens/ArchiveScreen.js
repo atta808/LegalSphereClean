@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -22,6 +24,8 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 
 export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const insets = useSafeAreaInsets();
   const currency = getCurrency(currentProfile);
@@ -154,7 +158,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
       >
         {loading ? (
           <View style={styles.loaderWrap}>
-            <ActivityIndicator size="large" color="#1E3A8A" />
+            <ActivityIndicator size="large" color={colors.primaryDark} />
             <Text style={styles.loaderText}>Decrypting Records...</Text>
           </View>
         ) : filteredCases.length === 0 ? (
@@ -233,16 +237,16 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#F1F5F9" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.border },
 
   // Header & Search
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 25,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.08,
     shadowRadius: 20,
@@ -257,30 +261,30 @@ const styles = StyleSheet.create({
   glassBackButton: {
     width: 44,
     height: 44,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
   backIcon: {
-    color: "#1E3A8A",
+    color: colors.primary,
     fontSize: 28,
     fontWeight: "300",
     marginTop: -4,
   },
   titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: "#1E3A8A" },
+  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
   jurisdictionPill: {
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
     marginTop: 4,
   },
   jurisdictionText: {
-    color: "#64748B",
+    color: colors.secondaryText,
     fontSize: 10,
     fontWeight: "700",
     textTransform: "uppercase",
@@ -296,16 +300,16 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
   emptyEmoji: { fontSize: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: "800", color: "#1E293B" },
+  emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
   emptySub: {
     fontSize: 14,
-    color: "#94A3B8",
+    color: colors.placeholder,
     marginTop: 8,
     textAlign: "center",
     lineHeight: 22,
@@ -313,13 +317,13 @@ const styles = StyleSheet.create({
 
   // Case Cards
   caseCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.03,
     shadowRadius: 10,
@@ -332,14 +336,14 @@ const styles = StyleSheet.create({
   caseTitle: {
     fontSize: 17,
     fontWeight: "800",
-    color: "#1E293B",
+    color: colors.text,
     marginBottom: 2,
   },
-  caseCourt: { fontSize: 13, color: "#64748B", fontWeight: "500" },
+  caseCourt: { fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
   statusPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
@@ -348,30 +352,30 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#94A3B8",
+    backgroundColor: colors.placeholder,
     marginRight: 6,
   },
-  statusText: { fontSize: 10, fontWeight: "800", color: "#64748B" },
+  statusText: { fontSize: 10, fontWeight: "800", color: colors.secondaryText },
 
-  divider: { height: 1, backgroundColor: "#F1F5F9", marginVertical: 15 },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: 15 },
 
   metaGrid: { flexDirection: "row", justifyContent: "space-between" },
   metaItem: { flex: 1 },
   metaLabel: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#94A3B8",
+    color: colors.placeholder,
     letterSpacing: 0.5,
   },
   metaValue: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1E293B",
+    color: colors.text,
     marginTop: 3,
   },
 
   balanceContainer: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     padding: 15,
     borderRadius: 16,
     marginTop: 15,
@@ -379,37 +383,37 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  balanceLabel: { fontSize: 12, fontWeight: "600", color: "#64748B" },
-  balanceValue: { fontSize: 15, fontWeight: "800", color: "#1E3A8A" },
+  balanceLabel: { fontSize: 12, fontWeight: "600", color: colors.secondaryText },
+  balanceValue: { fontSize: 15, fontWeight: "800", color: colors.primary },
 
   actionRow: { flexDirection: "row", marginTop: 20, gap: 10 },
   restoreBtn: {
     flex: 2,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 14,
     alignItems: "center",
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOpacity: 0.2,
     shadowRadius: 10,
     elevation: 4,
   },
-  restoreBtnText: { color: "#FFFFFF", fontWeight: "800", fontSize: 13 },
+  restoreBtnText: { color: colors.surface, fontWeight: "800", fontSize: 13 },
   deleteBtn: {
     flex: 1,
-    backgroundColor: "#FEF2F2",
+    backgroundColor: colors.surface,
     paddingVertical: 14,
     borderRadius: 14,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#FEE2E2",
+    borderColor: colors.danger,
   },
-  deleteBtnText: { color: "#DC2626", fontWeight: "800", fontSize: 13 },
+  deleteBtnText: { color: colors.danger, fontWeight: "800", fontSize: 13 },
 
   loaderWrap: { paddingVertical: 80, alignItems: "center" },
   loaderText: {
     marginTop: 15,
-    color: "#1E3A8A",
+    color: colors.primary,
     fontWeight: "700",
     fontSize: 13,
   },

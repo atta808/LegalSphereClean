@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
@@ -27,6 +29,8 @@ import {
 import { createUserProfile, getUserProfile } from "../services/userService";
 
 export default function LoginScreen({ onLoginSuccess }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
 
   const [isRegister, setIsRegister] = useState(false);
@@ -141,7 +145,7 @@ export default function LoginScreen({ onLoginSuccess }) {
 
   return (
     <View style={styles.mainContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E3A8A" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
 
       {/* HEADER */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 20 }]}>
@@ -177,7 +181,7 @@ export default function LoginScreen({ onLoginSuccess }) {
                 >
                   <Text
                     style={{
-                      color: "#1E293B",
+                      color: colors.text,
                       fontSize: 15,
                       fontWeight: "600",
                     }}
@@ -217,7 +221,7 @@ export default function LoginScreen({ onLoginSuccess }) {
             <TouchableOpacity onPress={handleForgotPassword}>
               <Text
                 style={{
-                  color: "#2B6EF2",
+                  color: colors.text,
                   marginTop: 10,
                   textAlign: "right",
                   fontWeight: "600",
@@ -232,7 +236,7 @@ export default function LoginScreen({ onLoginSuccess }) {
               onPress={handleSubmit}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={colors.surface} />
               ) : (
                 <Text style={styles.actionButtonText}>
                   {isRegister ? "REGISTER" : "LOGIN"}
@@ -272,10 +276,10 @@ export default function LoginScreen({ onLoginSuccess }) {
     </View>
   );
 }
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#F1F5F9" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.border },
   premiumHeader: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingHorizontal: 24,
     paddingBottom: 70,
     alignItems: "center",
@@ -292,24 +296,24 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 28,
     fontWeight: "900",
-    color: "#FFFFFF",
+    color: colors.surface,
     letterSpacing: -0.5,
   },
   subTitleText: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#C7D2FE",
+    color: colors.text,
     letterSpacing: 2.5,
     marginTop: 4,
   },
   contentArea: { flex: 1, marginTop: -50 },
   scrollContent: { paddingBottom: 40 },
   glassCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     marginHorizontal: 20,
     borderRadius: 35,
     padding: 28,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.15,
     shadowRadius: 30,
@@ -318,12 +322,12 @@ const styles = StyleSheet.create({
   formHeader: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#1E293B",
+    color: colors.text,
     textAlign: "center",
   },
   formSubHeader: {
     fontSize: 13,
-    color: "#64748B",
+    color: colors.secondaryText,
     textAlign: "center",
     marginTop: 6,
     marginBottom: 30,
@@ -333,7 +337,7 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 11,
     fontWeight: "800",
-    color: "#1E3A8A",
+    color: colors.primary,
     textTransform: "uppercase",
     letterSpacing: 1.2,
     marginBottom: 10,
@@ -341,9 +345,9 @@ const styles = StyleSheet.create({
   },
   pickerRow: { flexDirection: "row", alignItems: "center" },
   pickerWrapper: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderWidth: 1.5,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     borderRadius: 18,
 
     paddingHorizontal: 18,
@@ -355,24 +359,24 @@ const styles = StyleSheet.create({
   },
   locationBadge: {
     fontSize: 12,
-    color: "#2B6EF2",
+    color: colors.text,
     fontWeight: "700",
     marginTop: 8,
     marginLeft: 6,
   },
   actionButton: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     borderRadius: 20,
     paddingVertical: 18,
     alignItems: "center",
     marginTop: 15,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOpacity: 0.4,
     shadowRadius: 15,
     elevation: 8,
   },
   actionButtonText: {
-    color: "#FFFFFF",
+    color: colors.surface,
     fontSize: 15,
     fontWeight: "900",
     letterSpacing: 1,
@@ -380,16 +384,16 @@ const styles = StyleSheet.create({
   toggleLink: { marginTop: 25, paddingVertical: 5 },
   toggleText: {
     textAlign: "center",
-    color: "#64748B",
+    color: colors.secondaryText,
     fontSize: 14,
     fontWeight: "500",
   },
-  toggleBold: { color: "#2B6EF2", fontWeight: "800" },
+  toggleBold: { color: colors.text, fontWeight: "800" },
   securityFooter: {
     textAlign: "center",
     marginTop: 30,
     fontSize: 10,
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontWeight: "800",
     letterSpacing: 1.5,
   },
@@ -397,21 +401,21 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     alignItems: "center",
   },
 
   roleActive: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
   },
 
   roleText: {
     fontWeight: "700",
-    color: "#1E293B",
+    color: colors.text,
   },
 
   roleTextActive: {
-    color: "#FFF",
+    color: colors.surface,
   },
   footer: {
     marginTop: 18,
@@ -420,7 +424,7 @@ const styles = StyleSheet.create({
 
   footerText: {
     fontSize: 11,
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontWeight: "800",
     letterSpacing: 1.8,
   },

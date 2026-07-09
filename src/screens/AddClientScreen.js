@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import LegalPicker from "../components/LegalPicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -21,6 +23,8 @@ import { getProfile, insertClient } from "../services/sqliteService";
 import { getWhatsAppLink } from "../utils/phone";
 
 export default function AddClientScreen({ onBack, onSaved }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -171,7 +175,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
           }}
           style={styles.backBtn}
         >
-          <Ionicons name="chevron-back" size={24} color="#1A73E8" />
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
         </TouchableOpacity>
 
         <View style={{ flex: 1, alignItems: "center" }}>
@@ -199,7 +203,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
               <Ionicons
                 name="person-add"
                 size={14}
-                color="#1A73E8"
+                color={colors.primary}
                 style={{ marginRight: 4 }}
               />
               <Text style={styles.contactImportText}>Import</Text>
@@ -228,7 +232,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
               onPress={() => setCountryPickerVisible(true)}
             >
               <Text
-                style={{ color: country ? "#0F172A" : "#64748B", fontSize: 15 }}
+                style={{ color: country ? colors.text : colors.secondaryText, fontSize: 15 }}
               >
                 {countries.find((c) => c.code === country)?.name ||
                   "Select Country"}
@@ -266,7 +270,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
             <Text
               style={{
                 fontSize: 12,
-                color: "#64748B",
+                color: colors.secondaryText,
                 marginTop: 6,
                 fontStyle: "italic",
               }}
@@ -294,7 +298,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
               <Ionicons
                 name="logo-whatsapp"
                 size={18}
-                color="#FFF"
+                color={colors.surface}
                 style={{ marginRight: 8 }}
               />
               <Text style={styles.waText}>WhatsApp Ready</Text>
@@ -307,7 +311,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
           <Ionicons
             name="save"
             size={18}
-            color="#FFF"
+            color={colors.surface}
             style={{ marginRight: 8 }}
           />
           <Text style={styles.saveText}>Save Client</Text>
@@ -331,14 +335,14 @@ export default function AddClientScreen({ onBack, onSaved }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
   },
 
   header: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -351,25 +355,25 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
 
   backText: {
     fontSize: 26,
-    color: "#1A73E8",
+    color: colors.primary,
   },
 
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1A73E8",
+    color: colors.primary,
   },
 
   subtitle: {
     fontSize: 10,
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 2,
     fontWeight: "500",
   },
@@ -378,17 +382,17 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#0F172A",
+    color: colors.text,
     marginBottom: 16,
   },
 
@@ -405,31 +409,31 @@ const styles = StyleSheet.create({
   contactImportText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#1A73E8",
+    color: colors.primary,
   },
   label: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#64748B",
+    color: colors.secondaryText,
     marginBottom: 8,
   },
 
   input: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     minHeight: 48,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     justifyContent: "center",
   },
 
   codeText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#1A73E8",
+    color: colors.primary,
   },
 
   quickActions: {
@@ -438,7 +442,7 @@ const styles = StyleSheet.create({
   },
 
   waBtn: {
-    backgroundColor: "#25D366",
+    backgroundColor: colors.success,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
@@ -448,18 +452,18 @@ const styles = StyleSheet.create({
   },
 
   waText: {
-    color: "#FFF",
+    color: colors.surface,
     fontWeight: "700",
   },
 
   saveBtn: {
-    backgroundColor: "#1A73E8",
+    backgroundColor: colors.primary,
     paddingVertical: 18,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    shadowColor: "#1A73E8",
+    shadowColor: colors.primary,
     shadowOpacity: 0.2,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -468,7 +472,7 @@ const styles = StyleSheet.create({
   },
 
   saveText: {
-    color: "#FFF",
+    color: colors.surface,
     fontWeight: "700",
     fontSize: 16,
   },

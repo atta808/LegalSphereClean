@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 // CaseDetailScreen.js – Clean, Premium, Action-Ready
 
 import {
@@ -41,6 +43,8 @@ import CitationsScreen from "./CitationsScreen";
 import NotesScreen from "./NotesScreen";
 
 export default function CaseDetailScreen({ profile }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const route = useRoute();
   const navigation = useNavigation();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
@@ -228,7 +232,7 @@ export default function CaseDetailScreen({ profile }) {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#1E3A8A" />
+        <ActivityIndicator size="large" color={colors.primaryDark} />
       </View>
     );
   }
@@ -294,7 +298,7 @@ ${profile?.name || "Advocate"}`;
     return Math.max(score, 5);
   })();
   const healthColor =
-    healthScore >= 75 ? "#22C55E" : healthScore >= 45 ? "#F59E0B" : "#EF4444";
+    healthScore >= 75 ? "#22C55E" : healthScore >= 45 ? "#F59E0B" : colors.danger;
   const healthLabel =
     healthScore >= 75
       ? "LOW RISK"
@@ -306,7 +310,7 @@ ${profile?.name || "Advocate"}`;
 
   return (
     <View style={styles.mainContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E3A8A" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
 
       {/* HEADER */}
       <View style={[styles.newHeader, { paddingTop: insets.top + 10 }]}>
@@ -316,7 +320,7 @@ ${profile?.name || "Advocate"}`;
             onPress={() => navigation.goBack()}
             style={styles.newBackButton}
           >
-            <Ionicons name="chevron-back" size={24} color="#FFF" />
+            <Ionicons name="chevron-back" size={24} color={colors.surface} />
           </TouchableOpacity>
 
           <View style={styles.newHeaderCenter}>
@@ -365,7 +369,7 @@ Notes: ${caseData?.notes || "-"}`;
               }
             }}
           >
-            <Ionicons name="sparkles-outline" size={20} color="#FFF" />
+            <Ionicons name="sparkles-outline" size={20} color={colors.surface} />
           </TouchableOpacity>
         </View>
       </View>
@@ -387,22 +391,22 @@ Notes: ${caseData?.notes || "-"}`;
                   style={[
                     styles.priorityBadge,
                     caseData.priority === "urgent" && {
-                      backgroundColor: "#FEF2F2",
+                      backgroundColor: colors.surface,
                     },
                     caseData.priority === "important" && {
-                      backgroundColor: "#FFF7ED",
+                      backgroundColor: colors.surface,
                     },
                     caseData.priority === "normal" && {
-                      backgroundColor: "#EFF6FF",
+                      backgroundColor: colors.surface,
                     },
                   ]}
                 >
                   <Text
                     style={[
                       styles.priorityText,
-                      caseData.priority === "urgent" && { color: "#DC2626" },
-                      caseData.priority === "important" && { color: "#D97706" },
-                      caseData.priority === "normal" && { color: "#2563EB" },
+                      caseData.priority === "urgent" && { color: colors.danger },
+                      caseData.priority === "important" && { color: colors.text },
+                      caseData.priority === "normal" && { color: colors.primary },
                     ]}
                   >
                     {caseData.priority?.toUpperCase()}
@@ -414,9 +418,9 @@ Notes: ${caseData?.notes || "-"}`;
           </View>
           <View style={styles.divider} />
 
-          <Row label="Current Stage" value={caseData.stage} />
-          <Row label="Proceeding" value={caseData.description} />
-          <Row
+          <Row styles={styles}  label="Current Stage" value={caseData.stage} />
+          <Row styles={styles}  label="Proceeding" value={caseData.description} />
+          <Row styles={styles}
             label="Next Hearing"
             value={toDisplay(caseData.nextHearingISO, locale)}
             highlight
@@ -427,14 +431,14 @@ Notes: ${caseData?.notes || "-"}`;
               style={[
                 styles.statusTag,
                 isArchived
-                  ? { backgroundColor: "#FEF2F2" }
-                  : { backgroundColor: "#ECFDF5" },
+                  ? { backgroundColor: colors.surface }
+                  : { backgroundColor: colors.surface },
               ]}
             >
               <Text
                 style={[
                   styles.statusTagText,
-                  isArchived ? { color: "#DC2626" } : { color: "#15803D" },
+                  isArchived ? { color: colors.danger } : { color: colors.text },
                 ]}
               >
                 {caseData.status?.toUpperCase()}
@@ -448,25 +452,25 @@ Notes: ${caseData?.notes || "-"}`;
           <Text style={styles.sectionTitle}>Case Information</Text>
         </View>
         <View style={styles.card}>
-          {!!caseData?.judge && <Row label="Judge" value={caseData.judge} />}
+          {!!caseData?.judge && <Row styles={styles}  label="Judge" value={caseData.judge} />}
           {!!caseData?.caseType && (
-            <Row label="Case Type" value={caseData.caseType} />
+            <Row styles={styles}  label="Case Type" value={caseData.caseType} />
           )}
           {!!caseData?.litigationDomain && (
-            <Row label="Litigation Domain" value={caseData.litigationDomain} />
+            <Row styles={styles}  label="Litigation Domain" value={caseData.litigationDomain} />
           )}
           {!!caseData?.representingSide && (
-            <Row label="Representing Side" value={caseData.representingSide} />
+            <Row styles={styles}  label="Representing Side" value={caseData.representingSide} />
           )}
           {!!caseData?.opposingCounsel && (
-            <Row label="Opposing Counsel" value={caseData.opposingCounsel} />
+            <Row styles={styles}  label="Opposing Counsel" value={caseData.opposingCounsel} />
           )}
           {!!caseData?.opponent && (
-            <Row label="Opponent" value={caseData.opponent} />
+            <Row styles={styles}  label="Opponent" value={caseData.opponent} />
           )}
-          {!!caseData?.firNo && <Row label="FIR No" value={caseData.firNo} />}
+          {!!caseData?.firNo && <Row styles={styles}  label="FIR No" value={caseData.firNo} />}
           {!!caseData?.firDate && (
-            <Row label="FIR Date" value={caseData.firDate} />
+            <Row styles={styles}  label="FIR Date" value={caseData.firDate} />
           )}
         </View>
 
@@ -487,7 +491,7 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Ionicons name="calendar-outline" size={18} color="#1E3A8A" />
+              <Ionicons name="calendar-outline" size={18} color={colors.primaryDark} />
               <Text style={styles.actionBtnLabel}>Add Hearing</Text>
             </TouchableOpacity>
           </View>
@@ -505,7 +509,7 @@ Notes: ${caseData?.notes || "-"}`;
                 }
               }}
             >
-              <Ionicons name="sparkles-outline" size={18} color="#1E3A8A" />
+              <Ionicons name="sparkles-outline" size={18} color={colors.primaryDark} />
               <Text style={styles.actionBtnLabel}>AI Room</Text>
             </TouchableOpacity>
 
@@ -518,7 +522,7 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Ionicons name="flash-outline" size={18} color="#1E3A8A" />
+              <Ionicons name="flash-outline" size={18} color={colors.primaryDark} />
               <Text style={styles.actionBtnLabel}>Lex AI</Text>
             </TouchableOpacity>
 
@@ -530,7 +534,7 @@ Notes: ${caseData?.notes || "-"}`;
                 navigation.navigate("Timeline", { caseId: caseData.id });
               }}
             >
-              <Ionicons name="time-outline" size={18} color="#1E3A8A" />
+              <Ionicons name="time-outline" size={18} color={colors.primaryDark} />
               <Text style={styles.actionBtnLabel}>Timeline</Text>
             </TouchableOpacity>
           </View>
@@ -547,7 +551,7 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Ionicons name="folder-open-outline" size={18} color="#1E3A8A" />
+              <Ionicons name="folder-open-outline" size={18} color={colors.primaryDark} />
               <Text style={styles.actionBtnLabel}>Documents</Text>
             </TouchableOpacity>
 
@@ -559,7 +563,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Ionicons
                 name="document-text-outline"
                 size={18}
-                color="#1E3A8A"
+                color={colors.primaryDark}
               />
               <Text style={styles.actionBtnLabel}>Notes</Text>
             </TouchableOpacity>
@@ -572,7 +576,7 @@ Notes: ${caseData?.notes || "-"}`;
               <MaterialCommunityIcons
                 name="scale-balance"
                 size={18}
-                color="#1E3A8A"
+                color={colors.primaryDark}
               />
               <Text style={styles.actionBtnLabel}>Citations</Text>
             </TouchableOpacity>
@@ -637,23 +641,23 @@ Notes: ${caseData?.notes || "-"}`;
             </View>
           </View>
           <View style={styles.actionGrid}>
-            <ActionIconButton
-              color="#EFF6FF"
-              icon={<Ionicons name="call-outline" size={20} color="#2563EB" />}
+            <ActionIconButton colors={colors} styles={styles}
+              color={colors.text}
+              icon={<Ionicons name="call-outline" size={20} color={colors.primary} />}
               onPress={handleCallClient}
             />
-            <ActionIconButton
-              color="#ECFDF5"
-              icon={<Ionicons name="logo-whatsapp" size={20} color="#16A34A" />}
+            <ActionIconButton colors={colors} styles={styles}
+              color={colors.text}
+              icon={<Ionicons name="logo-whatsapp" size={20} color={colors.success} />}
               onPress={handleWhatsAppClient}
             />
-            <ActionIconButton
-              color="#FFF7ED"
+            <ActionIconButton colors={colors} styles={styles}
+              color={colors.text}
               icon={
                 <Ionicons
                   name="notifications-outline"
                   size={20}
-                  color="#D97706"
+                  color={colors.text}
                 />
               }
               onPress={handleSendReminder}
@@ -673,14 +677,14 @@ Notes: ${caseData?.notes || "-"}`;
         </View>
         <View style={styles.card}>
           <View style={styles.feeGrid}>
-            <FeeBox
+            <FeeBox styles={styles}
               label="Decided"
               val={formatMoney(caseData.feeDecided, currency, locale)}
             />
-            <FeeBox
+            <FeeBox styles={styles}
               label="Paid"
               val={formatMoney(caseData.feePaid, currency, locale)}
-              color="#10B981"
+              color={colors.success}
             />
           </View>
           <View style={styles.balanceRibbon}>
@@ -765,7 +769,7 @@ Notes: ${caseData?.notes || "-"}`;
           {isArchived ? (
             <TouchableOpacity
               activeOpacity={0.7}
-              style={[styles.mainActionBtn, { backgroundColor: "#10B981" }]}
+              style={[styles.mainActionBtn, { backgroundColor: colors.success }]}
               onPress={handleRestore}
             >
               <Text style={styles.mainActionBtnText}>
@@ -775,7 +779,7 @@ Notes: ${caseData?.notes || "-"}`;
           ) : (
             <TouchableOpacity
               activeOpacity={0.7}
-              style={[styles.mainActionBtn, { backgroundColor: "#EF4444" }]}
+              style={[styles.mainActionBtn, { backgroundColor: colors.danger }]}
               onPress={handleArchive}
             >
               <Text style={styles.mainActionBtnText}>
@@ -837,7 +841,7 @@ ${caseData?.status || "-"}
                 <Ionicons
                   name="document-text-outline"
                   size={16}
-                  color="#1E3A8A"
+                  color={colors.primaryDark}
                 />
                 <Text style={styles.aiActionText}>Summarize Case</Text>
               </View>
@@ -856,7 +860,7 @@ ${caseData?.status || "-"}
                 <MaterialCommunityIcons
                   name="scale-balance"
                   size={16}
-                  color="#1E3A8A"
+                  color={colors.primaryDark}
                 />
                 <Text style={styles.aiActionText}>Prepare Arguments</Text>
               </View>
@@ -875,7 +879,7 @@ ${caseData?.status || "-"}
                 <Ionicons
                   name="help-circle-outline"
                   size={16}
-                  color="#1E3A8A"
+                  color={colors.primaryDark}
                 />
                 <Text style={styles.aiActionText}>Cross Examination</Text>
               </View>
@@ -891,7 +895,7 @@ ${caseData?.status || "-"}
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
               >
-                <Ionicons name="calendar-outline" size={16} color="#1E3A8A" />
+                <Ionicons name="calendar-outline" size={16} color={colors.primaryDark} />
                 <Text style={styles.aiActionText}>Next Hearing Strategy</Text>
               </View>
             </TouchableOpacity>
@@ -899,19 +903,19 @@ ${caseData?.status || "-"}
             {generatedSummary ? (
               <View
                 style={{
-                  backgroundColor: "#F8FAFC",
+                  backgroundColor: colors.background,
                   padding: 14,
                   borderRadius: 14,
                   marginBottom: 12,
                   maxHeight: 220,
                   borderWidth: 1,
-                  borderColor: "#E2E8F0",
+                  borderColor: colors.border,
                 }}
               >
                 <ScrollView>
                   <Text
                     style={{
-                      color: "#1E293B",
+                      color: colors.text,
                       fontSize: 14,
                       lineHeight: 22,
                     }}
@@ -944,7 +948,7 @@ ${caseData?.status || "-"}
                       gap: 6,
                     }}
                   >
-                    <Ionicons name="save-outline" size={16} color="#1E3A8A" />
+                    <Ionicons name="save-outline" size={16} color={colors.primaryDark} />
                     <Text style={styles.aiActionText}>
                       Save Summary To Notes
                     </Text>
@@ -965,7 +969,7 @@ ${caseData?.status || "-"}
                       gap: 6,
                     }}
                   >
-                    <Ionicons name="copy-outline" size={16} color="#1E3A8A" />
+                    <Ionicons name="copy-outline" size={16} color={colors.primaryDark} />
                     <Text style={styles.aiActionText}>Copy Summary</Text>
                   </View>
                 </TouchableOpacity>
@@ -1073,13 +1077,13 @@ ${caseData?.status || "-"}
 }
 
 // ======================== HELPERS ========================
-const Row = ({ label, value, highlight }) => (
+const Row = ({ label, value, highlight, styles, colors }) => (
   <View style={styles.row}>
     <Text style={styles.rowLabel}>{label}</Text>
     <Text
       style={[
         styles.rowValue,
-        highlight && { color: "#1E3A8A", fontWeight: "900" },
+        highlight && { color: colors.primary, fontWeight: "900" },
       ]}
     >
       {value || "-"}
@@ -1087,7 +1091,7 @@ const Row = ({ label, value, highlight }) => (
   </View>
 );
 
-const ActionIconButton = ({ color, icon, onPress }) => (
+const ActionIconButton = ({ color, icon, onPress, styles }) => (
   <TouchableOpacity
     activeOpacity={0.7}
     style={[styles.actionIconBtn, { backgroundColor: color }]}
@@ -1097,7 +1101,7 @@ const ActionIconButton = ({ color, icon, onPress }) => (
   </TouchableOpacity>
 );
 
-const FeeBox = ({ label, val, color }) => (
+const FeeBox = ({ label, val, color, styles, colors }) => (
   <View style={styles.feeBox}>
     <Text style={styles.feeBoxLabel}>{label}</Text>
     <Text style={[styles.feeBoxVal, color && { color }]}>{val}</Text>
@@ -1105,12 +1109,12 @@ const FeeBox = ({ label, val, color }) => (
 );
 
 // ======================== STYLES ========================
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#F8FAFC" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.background },
   loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 
   newHeader: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingBottom: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
@@ -1138,7 +1142,7 @@ const styles = StyleSheet.create({
   newHeaderTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#FFF",
+    color: colors.surface,
     letterSpacing: 0.5,
   },
   newHeaderSubtitle: {
@@ -1159,13 +1163,13 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: 20, paddingTop: 20 },
 
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
+    borderColor: colors.border,
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
@@ -1181,10 +1185,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  caseTitle: { fontSize: 18, fontWeight: "700", color: "#0F172A", flex: 1 },
+  caseTitle: { fontSize: 18, fontWeight: "700", color: colors.text, flex: 1 },
   caseCourt: {
     fontSize: 13,
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 4,
     fontWeight: "500",
   },
@@ -1196,13 +1200,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   priorityText: { fontSize: 10, fontWeight: "600", letterSpacing: 0.5 },
-  divider: { height: 1, backgroundColor: "#F1F5F9", marginVertical: 14 },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: 14 },
   row: { flexDirection: "row", alignItems: "flex-start", paddingVertical: 8 },
-  rowLabel: { width: "42%", fontSize: 13, color: "#64748B", fontWeight: "500" },
+  rowLabel: { width: "42%", fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
   rowValue: {
     flex: 1,
     fontSize: 14,
-    color: "#1E293B",
+    color: colors.text,
     fontWeight: "600",
     textAlign: "right",
   },
@@ -1230,16 +1234,16 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   actionBtn: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     flexDirection: "row",
     gap: 6,
-    shadowColor: "#0F172A",
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
@@ -1252,20 +1256,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionBtnLabel: {
-    color: "#0F172A",
+    color: colors.text,
     fontSize: 12,
     fontWeight: "600",
     letterSpacing: 0.5,
   },
 
   aiInsightsCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
+    borderColor: colors.border,
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
@@ -1277,10 +1281,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  aiInsightsTitle: { color: "#0F172A", fontSize: 16, fontWeight: "700" },
+  aiInsightsTitle: { color: colors.text, fontSize: 16, fontWeight: "700" },
   aiInsightsBadge: {
-    backgroundColor: "#ECFDF5",
-    color: "#15803D",
+    backgroundColor: colors.surface,
+    color: colors.text,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -1290,7 +1294,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   aiInsightItem: {
-    color: "#475569",
+    color: colors.secondaryText,
     fontSize: 14,
     marginBottom: 12,
     fontWeight: "500",
@@ -1298,20 +1302,20 @@ const styles = StyleSheet.create({
   },
 
   healthCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
+    borderColor: colors.border,
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
   },
-  healthTitle: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
+  healthTitle: { fontSize: 18, fontWeight: "900", color: colors.text },
   healthCircle: {
     width: 120,
     height: 120,
@@ -1333,15 +1337,15 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: "#EFF6FF",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
   },
-  avatarText: { color: "#1E3A8A", fontSize: 20, fontWeight: "700" },
-  clientNameText: { fontSize: 18, fontWeight: "700", color: "#0F172A" },
+  avatarText: { color: colors.primary, fontSize: 20, fontWeight: "700" },
+  clientNameText: { fontSize: 18, fontWeight: "700", color: colors.text },
   clientSubText: {
     fontSize: 13,
-    color: "#64748B",
+    color: colors.secondaryText,
     fontWeight: "500",
     marginTop: 4,
   },
@@ -1357,41 +1361,41 @@ const styles = StyleSheet.create({
   feeGrid: { flexDirection: "row", gap: 12, marginBottom: 16 },
   feeBox: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     padding: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   feeBoxLabel: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#94A3B8",
+    color: colors.placeholder,
     textTransform: "uppercase",
   },
   feeBoxVal: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#1E293B",
+    color: colors.text,
     marginTop: 4,
   },
   balanceRibbon: {
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     padding: 16,
     borderRadius: 20,
     borderLeftWidth: 6,
-    borderLeftColor: "#EF4444",
+    borderLeftColor: colors.danger,
   },
   balanceLabel: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#64748B",
+    color: colors.secondaryText,
     letterSpacing: 0.5,
   },
   balanceValue: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#1E3A8A",
+    color: colors.primary,
     marginTop: 4,
   },
 
@@ -1405,12 +1409,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#475569",
+    color: colors.secondaryText,
     letterSpacing: 1.0,
     textTransform: "uppercase",
   },
-  addPaymentLink: { fontSize: 13, fontWeight: "600", color: "#1E3A8A" },
-  viewAllLink: { fontSize: 12, fontWeight: "600", color: "#1E3A8A" },
+  addPaymentLink: { fontSize: 13, fontWeight: "600", color: colors.primary },
+  viewAllLink: { fontSize: 12, fontWeight: "600", color: colors.primary },
 
   timelineItem: { flexDirection: "row", marginBottom: 16 },
   timelineLeft: { alignItems: "center", marginRight: 16 },
@@ -1418,18 +1422,18 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     marginTop: 4,
   },
-  timelineLine: { width: 1, flex: 1, backgroundColor: "#E2E8F0", marginTop: 4 },
+  timelineLine: { width: 1, flex: 1, backgroundColor: colors.border, marginTop: 4 },
   timelineModernCard: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
+    borderColor: colors.border,
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
@@ -1440,12 +1444,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  timelineDate: { fontSize: 14, fontWeight: "600", color: "#1E293B" },
+  timelineDate: { fontSize: 14, fontWeight: "600", color: colors.text },
   delText: {
     fontSize: 11,
-    color: "#DC2626",
+    color: colors.danger,
     fontWeight: "600",
-    backgroundColor: "#FEF2F2",
+    backgroundColor: colors.surface,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -1454,12 +1458,12 @@ const styles = StyleSheet.create({
   timelineStage: {
     fontSize: 13,
     fontWeight: "500",
-    color: "#475569",
+    color: colors.secondaryText,
     marginTop: 6,
   },
   timelineNotes: {
     fontSize: 13,
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 6,
     lineHeight: 20,
   },
@@ -1468,51 +1472,51 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     borderRadius: 12,
-    backgroundColor: "#EFF6FF",
+    backgroundColor: colors.surface,
   },
-  viewFullButtonText: { fontSize: 13, fontWeight: "600", color: "#1E3A8A" },
+  viewFullButtonText: { fontSize: 13, fontWeight: "600", color: colors.primary },
 
   cardSubtitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1E293B",
+    color: colors.text,
     marginBottom: 8,
   },
-  descriptionText: { fontSize: 14, color: "#475569", lineHeight: 22 },
+  descriptionText: { fontSize: 14, color: colors.secondaryText, lineHeight: 22 },
 
   mainActionBtn: {
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: "center",
-    shadowColor: "#0F172A",
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
   },
   mainActionBtnText: {
-    color: "#FFF",
+    color: colors.surface,
     fontWeight: "700",
     fontSize: 14,
     letterSpacing: 0.5,
   },
 
   aiActionBtn: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingVertical: 14,
     borderRadius: 12,
     marginBottom: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
+    borderColor: colors.border,
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
   },
   aiActionText: {
-    color: "#1E3A8A",
+    color: colors.primary,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -1524,14 +1528,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   modalCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 20,
     minHeight: 220,
   },
-  modalTitle: { fontSize: 18, fontWeight: "700", color: "#0F172A" },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: colors.text },
   modalSub: {
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 4,
     marginBottom: 20,
     fontSize: 13,
@@ -1542,20 +1546,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderRadius: 12,
   },
-  modalCancelText: { color: "#475569", fontWeight: "600" },
+  modalCancelText: { color: colors.secondaryText, fontWeight: "600" },
   modalSave: {
     flex: 1,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
   },
-  modalSaveText: { color: "#FFF", fontWeight: "600" },
+  modalSaveText: { color: colors.surface, fontWeight: "600" },
   emptyText: {
-    color: "#94A3B8",
+    color: colors.placeholder,
     fontWeight: "600",
     fontStyle: "italic",
     textAlign: "center",

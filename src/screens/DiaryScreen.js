@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
 import { LinearGradient } from "expo-linear-gradient";
@@ -26,7 +28,7 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday, toDisplay } from "../utils/date";
 
 // --- PREMIUM GLOSSY COMPONENT ---
-const PremiumExportButton = ({ item, openExportOptions }) => {
+const PremiumExportButton = ({ item, openExportOptions, styles }) => {
   return (
     <TouchableOpacity
       onPress={(e) => {
@@ -41,7 +43,7 @@ const PremiumExportButton = ({ item, openExportOptions }) => {
         end={{ x: 1, y: 1 }}
         style={styles.premiumExportBtn}
       >
-        <Share2 color="#00f2fe" size={14} strokeWidth={2.5} />
+        <Share2 color={colors.text} size={14} strokeWidth={2.5} />
         <Text style={styles.premiumExportText}>EXPORT</Text>
         <View style={styles.glossHighlight} />
       </LinearGradient>
@@ -50,6 +52,8 @@ const PremiumExportButton = ({ item, openExportOptions }) => {
 };
 
 export default function DiaryScreen({ profile }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
@@ -203,7 +207,7 @@ export default function DiaryScreen({ profile }) {
             style={styles.glassButton}
             onPress={handleFullDiaryPDF}
           >
-            <FileText color="#1E3A8A" size={24} />
+            <FileText color={colors.primaryDark} size={24} />
           </TouchableOpacity>
         </View>
 
@@ -226,7 +230,7 @@ export default function DiaryScreen({ profile }) {
       >
         {loading ? (
           <View style={styles.loaderWrap}>
-            <ActivityIndicator size="large" color="#1E3A8A" />
+            <ActivityIndicator size="large" color={colors.primaryDark} />
             <Text style={styles.loaderText}>Syncing Chambers...</Text>
           </View>
         ) : (
@@ -235,11 +239,11 @@ export default function DiaryScreen({ profile }) {
             {pendingCases.length > 0 && (
               <View style={styles.sectionContainer}>
                 <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: "#EF4444" }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.danger }]}>
                     Pending Updates
                   </Text>
-                  <View style={[styles.badge, { backgroundColor: "#FEE2E2" }]}>
-                    <Text style={[styles.badgeText, { color: "#EF4444" }]}>
+                  <View style={[styles.badge, { backgroundColor: colors.danger }]}>
+                    <Text style={[styles.badgeText, { color: colors.danger }]}>
                       {pendingCases.length}
                     </Text>
                   </View>
@@ -335,7 +339,7 @@ export default function DiaryScreen({ profile }) {
                         </Text>
                       </View>
                     </View>
-                    <PremiumExportButton
+                    <PremiumExportButton styles={styles}
                       item={item}
                       openExportOptions={openExportOptions}
                     />
@@ -358,7 +362,7 @@ export default function DiaryScreen({ profile }) {
                       </View>
                       <View style={{ alignItems: "flex-end" }}>
                         <Text style={styles.hLabel}>BALANCE</Text>
-                        <Text style={[styles.hDate, { color: "#EF4444" }]}>
+                        <Text style={[styles.hDate, { color: colors.danger }]}>
                           {formatMoney(item.feeBalance, currency, locale)}
                         </Text>
                       </View>
@@ -393,7 +397,7 @@ export default function DiaryScreen({ profile }) {
                 setExportModalVisible(false);
               }}
             >
-              <FileText color="#1E3A8A" size={20} />
+              <FileText color={colors.primaryDark} size={20} />
               <Text style={styles.exportText}>Export as PDF</Text>
             </TouchableOpacity>
 
@@ -406,7 +410,7 @@ export default function DiaryScreen({ profile }) {
                 setExportModalVisible(false);
               }}
             >
-              <Copy color="#1E3A8A" size={20} />
+              <Copy color={colors.primaryDark} size={20} />
               <Text style={styles.exportText}>Copy Full Details</Text>
             </TouchableOpacity>
 
@@ -420,7 +424,7 @@ export default function DiaryScreen({ profile }) {
                 setExportModalVisible(false);
               }}
             >
-              <Fingerprint color="#1E3A8A" size={20} />
+              <Fingerprint color={colors.primaryDark} size={20} />
               <Text style={styles.exportText}>Copy Case No</Text>
             </TouchableOpacity>
 
@@ -437,10 +441,10 @@ export default function DiaryScreen({ profile }) {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: "#F1F5F9" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: colors.border },
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingBottom: 25,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
@@ -455,17 +459,17 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
-  backIcon: { color: "#1E3A8A", fontSize: 28, marginTop: -4 },
+  backIcon: { color: colors.primary, fontSize: 28, marginTop: -4 },
   titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: "#1E3A8A" },
+  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
   jurisdictionPill: {
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 10,
@@ -474,7 +478,7 @@ const styles = StyleSheet.create({
   jurisdictionText: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#64748B",
+    color: colors.secondaryText,
     textTransform: "uppercase",
   },
   searchWrapper: { paddingHorizontal: 20, marginTop: 20 },
@@ -488,71 +492,71 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#64748B",
+    color: colors.secondaryText,
     textTransform: "uppercase",
     letterSpacing: 1.2,
   },
   badge: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,
     marginLeft: 10,
   },
-  badgeText: { fontSize: 10, fontWeight: "800", color: "#FFF" },
+  badgeText: { fontSize: 10, fontWeight: "800", color: colors.surface },
   caseCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 20,
     marginBottom: 16,
     borderLeftWidth: 6,
     elevation: 2,
   },
-  activeBorder: { borderLeftColor: "#3B82F6" },
-  pendingBorder: { borderLeftColor: "#EF4444" },
-  pipelineBorder: { borderLeftColor: "#F59E0B" },
+  activeBorder: { borderLeftColor: colors.primary },
+  pendingBorder: { borderLeftColor: colors.danger },
+  pipelineBorder: { borderLeftColor: colors.border },
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 6,
   },
-  caseTitleText: { fontSize: 17, fontWeight: "800", color: "#1E293B", flex: 1 },
-  caseCourtText: { fontSize: 13, color: "#64748B", marginBottom: 10 },
+  caseTitleText: { fontSize: 17, fontWeight: "800", color: colors.text, flex: 1 },
+  caseCourtText: { fontSize: 13, color: colors.secondaryText, marginBottom: 10 },
   hearingModule: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     padding: 12,
     borderRadius: 16,
     marginBottom: 10,
   },
-  hLabel: { fontSize: 9, fontWeight: "900", color: "#94A3B8" },
-  hDate: { fontSize: 15, fontWeight: "800", color: "#1E3A8A" },
+  hLabel: { fontSize: 9, fontWeight: "900", color: colors.placeholder },
+  hDate: { fontSize: 15, fontWeight: "800", color: colors.primary },
   cardFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
     borderTopWidth: 1,
-    borderTopColor: "#F1F5F9",
+    borderTopColor: colors.border,
     paddingTop: 12,
     marginTop: 5,
   },
-  archiveLink: { color: "#94A3B8", fontSize: 12, fontWeight: "600" },
-  tapHint: { color: "#3B82F6", fontSize: 12, fontWeight: "800" },
+  archiveLink: { color: colors.placeholder, fontSize: 12, fontWeight: "600" },
+  tapHint: { color: colors.primary, fontSize: 12, fontWeight: "800" },
   overdueBadge: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: colors.danger,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
     marginLeft: 10,
   },
-  overdueText: { color: "#EF4444", fontSize: 9, fontWeight: "900" },
+  overdueText: { color: colors.danger, fontSize: 9, fontWeight: "900" },
   activateBtn: {
-    backgroundColor: "#F59E0B",
+    backgroundColor: colors.surface,
     paddingVertical: 8,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
   },
-  activateBtnText: { color: "#FFF", fontSize: 11, fontWeight: "900" },
+  activateBtnText: { color: colors.surface, fontSize: 11, fontWeight: "900" },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(15, 23, 42, 0.6)",
@@ -561,7 +565,7 @@ const styles = StyleSheet.create({
   },
   exportModalCard: {
     width: "85%",
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 30,
     padding: 25,
     elevation: 20,
@@ -569,7 +573,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "900",
-    color: "#1E3A8A",
+    color: colors.primary,
     marginBottom: 20,
     textAlign: "center",
   },
@@ -578,17 +582,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 18,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: colors.border,
   },
   exportText: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#334155",
+    color: colors.text,
     marginLeft: 15,
   },
   cancelBtn: { marginTop: 20, paddingVertical: 12 },
   cancelText: {
-    color: "#EF4444",
+    color: colors.danger,
     textAlign: "center",
     fontWeight: "900",
     fontSize: 14,
@@ -602,7 +606,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   premiumExportText: {
-    color: "#FFF",
+    color: colors.surface,
     fontSize: 11,
     fontWeight: "900",
     marginLeft: 6,
@@ -621,17 +625,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     marginTop: 4,
   },
-  priorityUrgent: { backgroundColor: "#FEE2E2" },
-  priorityText: { fontSize: 9, fontWeight: "900", color: "#475569" },
+  priorityUrgent: { backgroundColor: colors.danger },
+  priorityText: { fontSize: 9, fontWeight: "900", color: colors.secondaryText },
   loaderWrap: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 100,
   },
-  loaderText: { marginTop: 15, color: "#64748B", fontWeight: "700" },
+  loaderText: { marginTop: 15, color: colors.secondaryText, fontWeight: "700" },
   glassButton: { padding: 5 },
 });

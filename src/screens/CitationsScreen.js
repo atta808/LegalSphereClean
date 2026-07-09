@@ -2,8 +2,9 @@ import { exportCitationPdf } from "../utils/citationPdf";
 import { askDeepSeek } from "../services/deepseekService";
 import LegalInput from "../components/LegalInput";
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTheme } from "../theme/ThemeContext";
 import { Share2, Copy, FileText } from "lucide-react-native";
 import {
   Alert,
@@ -28,7 +29,7 @@ import {
 } from "../services/sqliteService";
 import { toDisplay } from "../utils/date";
 import { useNavigation, useRoute } from "@react-navigation/native";
-const PremiumExportButton = ({ item, openExportOptions }) => {
+const PremiumExportButton = ({ item, openExportOptions, styles }) => {
   return (
     <TouchableOpacity
       onPress={() => openExportOptions(item)}
@@ -40,7 +41,7 @@ const PremiumExportButton = ({ item, openExportOptions }) => {
         end={{ x: 1, y: 1 }}
         style={styles.premiumExportBtn}
       >
-        <Share2 color="#00f2fe" size={14} strokeWidth={2.5} />
+        <Share2 color={colors.text} size={14} strokeWidth={2.5} />
 
         <Text style={styles.premiumExportText}>EXPORT</Text>
 
@@ -57,6 +58,8 @@ export default function CitationsScreen({
   route,
 }) {
   const navigation = useNavigation();
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
 
   console.log("PROP CASE ID:", caseId);
   console.log("ROUTE CASE ID:", route?.params?.caseId);
@@ -337,7 +340,7 @@ ${selectedCitation?.description || ""}`,
                 <View style={styles.cardContent}>
                   <View style={styles.cardHeader}>
                     <Text style={styles.citationTitle}>{c.citation}</Text>
-                    <PremiumExportButton
+                    <PremiumExportButton styles={styles}
                       item={c}
                       openExportOptions={openExportOptions}
                     />
@@ -390,7 +393,7 @@ ${selectedCitation?.description || ""}`,
 
             <TouchableOpacity
               style={{
-                backgroundColor: "#0F172A",
+                backgroundColor: colors.text,
                 paddingVertical: 16,
                 borderRadius: 18,
                 alignItems: "center",
@@ -400,7 +403,7 @@ ${selectedCitation?.description || ""}`,
             >
               <Text
                 style={{
-                  color: "#fff",
+                  color: colors.surface,
                   fontWeight: "800",
                   fontSize: 15,
                 }}
@@ -423,7 +426,7 @@ ${selectedCitation?.description || ""}`,
           style={styles.researchFab}
           onPress={openResearchSource}
         >
-          <Ionicons name="globe-outline" size={28} color="#fff" />
+          <Ionicons name="globe-outline" size={28} color={colors.surface} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -438,7 +441,7 @@ ${selectedCitation?.description || ""}`,
           <Ionicons
             name={showInputPanel ? "chevron-down" : "chevron-up"}
             size={22}
-            color={showInputPanel ? "#EF4444" : "#C5A880"}
+            color={showInputPanel ? colors.danger : "#C5A880"}
           />
         </TouchableOpacity>
         <Modal visible={exportModalVisible} transparent animationType="fade">
@@ -452,14 +455,14 @@ ${selectedCitation?.description || ""}`,
                   setExportModalVisible(false);
                 }}
               >
-                <FileText color="#1E3A8A" size={20} />
+                <FileText color={colors.primaryDark} size={20} />
                 <Text style={styles.exportText}>Export PDF</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.exportOption}
                 onPress={handleCopyFullCitation}
               >
-                <Copy color="#1E3A8A" size={20} />
+                <Copy color={colors.primaryDark} size={20} />
                 <Text style={styles.exportText}>Copy Full Citation</Text>
               </TouchableOpacity>
 
@@ -467,7 +470,7 @@ ${selectedCitation?.description || ""}`,
                 style={styles.exportOption}
                 onPress={handleShareCitation}
               >
-                <Share2 color="#1E3A8A" size={20} />
+                <Share2 color={colors.primaryDark} size={20} />
                 <Text style={styles.exportText}>Share Citation</Text>
               </TouchableOpacity>
 
@@ -475,7 +478,7 @@ ${selectedCitation?.description || ""}`,
                 style={styles.exportOption}
                 onPress={handleEditCitation}
               >
-                <FileText color="#1E3A8A" size={20} />
+                <FileText color={colors.primaryDark} size={20} />
                 <Text style={styles.exportText}>Edit Citation</Text>
               </TouchableOpacity>
 
@@ -489,7 +492,7 @@ ${selectedCitation?.description || ""}`,
               >
                 <Text
                   style={{
-                    color: "#EF4444",
+                    color: colors.danger,
                     fontWeight: "800",
                   }}
                 >
@@ -511,17 +514,17 @@ ${selectedCitation?.description || ""}`,
   );
 }
 
-const styles = StyleSheet.create({
-  mainWrapper: { flex: 1, backgroundColor: "#F8FAFC" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  mainWrapper: { flex: 1, backgroundColor: colors.background },
 
   // HEADER
   premiumHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 20,
     paddingBottom: 20,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    shadowColor: "#0F172A",
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.06,
     shadowRadius: 24,
@@ -536,17 +539,17 @@ const styles = StyleSheet.create({
   glassBackButton: {
     width: 44,
     height: 44,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
-  backIconText: { fontSize: 22, color: "#1E3A8A", fontWeight: "600" },
+  backIconText: { fontSize: 22, color: colors.primary, fontWeight: "600" },
   headerTitleWrapper: { flex: 1, alignItems: "center" },
   headerTitleText: {
-    color: "#0F172A",
+    color: colors.text,
     fontSize: 20,
     fontWeight: "900",
     letterSpacing: -0.5,
@@ -554,7 +557,7 @@ const styles = StyleSheet.create({
   jurisdictionPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EEF2FF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
@@ -564,11 +567,11 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#4F46E5",
+    backgroundColor: colors.surface,
     marginRight: 6,
   },
   jurisdictionText: {
-    color: "#4F46E5",
+    color: colors.text,
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 1,
@@ -577,12 +580,12 @@ const styles = StyleSheet.create({
   // LIST & CARDS
   list: { flex: 1, paddingHorizontal: 18 },
   citationCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 28,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.02,
     shadowRadius: 8,
@@ -599,27 +602,27 @@ const styles = StyleSheet.create({
   citationTitle: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#1E293B",
+    color: colors.text,
     flex: 1,
     lineHeight: 24,
   },
   copyActionBtn: {
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     marginLeft: 12,
   },
   copyBtnText: {
     fontSize: 10,
     fontWeight: "900",
-    color: "#475569",
+    color: colors.secondaryText,
   },
   descriptionText: {
     fontSize: 15,
-    color: "#64748B",
+    color: colors.secondaryText,
     lineHeight: 22,
     marginBottom: 18,
     fontStyle: "italic",
@@ -629,12 +632,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: "#F8FAFC",
+    borderTopColor: colors.background,
     paddingTop: 14,
   },
-  dateText: { fontSize: 12, color: "#94A3B8", fontWeight: "600" },
+  dateText: { fontSize: 12, color: colors.placeholder, fontWeight: "600" },
   deleteLink: {
-    color: "#FDA4AF",
+    color: colors.text,
     fontWeight: "700",
     fontSize: 12,
   },
@@ -645,12 +648,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 24,
     paddingTop: 16,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOpacity: 0.12,
     shadowRadius: 30,
     elevation: 20,
@@ -658,7 +661,7 @@ const styles = StyleSheet.create({
   panelHandle: {
     width: 36,
     height: 5,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     borderRadius: 10,
     alignSelf: "center",
     marginBottom: 20,
@@ -666,7 +669,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 12,
     fontWeight: "900",
-    color: "#94A3B8",
+    color: colors.placeholder,
     textTransform: "uppercase",
     marginBottom: 16,
     letterSpacing: 1.5,
@@ -674,28 +677,28 @@ const styles = StyleSheet.create({
   },
   inputGroup: { gap: 12, marginBottom: 20 },
   premiumInput: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
     borderWidth: 1.5,
-    borderColor: "#F1F5F9",
+    borderColor: colors.border,
     borderRadius: 20,
     paddingHorizontal: 20,
     paddingVertical: 16,
     fontSize: 16,
-    color: "#1E293B",
+    color: colors.text,
   },
   multilineInput: { minHeight: 80, textAlignVertical: "top" },
   addCitationBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     paddingVertical: 20,
     borderRadius: 22,
     alignItems: "center",
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOpacity: 0.35,
     shadowRadius: 15,
     elevation: 8,
   },
   addBtnText: {
-    color: "#FFF",
+    color: colors.surface,
     fontWeight: "900",
     fontSize: 16,
     letterSpacing: 0.5,
@@ -705,24 +708,24 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   emptyIcon: { fontSize: 36 },
-  emptyText: { fontSize: 20, fontWeight: "900", color: "#334155" },
+  emptyText: { fontSize: 20, fontWeight: "900", color: colors.text },
   emptySub: {
     fontSize: 15,
-    color: "#94A3B8",
+    color: colors.placeholder,
     marginTop: 10,
     textAlign: "center",
     lineHeight: 22,
   },
   backIcon: {
-    color: "#1E3A8A",
+    color: colors.primary,
     fontSize: 28,
     fontWeight: "300",
     marginTop: -4,
@@ -734,11 +737,11 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
     elevation: 10,
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOpacity: 0.3,
     shadowRadius: 12,
   },
@@ -754,7 +757,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -764,11 +767,11 @@ const styles = StyleSheet.create({
     zIndex: 99,
   },
   panelToggleInactive: {
-    backgroundColor: "#1E293B", // Deep slate background to match your premium UI
+    backgroundColor: colors.text, // Deep slate background to match your premium UI
     borderColor: "rgba(197, 168, 128, 0.3)", // Subtle gold border
   },
   panelToggleActive: {
-    backgroundColor: "#111827",
+    backgroundColor: colors.surface,
     borderColor: "rgba(239, 68, 68, 0.2)", // Subtle red border when active/closing
   },
   modalOverlay: {
@@ -780,7 +783,7 @@ const styles = StyleSheet.create({
 
   exportModalCard: {
     width: "85%",
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     borderRadius: 30,
     padding: 25,
   },
@@ -788,7 +791,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "900",
-    color: "#1E3A8A",
+    color: colors.primary,
     textAlign: "center",
     marginBottom: 20,
   },
@@ -798,13 +801,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 18,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: colors.border,
   },
 
   exportText: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#334155",
+    color: colors.text,
     marginLeft: 15,
   },
 
@@ -814,7 +817,7 @@ const styles = StyleSheet.create({
 
   cancelText: {
     textAlign: "center",
-    color: "#EF4444",
+    color: colors.danger,
     fontWeight: "900",
   },
 
@@ -828,7 +831,7 @@ const styles = StyleSheet.create({
   },
 
   premiumExportText: {
-    color: "#FFF",
+    color: colors.surface,
     fontSize: 11,
     fontWeight: "900",
     marginLeft: 6,

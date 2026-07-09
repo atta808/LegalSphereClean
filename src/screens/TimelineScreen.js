@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTheme } from '../theme/ThemeContext';
 import {
   View,
   Text,
@@ -11,6 +12,8 @@ import { getTimelineByCaseId } from "../services/sqliteService";
 import { toDisplay } from "../utils/date";
 
 export default function TimelineScreen({ route, navigation }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const { caseId } = route.params;
   const insets = useSafeAreaInsets();
 
@@ -86,10 +89,10 @@ export default function TimelineScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
   },
 
   header: {
@@ -102,13 +105,13 @@ const styles = StyleSheet.create({
 
   back: {
     fontSize: 28,
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   row: {
@@ -125,22 +128,22 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
   },
 
   line: {
     width: 2,
     flex: 1,
-    backgroundColor: "#CBD5F5",
+    backgroundColor: colors.surface,
     marginTop: 2,
   },
 
   card: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 14,
     padding: 14,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
@@ -149,23 +152,23 @@ const styles = StyleSheet.create({
   date: {
     fontWeight: "700",
     marginBottom: 6,
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   label: {
     fontSize: 11,
-    color: "#64748B",
+    color: colors.secondaryText,
     marginTop: 6,
   },
 
   value: {
     fontSize: 14,
-    color: "#0F172A",
+    color: colors.text,
   },
 
   empty: {
     textAlign: "center",
     marginTop: 40,
-    color: "#64748B",
+    color: colors.secondaryText,
   },
 });

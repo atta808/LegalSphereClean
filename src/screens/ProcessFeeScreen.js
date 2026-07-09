@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import LegalPicker from "../components/LegalPicker";
@@ -28,6 +30,8 @@ import { toDisplay } from "../utils/date";
 import { formatMoney, getCurrency } from "../utils/currency";
 
 export default function ProcessFeeScreen({ profile, onBack }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const [caseName, setCaseName] = useState("");
   const [casePickerVisible, setCasePickerVisible] = useState(false);
   const [courtName, setCourtName] = useState("");
@@ -187,7 +191,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
       {/* LOADER */}
       {loading ? (
         <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#1E3A8A" />
+          <ActivityIndicator size="large" color={colors.primaryDark} />
         </View>
       ) : null}
 
@@ -219,7 +223,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         >
           <Text
             style={{
-              color: selectedCaseId ? "#000" : "#94A3B8",
+              color: selectedCaseId ? colors.shadow : colors.placeholder,
               fontSize: 15,
             }}
           >
@@ -230,7 +234,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
 
         {/* AUTO COURT DISPLAY */}
         <View style={styles.input}>
-          <Text style={{ color: courtName ? "#000" : "#94A3B8" }}>
+          <Text style={{ color: courtName ? colors.shadow : colors.placeholder }}>
             {courtName || "Court will auto-fill"}
           </Text>
         </View>
@@ -248,7 +252,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
           style={styles.input}
           onPress={() => setShowDatePicker(true)}
         >
-          <Text style={{ color: dateObject ? "#000" : "#94A3B8" }}>
+          <Text style={{ color: dateObject ? colors.shadow : colors.placeholder }}>
             {dateObject ? toDisplay(dateObject, locale) : "Select Date"}
           </Text>
         </TouchableOpacity>
@@ -306,7 +310,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
 
               <Text
                 style={{
-                  color: item.paid ? "#10B981" : "#EF4444",
+                  color: item.paid ? colors.success : colors.danger,
                   fontWeight: "800",
                   marginTop: 6,
                 }}
@@ -350,7 +354,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                       setShowPaidModal(true);
                     }}
                   >
-                    <Text style={{ color: "#fff" }}>Paid</Text>
+                    <Text style={{ color: colors.surface }}>Paid</Text>
                   </TouchableOpacity>
                 ) : null}
 
@@ -397,7 +401,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.confirmBtn} onPress={confirmPaid}>
-                <Text style={{ color: "#fff" }}>Confirm</Text>
+                <Text style={{ color: colors.surface }}>Confirm</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -420,10 +424,10 @@ export default function ProcessFeeScreen({ profile, onBack }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F1F5F9" },
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.border },
   header: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingTop: 50,
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
@@ -434,43 +438,43 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
   },
-  subTitle: { fontSize: 11, color: "#64748B", marginTop: 2 },
+  subTitle: { fontSize: 11, color: colors.secondaryText, marginTop: 2 },
   backBtn: {
     width: 42,
     height: 42,
     borderRadius: 12,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
-  backIcon: { fontSize: 24, color: "#1E3A8A" },
+  backIcon: { fontSize: 24, color: colors.primary },
   title: { fontSize: 18, fontWeight: "800" },
   input: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     padding: 14,
     borderRadius: 14,
     marginBottom: 12,
-    color: "#000",
+    color: colors.shadow,
   },
   saveBtn: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 16,
     alignItems: "center",
   },
-  saveText: { color: "#FFF", fontWeight: "800" },
-  total: { marginTop: 20, fontWeight: "800", color: "#000" },
+  saveText: { color: colors.surface, fontWeight: "800" },
+  total: { marginTop: 20, fontWeight: "800", color: colors.shadow },
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 20,
     marginTop: 14,
   },
-  amount: { color: "#DC2626", fontWeight: "900", fontSize: 16 },
+  amount: { color: colors.danger, fontWeight: "900", fontSize: 16 },
   row: { flexDirection: "row", marginTop: 10 },
   btn: {
     flex: 1,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     padding: 10,
     borderRadius: 10,
     alignItems: "center",
@@ -478,7 +482,7 @@ const styles = StyleSheet.create({
   },
   paidBtn: {
     flex: 1,
-    backgroundColor: "#10B981",
+    backgroundColor: colors.success,
     padding: 10,
     borderRadius: 10,
     alignItems: "center",
@@ -486,7 +490,7 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     flex: 1,
-    backgroundColor: "#FEE2E2",
+    backgroundColor: colors.danger,
     padding: 10,
     borderRadius: 10,
     alignItems: "center",
@@ -510,14 +514,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalBox: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     padding: 20,
     borderRadius: 20,
     width: "85%",
   },
   cancelBtn: {
     flex: 1,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: colors.border,
     padding: 12,
     borderRadius: 10,
     alignItems: "center",
@@ -525,7 +529,7 @@ const styles = StyleSheet.create({
   },
   confirmBtn: {
     flex: 1,
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     padding: 12,
     borderRadius: 10,
     alignItems: "center",

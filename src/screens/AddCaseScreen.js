@@ -1,3 +1,5 @@
+import React from "react";
+import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -15,7 +17,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { COLORS } from "../constants/colors";
 import { CMS_SYSTEMS } from "../constants/cmsSystems";
 import {
   getAllClients,
@@ -27,6 +28,8 @@ import {
 import { formatMoney, getCurrency, getLocale } from "../utils/currency";
 import { normalizeDateInput, toDatePickerDate, toISO } from "../utils/date";
 export default function AddCaseScreen({ route, profile }) {
+  const { colors, resolvedTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
   const [court, setCourt] = useState("");
   const [courtPickerVisible, setCourtPickerVisible] = useState(false);
   const [judgePickerVisible, setJudgePickerVisible] = useState(false);
@@ -467,7 +470,7 @@ export default function AddCaseScreen({ route, profile }) {
             onPress={() => navigation.goBack()}
             activeOpacity={0.8}
           >
-            <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
+            <Ionicons name="chevron-back" size={22} color={colors.primary} />
           </TouchableOpacity>
 
           <View style={styles.headerTextWrap}>
@@ -491,7 +494,7 @@ export default function AddCaseScreen({ route, profile }) {
           >
             <Text
               style={{
-                color: selectedClient ? COLORS.text : COLORS.muted,
+                color: selectedClient ? colors.text : colors.secondaryText,
                 fontSize: 15,
               }}
             >
@@ -536,7 +539,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: COLORS.text,
+                  color: colors.text,
                   fontSize: 15,
                 }}
               >
@@ -572,7 +575,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: litigationDomain ? COLORS.text : COLORS.muted,
+                  color: litigationDomain ? colors.text : colors.secondaryText,
                   fontSize: 15,
                   textTransform: "capitalize",
                 }}
@@ -589,7 +592,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: court ? COLORS.text : COLORS.muted,
+                  color: court ? colors.text : colors.secondaryText,
                   fontSize: 15,
                 }}
               >
@@ -605,7 +608,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: judge ? COLORS.text : COLORS.muted,
+                  color: judge ? colors.text : colors.secondaryText,
                   fontSize: 15,
                 }}
               >
@@ -694,7 +697,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: nextHearingDate ? COLORS.text : COLORS.muted,
+                  color: nextHearingDate ? colors.text : colors.secondaryText,
                 }}
               >
                 {nextHearingDate || "Select Next Hearing Date"}
@@ -707,7 +710,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: stage ? COLORS.text : COLORS.muted,
+                  color: stage ? colors.text : colors.secondaryText,
                   fontSize: 15,
                 }}
               >
@@ -723,7 +726,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: description ? COLORS.text : COLORS.muted,
+                  color: description ? colors.text : colors.secondaryText,
                   fontSize: 15,
                 }}
               >
@@ -737,7 +740,7 @@ export default function AddCaseScreen({ route, profile }) {
             >
               <Text
                 style={{
-                  color: caseType ? COLORS.text : COLORS.muted,
+                  color: caseType ? colors.text : colors.secondaryText,
                   fontSize: 15,
                 }}
               >
@@ -1045,10 +1048,10 @@ export default function AddCaseScreen({ route, profile }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.lightBg,
+    backgroundColor: colors.background,
   },
   keyboardWrap: {
     flex: 1,
@@ -1057,7 +1060,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   header: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     borderRadius: 18,
     paddingVertical: 18, // 🔥 was 18 → smaller header height
     paddingHorizontal: 0, // 🔥 was 18 → smaller header height
@@ -1073,7 +1076,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 16, // ⭐ ADD THIS
@@ -1086,66 +1089,66 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    color: COLORS.white,
+    color: colors.surface,
     fontSize: 18, // 🔥 was 22
     fontWeight: "800",
   },
 
   headerSub: {
-    color: COLORS.white,
+    color: colors.surface,
     marginTop: 2,
     fontSize: 12, // 🔥 was 13
     opacity: 0.9,
   },
   card: {
     marginHorizontal: 16, // ← add this
-    backgroundColor: COLORS.cardBg,
+    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: 14,
   },
   inputLabel: {
     fontSize: 13,
-    color: COLORS.muted,
+    color: colors.secondaryText,
     marginBottom: 6,
     marginLeft: 4,
     fontWeight: "600",
   },
   input: {
-    backgroundColor: COLORS.white,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 4, // 👈 FIXED (was 12)
     marginBottom: 12,
-    color: COLORS.text,
+    color: colors.text,
   },
   multilineInput: {
     minHeight: 96,
   },
   balanceCard: {
-    backgroundColor: "#F8FAFD",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     padding: 14,
   },
   balanceLabel: {
-    color: COLORS.muted,
+    color: colors.secondaryText,
     fontSize: 13,
     marginBottom: 6,
   },
   balanceValue: {
-    color: COLORS.primary,
+    color: colors.primary,
     fontSize: 20,
     fontWeight: "800",
   },
@@ -1156,12 +1159,12 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   rowLabel: {
-    color: COLORS.text,
+    color: colors.text,
     fontSize: 16,
     fontWeight: "600",
   },
   statusLabel: {
-    color: COLORS.text,
+    color: colors.text,
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 10,
@@ -1173,25 +1176,25 @@ const styles = StyleSheet.create({
   statusButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingVertical: 13,
     alignItems: "center",
-    backgroundColor: COLORS.white,
+    backgroundColor: colors.surface,
   },
   statusButtonActive: {
-    backgroundColor: COLORS.secondary,
-    borderColor: COLORS.secondary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   statusButtonText: {
-    color: COLORS.text,
+    color: colors.text,
     fontWeight: "700",
   },
   statusButtonTextActive: {
-    color: COLORS.white,
+    color: colors.surface,
   },
   saveButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
@@ -1201,40 +1204,40 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonText: {
-    color: COLORS.white,
+    color: colors.surface,
     fontSize: 16,
     fontWeight: "800",
   },
   aiCard: {
-    backgroundColor: "#EEF4FF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#D6E4FF",
+    borderColor: colors.border,
   },
 
   aiTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#1E3A8A",
+    color: colors.primary,
   },
 
   aiText: {
     marginTop: 4,
-    color: "#475569",
+    color: colors.secondaryText,
     marginBottom: 12,
   },
 
   aiButton: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 16,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
 
-    shadowColor: "#1E3A8A",
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -1246,7 +1249,7 @@ const styles = StyleSheet.create({
   },
 
   aiButtonText: {
-    color: "#FFFFFF",
+    color: colors.surface,
     fontSize: 16,
     fontWeight: "800",
     marginLeft: 8,

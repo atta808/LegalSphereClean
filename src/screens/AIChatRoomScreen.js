@@ -32,12 +32,11 @@ import Markdown from "react-native-markdown-display"; // ✅ Added Markdown supp
 
 // Services
 import { addCaseNote } from "../services/sqliteService";
-
-// Components
 import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
 import { AIEvents } from "../services/ai/core/AIEvents";
 import { CaseAIRequest } from "../services/ai/core/models/Requests";
-import { addCaseNote } from "../services/sqliteService";
+
+// Components
 
 import LegalInput from "../components/LegalInput";
 
@@ -86,7 +85,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
   const [attachedFile, setAttachedFile] = useState(null);
-  const [stats, setStats] = useState({ documents: 0, citations: 0, notes: 0 });
+  const [loadingMessage, setLoadingMessage] = useState("Processing...");
 
   const {
     caseId,
@@ -111,14 +110,13 @@ export default function AIChatRoomScreen({ route, navigation }) {
     }).start();
 
     loadMessages();
-    loadCaseStats();
-  }, []);
+      }, []);
 
   // Save messages
   useEffect(() => {
     if (messages.length > 0) {
       AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(messages)).catch(
-        console.log,
+        __DEV__ ? console.log : () => {},
       );
     }
   }, [messages]);
@@ -140,11 +138,10 @@ export default function AIChatRoomScreen({ route, navigation }) {
         ]);
       }
     } catch (e) {
-      console.log("Load chat error", e);
+      if (__DEV__) console.log("Load chat error", e);
     }
   };
 
-  const loadCaseStats = () => { /* Now managed by engine */ };
 
   // Listen for AI progress events
   useEffect(() => {
@@ -426,12 +423,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
           ListHeaderComponent={
             <View style={styles.contextBanner}>
               <Text style={styles.contextBannerText}>
-                Injecting{" "}
-                <Text style={{ fontWeight: "700" }}>
-                  {stats.documents} Docs
-                </Text>{" "}
-                & <Text style={{ fontWeight: "700" }}>{stats.notes} Notes</Text>{" "}
-                into AI context
+                AI context includes all case documents, notes, hearings, and timeline events.
               </Text>
             </View>
           }
@@ -439,7 +431,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
             loading && (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="small" color={colors.primary} />
-                <Text style={styles.loadingText}>Lex is analyzing...</Text>
+                <Text style={styles.loadingText}>{loadingMessage}</Text>
               </View>
             )
           }

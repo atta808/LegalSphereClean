@@ -32,7 +32,7 @@ export class CaseContext {
                 documents
             ] = await Promise.all([
                 sqliteService.getCaseById(caseId),
-                sqliteService.getHearingsByCase ? sqliteService.getHearingsByCase(caseId) : sqliteService.getCaseHearings ? sqliteService.getCaseHearings(caseId) : [],
+                sqliteService.getCaseHearings ? sqliteService.getCaseHearings(caseId) : [],
                 sqliteService.getTimelineByCaseId ? sqliteService.getTimelineByCaseId(caseId) : [],
                 sqliteService.getCitationsByCaseId ? sqliteService.getCitationsByCaseId(caseId) : [],
 

@@ -1,12 +1,12 @@
 /**
  * @file AIConfig.js
  * @description Centralized configuration for AI provider credentials and URLs.
- * Expects environment variables to be mapped here in a future milestone.
+ * Reads configurations from Expo environment variables.
  */
 
 export const AIConfig = {
-    getDeepSeekKey: () => undefined, // Placeholder for process.env mapping
+    getDeepSeekKey: () => process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY,
     getDeepSeekUrl: () => 'https://api.deepseek.com/v1/chat/completions',
-    getGoogleVisionKey: () => undefined,
-    getOCRSpaceKey: () => undefined,
+    getGoogleVisionKey: () => process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY,
+    getOCRSpaceKey: () => process.env.EXPO_PUBLIC_OCR_SPACE_API_KEY,
 };

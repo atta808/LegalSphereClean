@@ -1,8 +1,6 @@
 import React from "react";
 import { useTheme } from "../theme/ThemeContext";
 // screens/DocumentVaultScreen.js
-import { extractDocumentText } from "../services/ai/documentReaders";
-import { askLegalSphereAI } from "../services/ai/legalSphereAI";
 import {
   useFocusEffect,
   useNavigation,
@@ -43,7 +41,10 @@ import * as ImagePicker from "expo-image-picker";
 import * as IntentLauncher from "expo-intent-launcher";
 import * as IntentLauncherAndroid from "expo-intent-launcher";
 import * as Sharing from "expo-sharing";
-import { askDeepSeek } from "../services/deepseekService";
+import Markdown from "react-native-markdown-display";
+import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
+import { DocumentVaultRequest } from "../services/ai/core/models/Requests";
+
 const generateId = () =>
   Date.now().toString() + Math.random().toString(36).substring(2, 9);
 // Utility: get file extension
@@ -78,7 +79,10 @@ const getFileTypeLabel = (filename) => {
 
 export default function DocumentVaultScreen() {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const route = useRoute();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -100,19 +104,44 @@ export default function DocumentVaultScreen() {
   const [aiInsights, setAiInsights] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const copyAIResponse = async () => {
-    if (!aiInsights?.summary) return;
+    if (!aiInsights?.userFacing) return;
 
-    await Clipboard.setStringAsync(aiInsights.summary);
+    await Clipboard.setStringAsync(aiInsights.userFacing);
 
     Alert.alert("Copied", "AI analysis copied to clipboard.");
   };
+
+  const shareAIResponse = async () => {
+    if (!aiInsights?.userFacing || !aiInsights?.documentName) return;
+
+    try {
+      const result = await Share.share({
+        title: `AI Document Analysis – ${aiInsights.documentName}`,
+        message: aiInsights.userFacing,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
   const saveAIToNotes = () => {
     try {
-      if (!aiInsights?.summary) return;
+      if (!aiInsights?.userFacing || !aiInsights?.documentName) return;
+
+      const title = `AI Document Analysis – ${aiInsights.documentName}`;
 
       addCaseNote({
         caseId,
-        text: aiInsights.summary,
+        text: `${title}\n\n${aiInsights.userFacing}`,
         image: null,
       });
 
@@ -410,33 +439,29 @@ Case: ${doc.caseTitle || "—"}
       setInsightsLoading(true);
       setAiInsights(null);
 
-      const documentText = await extractDocumentText(doc);
-
-      if (__DEV__) {
-        console.log("📄 Extracted Text:", documentText);
-      }
-
-      const result = await askLegalSphereAI({
-        mode: "document",
-        question:
-          "Analyze this legal document and provide summary, issues, facts and category.",
-        documentText,
+      // Create structured request object for LegalSphereEngine
+      const request = new DocumentVaultRequest({
+        attachment: {
+          uri: doc.uri,
+          name: doc.name,
+          type: doc.mimeType,
+          size: doc.fileSize,
+        },
       });
 
+      const response = await LegalSphereEngine.processDocumentVault(request);
+
       setAiInsights({
-        summary: result || "No response",
-        keywords: [],
-        recommendation: "",
-        relatedCases: [],
+        userFacing: response.userFacing,
+        documentName: doc.name,
       });
     } catch (error) {
       console.log("❌ handleAiInsights error:", error);
+      const errorMessage = error.userMessage || "Failed to analyze document.";
 
       setAiInsights({
-        summary: "Failed to analyze document.",
-        keywords: [],
-        recommendation: "",
-        relatedCases: [],
+        userFacing: errorMessage,
+        documentName: doc.name,
       });
     } finally {
       setInsightsLoading(false);
@@ -774,21 +799,29 @@ Case: ${doc.caseTitle || "—"}
                 style={{ maxHeight: 450 }}
               >
                 {aiInsights && (
-                  <>
-                    <Text style={styles.aiText}>{aiInsights.summary}</Text>
-
-                    {aiInsights.relatedCases.length > 0 && (
-                      <>
-                        <Text style={styles.aiSectionTitle}>Related Cases</Text>
-
-                        {aiInsights.relatedCases.map((c, idx) => (
-                          <Text key={idx} style={styles.aiText}>
-                            • {c}
-                          </Text>
-                        ))}
-                      </>
-                    )}
-                  </>
+                  <Markdown
+                    style={{
+                      body: { ...styles.aiText, color: colors.text },
+                      heading2: {
+                        ...styles.aiSectionTitle,
+                        color: colors.primary,
+                        marginTop: 16,
+                        marginBottom: 8,
+                        fontSize: 16,
+                      },
+                      heading3: {
+                        ...styles.aiSectionTitle,
+                        color: colors.primary,
+                        marginTop: 12,
+                        marginBottom: 6,
+                        fontSize: 14,
+                      },
+                      paragraph: { marginTop: 0, marginBottom: 8 },
+                      list_item: { marginBottom: 4 },
+                    }}
+                  >
+                    {aiInsights.userFacing}
+                  </Markdown>
                 )}
               </ScrollView>
             )}
@@ -808,6 +841,13 @@ Case: ${doc.caseTitle || "—"}
               </TouchableOpacity>
 
               <TouchableOpacity
+                style={styles.aiSecondaryButton}
+                onPress={shareAIResponse}
+              >
+                <Text style={styles.aiSecondaryText}>📤 Share</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 style={styles.aiPrimaryButton}
                 onPress={() => setAiInsightsVisible(false)}
               >
@@ -821,338 +861,368 @@ Case: ${doc.caseTitle || "—"}
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: colors.surface },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.surface,
-  },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: { flex: 1, backgroundColor: colors.surface },
+    loaderContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.surface,
+    },
 
-  // Header
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 16,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    zIndex: 10,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  glassBackButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backIcon: {
-    fontSize: 28,
-    color: colors.primary,
-    fontWeight: "300",
-    marginTop: -4,
-  },
-  titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
-  caseContext: {
-    fontSize: 11,
-    color: colors.secondaryText,
-    marginTop: 2,
-    fontWeight: "500",
-  },
-  aiCopyButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: colors.surface,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  aiCopyIcon: { fontSize: 18, color: colors.primary, fontWeight: "900" },
+    // Header
+    premiumHeader: {
+      backgroundColor: colors.surface,
+      paddingBottom: 16,
+      borderBottomLeftRadius: 28,
+      borderBottomRightRadius: 28,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.04,
+      shadowRadius: 12,
+      zIndex: 10,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 20,
+    },
+    glassBackButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    backIcon: {
+      fontSize: 28,
+      color: colors.primary,
+      fontWeight: "300",
+      marginTop: -4,
+    },
+    titleCenter: { flex: 1, alignItems: "center" },
+    headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
+    caseContext: {
+      fontSize: 11,
+      color: colors.secondaryText,
+      marginTop: 2,
+      fontWeight: "500",
+    },
+    aiCopyButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: colors.surface,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    aiCopyIcon: { fontSize: 18, color: colors.primary, fontWeight: "900" },
 
-  scrollContent: { paddingHorizontal: 20, paddingTop: 24 },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 24 },
 
-  // Action Buttons
-  actionContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 24,
-  },
-  actionButton: {
-    flex: 1,
-    backgroundColor: colors.text,
-    borderRadius: 20,
-    paddingVertical: 16,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  actionIcon: { fontSize: 28, color: colors.text, fontWeight: "900" },
-  actionLabel: {
-    marginTop: 8,
-    color: colors.surface,
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-  },
+    // Action Buttons
+    actionContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 12,
+      marginBottom: 24,
+    },
+    actionButton: {
+      flex: 1,
+      backgroundColor: colors.text,
+      borderRadius: 20,
+      paddingVertical: 16,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.08)",
+    },
+    actionIcon: { fontSize: 28, color: colors.text, fontWeight: "900" },
+    actionLabel: {
+      marginTop: 8,
+      color: colors.surface,
+      fontSize: 12,
+      fontWeight: "800",
+      letterSpacing: 0.5,
+    },
 
-  // Search
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  searchIcon: { fontSize: 16, marginRight: 12, color: colors.placeholder },
-  searchInput: { flex: 1, paddingVertical: 14, fontSize: 16, color: colors.text },
-  clearIcon: { fontSize: 16, color: colors.placeholder, padding: 4 },
+    // Search
+    searchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    searchIcon: { fontSize: 16, marginRight: 12, color: colors.placeholder },
+    searchInput: {
+      flex: 1,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: colors.text,
+    },
+    clearIcon: { fontSize: 16, color: colors.placeholder, padding: 4 },
 
-  // Category Filter
-  categoryScroll: { flexDirection: "row", marginBottom: 20 },
-  categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.border,
-    marginRight: 10,
-  },
-  categoryChipActive: { backgroundColor: colors.primary },
-  categoryChipText: { fontSize: 14, fontWeight: "600", color: colors.secondaryText },
-  categoryChipTextActive: { color: colors.surface },
+    // Category Filter
+    categoryScroll: { flexDirection: "row", marginBottom: 20 },
+    categoryChip: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.border,
+      marginRight: 10,
+    },
+    categoryChipActive: { backgroundColor: colors.primary },
+    categoryChipText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.secondaryText,
+    },
+    categoryChipTextActive: { color: colors.surface },
 
-  // Count
-  countContainer: { marginBottom: 16, paddingHorizontal: 4 },
-  countText: { fontSize: 13, fontWeight: "600", color: colors.secondaryText },
+    // Count
+    countContainer: { marginBottom: 16, paddingHorizontal: 4 },
+    countText: { fontSize: 13, fontWeight: "600", color: colors.secondaryText },
 
-  // Empty State
-  emptyContainer: {
-    alignItems: "center",
-    paddingVertical: 60,
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    marginTop: 20,
-  },
-  emptyIcon: { fontSize: 64, marginBottom: 16 },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: colors.text,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: colors.secondaryText,
-    textAlign: "center",
-    paddingHorizontal: 40,
-  },
+    // Empty State
+    emptyContainer: {
+      alignItems: "center",
+      paddingVertical: 60,
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      marginTop: 20,
+    },
+    emptyIcon: { fontSize: 64, marginBottom: 16 },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: "800",
+      color: colors.text,
+      marginBottom: 8,
+    },
+    emptySubtitle: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      textAlign: "center",
+      paddingHorizontal: 40,
+    },
 
-  // Document Card
-  documentCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    marginBottom: 16,
-    padding: 16,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  documentContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  documentIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 14,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 14,
-  },
-  documentIconText: { fontSize: 28 },
-  documentInfo: { flex: 1 },
-  documentName: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: colors.text,
-    marginBottom: 2,
-  },
-  documentMeta: { fontSize: 12, color: colors.secondaryText, marginBottom: 2 },
-  documentDescription: { fontSize: 13, color: colors.secondaryText, marginTop: 2 },
-  categoryBadge: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
-    alignSelf: "flex-start",
-    marginTop: 6,
-  },
-  categoryBadgeText: { fontSize: 10, fontWeight: "700", color: colors.primary },
-  documentActions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  actionIconBtn: { padding: 8 },
-  actionIconSmall: { fontSize: 18, opacity: 0.7 },
+    // Document Card
+    documentCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      marginBottom: 16,
+      padding: 16,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+    documentContent: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    documentIcon: {
+      width: 50,
+      height: 50,
+      borderRadius: 14,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 14,
+    },
+    documentIconText: { fontSize: 28 },
+    documentInfo: { flex: 1 },
+    documentName: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.text,
+      marginBottom: 2,
+    },
+    documentMeta: {
+      fontSize: 12,
+      color: colors.secondaryText,
+      marginBottom: 2,
+    },
+    documentDescription: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      marginTop: 2,
+    },
+    categoryBadge: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      borderRadius: 12,
+      alignSelf: "flex-start",
+      marginTop: 6,
+    },
+    categoryBadgeText: {
+      fontSize: 10,
+      fontWeight: "700",
+      color: colors.primary,
+    },
+    documentActions: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    actionIconBtn: { padding: 8 },
+    actionIconSmall: { fontSize: 18, opacity: 0.7 },
 
-  // Modals
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(15,23,42,0.9)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  previewContainer: {
-    width: "100%",
-    height: "80%",
-    backgroundColor: colors.shadow,
-    borderRadius: 24,
-    overflow: "hidden",
-    position: "relative",
-  },
-  closePreviewBtn: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    zIndex: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closePreviewText: { color: colors.surface, fontSize: 18, fontWeight: "bold" },
-  previewImage: { width: "100%", height: "100%" },
+    // Modals
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(15,23,42,0.9)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    previewContainer: {
+      width: "100%",
+      height: "80%",
+      backgroundColor: colors.shadow,
+      borderRadius: 24,
+      overflow: "hidden",
+      position: "relative",
+    },
+    closePreviewBtn: {
+      position: "absolute",
+      top: 20,
+      right: 20,
+      zIndex: 10,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    closePreviewText: {
+      color: colors.surface,
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+    previewImage: { width: "100%", height: "100%" },
 
-  modalCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 28,
-    padding: 24,
-    width: "100%",
-    maxHeight: "80%",
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "900",
-    color: colors.text,
-    marginBottom: 20,
-  },
-  modalInput: {
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  modalTextArea: { minHeight: 80, textAlignVertical: "top" },
-  modalCategoryRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 24,
-  },
-  modalCategoryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.border,
-  },
-  modalCategoryChipActive: { backgroundColor: colors.primary },
-  modalCategoryChipText: { fontSize: 13, fontWeight: "600", color: colors.secondaryText },
-  modalCategoryChipTextActive: { color: colors.surface },
-  modalActionRow: { flexDirection: "row", gap: 12, marginTop: 8 },
-  modalCancel: {
-    flex: 1,
-    paddingVertical: 14,
-    alignItems: "center",
-    backgroundColor: colors.border,
-    borderRadius: 16,
-  },
-  modalCancelText: { color: colors.secondaryText, fontWeight: "700" },
-  modalSave: {
-    flex: 2,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  modalSaveText: { color: colors.surface, fontWeight: "800" },
+    modalCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 28,
+      padding: 24,
+      width: "100%",
+      maxHeight: "80%",
+    },
+    modalTitle: {
+      fontSize: 22,
+      fontWeight: "900",
+      color: colors.text,
+      marginBottom: 20,
+    },
+    modalInput: {
+      backgroundColor: colors.background,
+      borderRadius: 16,
+      padding: 16,
+      fontSize: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    modalTextArea: { minHeight: 80, textAlignVertical: "top" },
+    modalCategoryRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 10,
+      marginBottom: 24,
+    },
+    modalCategoryChip: {
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.border,
+    },
+    modalCategoryChipActive: { backgroundColor: colors.primary },
+    modalCategoryChipText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.secondaryText,
+    },
+    modalCategoryChipTextActive: { color: colors.surface },
+    modalActionRow: { flexDirection: "row", gap: 12, marginTop: 8 },
+    modalCancel: {
+      flex: 1,
+      paddingVertical: 14,
+      alignItems: "center",
+      backgroundColor: colors.border,
+      borderRadius: 16,
+    },
+    modalCancelText: { color: colors.secondaryText, fontWeight: "700" },
+    modalSave: {
+      flex: 2,
+      backgroundColor: colors.primary,
+      paddingVertical: 14,
+      borderRadius: 16,
+      alignItems: "center",
+    },
+    modalSaveText: { color: colors.surface, fontWeight: "800" },
 
-  // AI Insights
-  aiSectionTitle: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: colors.primary,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  aiText: { fontSize: 14, color: colors.secondaryText, lineHeight: 20 },
-  aiKeywordsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 8,
-  },
-  aiKeywordChip: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  aiKeywordText: { fontSize: 12, fontWeight: "600", color: colors.primary },
-  aiPrimaryButton: {
-    flex: 1.4,
-    backgroundColor: colors.primary,
-    height: 56,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    // AI Insights
+    aiSectionTitle: {
+      fontSize: 14,
+      fontWeight: "800",
+      color: colors.primary,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    aiText: { fontSize: 14, color: colors.secondaryText, lineHeight: 20 },
+    aiKeywordsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginBottom: 8,
+    },
+    aiKeywordChip: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 16,
+    },
+    aiKeywordText: { fontSize: 12, fontWeight: "600", color: colors.primary },
+    aiPrimaryButton: {
+      flex: 1.4,
+      backgroundColor: colors.primary,
+      height: 56,
+      borderRadius: 18,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  aiPrimaryText: {
-    color: colors.surface,
-    fontSize: 16,
-    fontWeight: "800",
-  },
+    aiPrimaryText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "800",
+    },
 
-  aiSecondaryButton: {
-    flex: 1,
-    backgroundColor: colors.border,
-    height: 56,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    aiSecondaryButton: {
+      flex: 1,
+      backgroundColor: colors.border,
+      height: 56,
+      borderRadius: 18,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  aiSecondaryText: {
-    color: colors.secondaryText,
-    fontSize: 14,
-    fontWeight: "700",
-  },
-});
+    aiSecondaryText: {
+      color: colors.secondaryText,
+      fontSize: 14,
+      fontWeight: "700",
+    },
+  });

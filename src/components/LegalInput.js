@@ -67,7 +67,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     width: "100%",
     flexShrink: 0,
-    marginBottom: 0,
+    marginBottom: 20,
   },
 
   // Floating Label Position

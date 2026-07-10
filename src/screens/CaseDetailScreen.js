@@ -642,28 +642,37 @@ Notes: ${caseData?.notes || "-"}`;
               </Text>
             </View>
           </View>
-          <View style={styles.actionGrid}>
-            <ActionIconButton colors={colors} styles={styles}
-              color={colors.text}
-              icon={<Ionicons name="call-outline" size={20} color={colors.primary} />}
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.actionBtn}
               onPress={handleCallClient}
-            />
-            <ActionIconButton colors={colors} styles={styles}
-              color={colors.text}
-              icon={<Ionicons name="logo-whatsapp" size={20} color={colors.success} />}
+            >
+              <Ionicons name="call-outline" size={16} color={colors.primary} />
+              <Text style={styles.actionBtnLabel}>Call</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={[styles.actionBtn, styles.waBtn]}
               onPress={handleWhatsAppClient}
-            />
-            <ActionIconButton colors={colors} styles={styles}
-              color={colors.text}
-              icon={
-                <Ionicons
-                  name="notifications-outline"
-                  size={20}
-                  color={colors.text}
-                />
-              }
+            >
+              <Ionicons name="logo-whatsapp" size={16} color={colors.success} />
+              <Text style={[styles.actionBtnLabel, styles.waText]}>WhatsApp</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.actionBtn}
               onPress={handleSendReminder}
-            />
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={16}
+                color={colors.primary}
+              />
+              <Text style={styles.actionBtnLabel}>Remind</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -1235,27 +1244,23 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
   actionRow: {
     flexDirection: "row",
-    gap: 12,
+    justifyContent: "space-between",
+    gap: 10,
+    marginTop: 15,
   },
   actionBtn: {
-    backgroundColor: colors.surface,
-    borderRadius: 14,
-    paddingVertical: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
+    flex: 1,
     flexDirection: "row",
-    gap: 6,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor:
+      resolvedTheme === "dark"
+        ? colors.border
+        : "transparent",
   },
   actionBtnFull: {
     flex: 1,
@@ -1264,10 +1269,38 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     flex: 1,
   },
   actionBtnLabel: {
-    color: colors.text,
-    fontSize: 12,
-    fontWeight: "600",
-    letterSpacing: 0.5,
+    fontSize: 13,
+    fontWeight: "800",
+    marginLeft: 6,
+    color: colors.primary,
+  },
+  waBtn: {
+    backgroundColor:
+      resolvedTheme === "dark"
+        ? "rgba(16,185,129,0.15)"
+        : "rgba(5,150,105,0.10)",
+    borderWidth: 1,
+    borderColor:
+      resolvedTheme === "dark"
+        ? "rgba(16,185,129,0.30)"
+        : "transparent",
+  },
+  waText: {
+    color: colors.success,
+  },
+  dangerBtn: {
+    backgroundColor:
+      resolvedTheme === "dark"
+        ? "rgba(239,68,68,0.15)"
+        : "rgba(220,38,38,0.10)",
+    borderWidth: 1,
+    borderColor:
+      resolvedTheme === "dark"
+        ? "rgba(239,68,68,0.30)"
+        : "transparent",
+  },
+  dangerText: {
+    color: colors.danger,
   },
 
   aiInsightsCard: {

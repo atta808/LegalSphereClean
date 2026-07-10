@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
-import { LinearGradient } from "expo-linear-gradient";
+
 import { Copy, FileText, Fingerprint, Share2 } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -28,28 +28,19 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday, toDisplay } from "../utils/date";
 
 // --- PREMIUM GLOSSY COMPONENT ---
-const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => {
-  return (
-    <TouchableOpacity
-      onPress={(e) => {
-        e.stopPropagation();
-        openExportOptions(item);
-      }}
-      activeOpacity={0.7}
-    >
-      <LinearGradient
-        colors={["#434343", "#1a1a1a", "#000000"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.premiumExportBtn}
-      >
-        <Share2 color={colors.text} size={14} strokeWidth={2.5} />
-        <Text style={styles.premiumExportText}>EXPORT</Text>
-        <View style={styles.glossHighlight} />
-      </LinearGradient>
-    </TouchableOpacity>
-  );
-};
+const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => (
+  <TouchableOpacity
+    style={styles.premiumExportBtn}
+    activeOpacity={0.7}
+    onPress={(e) => {
+      e.stopPropagation();
+      openExportOptions(item);
+    }}
+  >
+    <Share2 color={colors.primary} size={14} strokeWidth={2.5} />
+    <Text style={styles.premiumExportText}>Export</Text>
+  </TouchableOpacity>
+);
 
 export default function DiaryScreen({ profile }) {
   const { colors, resolvedTheme } = useTheme();
@@ -516,17 +507,20 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     padding: 20,
     marginBottom: 16,
     borderLeftWidth: 6,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 2,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-    } : {
-      elevation: 0,
-      borderWidth: 1,
-      borderColor: colors.border,
-    }),
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...(resolvedTheme === "light"
+      ? {
+          shadowColor: colors.shadow,
+          shadowOpacity: 0.04,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 2,
+        }
+      : {
+          shadowOpacity: 0,
+          elevation: 0,
+        }),
   },
   activeBorder: { borderLeftColor: colors.primary },
   pendingBorder: { borderLeftColor: colors.danger },
@@ -582,6 +576,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   exportModalCard: {
     width: "85%",
     backgroundColor: colors.surface,
+    borderColor: colors.border,
     borderRadius: 30,
     padding: 25,
     ...(resolvedTheme === 'light' ? {
@@ -593,7 +588,6 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     } : {
       elevation: 0,
       borderWidth: 1,
-      borderColor: colors.border,
     }),
   },
   modalTitle: {
@@ -630,11 +624,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     overflow: "hidden",
+    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor:
+      resolvedTheme === "dark" ? colors.border : "transparent",
   },
   premiumExportText: {
-    color: colors.surface,
+    color: colors.primary,
     fontSize: 11,
-    fontWeight: "900",
+    fontWeight: "700",
     marginLeft: 6,
     letterSpacing: 0.5,
   },

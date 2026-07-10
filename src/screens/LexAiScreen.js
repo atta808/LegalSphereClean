@@ -216,7 +216,7 @@ export default function LexAiScreen() {
         ]);
       }
     } catch (e) {
-      console.log("❌ Failed to resolve message cache storage:", e);
+      if (__DEV__) console.log("❌ Failed to resolve message cache storage:", e);
     }
   };
 
@@ -227,7 +227,7 @@ export default function LexAiScreen() {
         : "chat_history_global";
       await AsyncStorage.setItem(storageKey, JSON.stringify(updatedList));
     } catch (e) {
-      console.log("❌ Error synchronizing local state persistence cache:", e);
+      if (__DEV__) console.log("❌ Error synchronizing local state persistence cache:", e);
     }
   };
 
@@ -270,31 +270,11 @@ export default function LexAiScreen() {
     setTimeout(() => setCopyFeedback(null), 2000);
   };
 
-  const getSystemDateString = () => {
-    return new Date().toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  // UPDATED: Dynamic Language Policy
-  const enforceLanguagePolicy = (prompt) => {
-    return `
-LANGUAGE INSTRUCTION:
-- You are a highly professional legal AI.
-- Default to formal legal English for precision.
-- IMPORTANT: If the user writes in Urdu (or any other native language), or explicitly asks for an Urdu translation, you MUST respond in that requested language. 
-- When speaking in Urdu or another language, ensure legal concepts remain accurate (you may bracket the English legal terms for clarity).
-
-USER QUERY: ${prompt}
-`;
-  };
-
   const handleAttachDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: [
+          "image/*",
           "application/pdf",
           "text/plain",
           "application/msword",
@@ -390,7 +370,8 @@ USER QUERY: ${prompt}
       setSelectedFile(null); // Clear selected file after successful send
       scrollToBottom();
     } catch (coreError) {
-      Alert.alert("Connection Issue", "Unable to reach the AI service.");
+      const errorMsg = coreError.userMessage || "Unable to reach the AI service.";
+      Alert.alert("Analysis Error", errorMsg);
     } finally {
       setLoading(false);
       setIsTyping(false);

@@ -28,7 +28,7 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday, toDisplay } from "../utils/date";
 
 // --- PREMIUM GLOSSY COMPONENT ---
-const PremiumExportButton = ({ item, openExportOptions, styles }) => {
+const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => {
   return (
     <TouchableOpacity
       onPress={(e) => {
@@ -339,7 +339,7 @@ export default function DiaryScreen({ profile }) {
                         </Text>
                       </View>
                     </View>
-                    <PremiumExportButton styles={styles}
+                    <PremiumExportButton styles={styles} colors={colors}
                       item={item}
                       openExportOptions={openExportOptions}
                     />

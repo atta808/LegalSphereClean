@@ -29,7 +29,7 @@ import {
 } from "../services/sqliteService";
 import { toDisplay } from "../utils/date";
 import { useNavigation, useRoute } from "@react-navigation/native";
-const PremiumExportButton = ({ item, openExportOptions, styles }) => {
+const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => {
   return (
     <TouchableOpacity
       onPress={() => openExportOptions(item)}
@@ -340,7 +340,7 @@ ${selectedCitation?.description || ""}`,
                 <View style={styles.cardContent}>
                   <View style={styles.cardHeader}>
                     <Text style={styles.citationTitle}>{c.citation}</Text>
-                    <PremiumExportButton styles={styles}
+                    <PremiumExportButton styles={styles} colors={colors}
                       item={c}
                       openExportOptions={openExportOptions}
                     />

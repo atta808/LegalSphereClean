@@ -850,23 +850,23 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: colors.border,
+    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: resolvedTheme === 'dark' ? colors.border : "rgba(255,255,255,0.1)",
   },
 
   backIcon: {
     fontSize: 28,
-    color: colors.primary,
+    color: resolvedTheme === 'dark' ? colors.primary : colors.surface,
     fontWeight: "300",
     marginTop: -4,
   },
 
   titleCenter: { flex: 1, alignItems: "center" },
 
-  headerTitleText: { fontSize: 18, fontWeight: "700", color: colors.primary },
+  headerTitleText: { fontSize: 18, fontWeight: "700", color: resolvedTheme === 'dark' ? colors.primary : colors.surface },
 
   jurisdictionPill: {
     backgroundColor: colors.surface,

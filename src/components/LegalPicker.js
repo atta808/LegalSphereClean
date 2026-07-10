@@ -100,7 +100,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: resolvedTheme === "dark" ? "rgba(30,30,30,0.92)" : "rgba(255,255,255,0.92)",
+    backgroundColor: resolvedTheme === "dark" ? "rgba(30, 41, 59, 0.95)" : "rgba(255,255,255,0.95)",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     paddingHorizontal: 24,
@@ -111,14 +111,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderColor: colors.border,
     borderBottomWidth: 0,
 
-    shadowColor: colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: -8,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 18,
-    elevation: 10,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: -8 },
+      shadowOpacity: 0.12,
+      shadowRadius: 18,
+      elevation: 10,
+    } : {
+      elevation: 0,
+    }),
   },
 
   handleContainer: {
@@ -157,28 +158,33 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderRadius: 18,
     marginBottom: 10,
 
-    backgroundColor: resolvedTheme === "dark" ? "rgba(36,36,36,0.72)" : "rgba(255,255,255,0.72)",
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
 
-    shadowColor: colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 8,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
 
   activeItem: {
-    backgroundColor: resolvedTheme === "dark" ? "rgba(50,50,50,0.95)" : "rgba(243,239,223,0.95)",
+    backgroundColor: colors.primaryLight,
     borderColor: colors.primary,
 
-    shadowColor: colors.primary,
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 4,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.primary,
+      shadowOpacity: 0.1,
+      shadowRadius: 10,
+      elevation: 4,
+    } : {
+      elevation: 0,
+    }),
   },
 
   itemText: {
@@ -215,7 +221,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   closeButton: {
     marginTop: 10,
 
-    backgroundColor: resolvedTheme === "dark" ? colors.card : "#F3EFDF",
+    backgroundColor: colors.surface,
     paddingVertical: 16,
     borderRadius: 18,
     alignItems: "center",
@@ -223,14 +229,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
 
-    shadowColor: colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 8,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
 
   closeText: {

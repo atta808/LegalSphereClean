@@ -413,7 +413,9 @@ Notes: ${caseData?.notes || "-"}`;
                   </Text>
                 </View>
               </View>
-              <Text style={styles.caseCourt}>🏛 {caseData.court}</Text>
+              <Text style={styles.caseCourt}>
+                <Ionicons name="business" size={12} color={colors.secondaryText} style={{ marginRight: 4 }} /> {caseData.court}
+              </Text>
             </View>
           </View>
           <View style={styles.divider} />
@@ -1167,11 +1169,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   titleRow: {
     flexDirection: "row",
@@ -1241,11 +1247,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderColor: colors.border,
     flexDirection: "row",
     gap: 6,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   actionBtnFull: {
     flex: 1,
@@ -1267,11 +1277,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   aiInsightsHeader: {
     flexDirection: "row",
@@ -1307,11 +1321,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   healthTitle: { fontSize: 18, fontWeight: "900", color: colors.text },
   healthCircle: {
@@ -1431,11 +1449,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   timelineHeader: {
     flexDirection: "row",
@@ -1486,11 +1508,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: "center",
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   mainActionBtnText: {
     color: colors.surface,
@@ -1507,11 +1533,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   aiActionText: {
     color: colors.primary,

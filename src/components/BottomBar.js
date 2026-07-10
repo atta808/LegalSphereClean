@@ -100,7 +100,7 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
                 // ✨ FIX: Now it cleanly switches between the exact names we defined
                 name={active ? tab.activeIcon : tab.inactiveIcon}
                 size={22}
-                color={active ? "#0F172A" : "#94A3B8"}
+                color={active ? colors.primary : colors.placeholder}
               />
               {active && <Text style={styles.activeLabel}>{tab.label}</Text>}
             </View>
@@ -122,16 +122,23 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: resolvedTheme === "dark" ? colors.card : "#E6F0FA",
+    backgroundColor: colors.surface,
     borderRadius: 24,
     paddingHorizontal: 12,
 
+    borderWidth: 1,
+    borderColor: colors.border,
+
     // Soft, wide diffusion shadow
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: resolvedTheme === "dark" ? 0.4 : 0.15,
-    shadowRadius: 20,
-    elevation: 10,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.04,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 20,
+      elevation: 2
+    } : {
+      elevation: 0
+    }),
   },
 
   // 🟦 STANDARD TABS
@@ -154,19 +161,14 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
 
   activeIconBox: {
-    backgroundColor: resolvedTheme === "dark" ? "#333333" : "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: colors.primaryLight,
   },
 
   // 📝 DYNAMIC LABEL
   activeLabel: {
     marginLeft: 6,
     fontSize: 12,
-    color: colors.text,
+    color: colors.primary,
     fontWeight: "700",
   },
 
@@ -186,10 +188,16 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
 
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6
+    } : {
+      elevation: 0,
+      borderWidth: 1,
+      borderColor: colors.border
+    }),
   },
 });

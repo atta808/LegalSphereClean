@@ -1,7 +1,7 @@
 // services/ocrService.js
 import axios from "axios";
 
-const OCR_API_KEY = "K85664157688957";
+const OCR_API_KEY = "REDACTED";
 
 /**
  * High-performance OCR pipeline utilizing structural multi-page extraction.

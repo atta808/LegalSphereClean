@@ -37,7 +37,6 @@ import { addCaseNote } from "../services/sqliteService";
 import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
 import { AIEvents } from "../services/ai/core/AIEvents";
 import { CaseAIRequest } from "../services/ai/core/models/Requests";
-import { addCaseNote } from "../services/sqliteService";
 
 import LegalInput from "../components/LegalInput";
 

@@ -19,7 +19,7 @@ export default function LegalInput({
   const styles = useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       {/* Floating Premium Label */}
       {label ? (
         <View style={styles.labelContainer}>
@@ -56,7 +56,7 @@ export default function LegalInput({
           cursorColor={colors.primary}
           autoCapitalize="none"
           autoCorrect={false}
-          style={[styles.input, multiline && styles.multilineInput, style]}
+          style={[styles.input, multiline && styles.multilineInput]}
         />
       </View>
     </View>
@@ -65,7 +65,8 @@ export default function LegalInput({
 
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
-    flex: 1,
+    width: "100%",
+    flexShrink: 0,
     marginBottom: 0,
   },
 

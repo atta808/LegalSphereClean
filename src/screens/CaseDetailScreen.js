@@ -995,14 +995,13 @@ ${caseData?.status || "-"}
             <Text style={styles.modalSub}>
               Paste ChatGPT share link for this case
             </Text>
-            <View style={{ flex: 0, marginBottom: 40 }}>
-              <LegalInput
-                label="AI Litigation Room"
-                value={aiChatLink}
-                onChangeText={setAiChatLink}
-                placeholder="https://chatgpt.com/..."
-              />
-            </View>
+            <LegalInput
+              label="AI Litigation Room"
+              value={aiChatLink}
+              onChangeText={setAiChatLink}
+              placeholder="https://chatgpt.com/..."
+              style={{ marginBottom: 40 }}
+            />
             <View style={styles.modalActionRow}>
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -1041,15 +1040,14 @@ ${caseData?.status || "-"}
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Record Payment</Text>
             <Text style={styles.modalSub}>{caseData.title}</Text>
-            <View style={{ marginBottom: 20 }}>
-              <LegalInput
-                label="Payment Amount"
-                value={paymentAmount}
-                onChangeText={setPaymentAmount}
-                placeholder="0.00"
-                keyboardType="numeric"
-              />
-            </View>
+            <LegalInput
+              label="Payment Amount"
+              value={paymentAmount}
+              onChangeText={setPaymentAmount}
+              placeholder="0.00"
+              keyboardType="numeric"
+              style={{ marginBottom: 20 }}
+            />
             <View style={styles.modalActionRow}>
               <TouchableOpacity
                 activeOpacity={0.7}

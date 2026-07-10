@@ -75,9 +75,9 @@ const formatTime = (timestamp) => {
 
 export default function AIChatRoomScreen({ route, navigation }) {
   const { colors, resolvedTheme } = useTheme();
-  const THEME = React.useMemo(() => getThemeConfig(colors), [colors]);
-  const markdownStyles = React.useMemo(() => getMarkdownStyles(THEME, colors), [THEME]);
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const themeConfig = React.useMemo(() => getThemeConfig(colors), [colors]);
+  const markdownStyles = React.useMemo(() => getMarkdownStyles(themeConfig, colors), [themeConfig]);
+  const styles = React.useMemo(() => createStyles(colors, resolvedTheme, themeConfig), [colors, resolvedTheme, themeConfig]);
   const insets = useSafeAreaInsets();
   const flatListRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -530,9 +530,9 @@ export default function AIChatRoomScreen({ route, navigation }) {
 // ------------------------------
 
 // SaaS-Grade Custom Markdown Styles
-const getMarkdownStyles = (THEME, colors) => StyleSheet.create({
+const getMarkdownStyles = (themeConfig, colors) => StyleSheet.create({
   body: {
-    color: THEME.textAI,
+    color: themeConfig.textAI,
     fontSize: 15,
     lineHeight: 24,
     fontFamily: Platform.OS === "ios" ? "System" : "sans-serif",
@@ -540,7 +540,7 @@ const getMarkdownStyles = (THEME, colors) => StyleSheet.create({
   heading1: {
     fontSize: 20,
     fontWeight: "900",
-    color: THEME.userBubble,
+    color: themeConfig.userBubble,
     marginTop: 12,
     marginBottom: 8,
     letterSpacing: -0.5,
@@ -548,14 +548,14 @@ const getMarkdownStyles = (THEME, colors) => StyleSheet.create({
   heading2: {
     fontSize: 17,
     fontWeight: "800",
-    color: THEME.userBubble,
+    color: themeConfig.userBubble,
     marginTop: 10,
     marginBottom: 6,
   },
   heading3: {
     fontSize: 15,
     fontWeight: "700",
-    color: THEME.userBubble,
+    color: themeConfig.userBubble,
     marginTop: 8,
     marginBottom: 4,
   },
@@ -565,11 +565,11 @@ const getMarkdownStyles = (THEME, colors) => StyleSheet.create({
   },
   strong: {
     fontWeight: "800",
-    color: THEME.userBubble,
+    color: themeConfig.userBubble,
   },
   em: {
     fontStyle: "italic",
-    color: THEME.muted,
+    color: themeConfig.muted,
   },
   bullet_list: {
     marginBottom: 10,
@@ -609,13 +609,13 @@ const getMarkdownStyles = (THEME, colors) => StyleSheet.create({
     marginBottom: 12,
   },
   hr: {
-    backgroundColor: THEME.border,
+    backgroundColor: themeConfig.border,
     height: 1,
     marginVertical: 12,
   },
   blockquote: {
     borderLeftWidth: 4,
-    borderLeftColor: THEME.accent,
+    borderLeftColor: themeConfig.accent,
     paddingLeft: 12,
     marginLeft: 0,
     marginVertical: 10,
@@ -623,8 +623,8 @@ const getMarkdownStyles = (THEME, colors) => StyleSheet.create({
   },
 });
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: THEME.bg },
+const createStyles = (colors, resolvedTheme, themeConfig) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themeConfig.bg },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -632,7 +632,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
+    borderBottomColor: themeConfig.border,
     backgroundColor: "rgba(252, 252, 253, 0.8)",
     position: "absolute",
     top: 0,
@@ -644,7 +644,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: "800",
-    color: THEME.userBubble,
+    color: themeConfig.userBubble,
     letterSpacing: -0.5,
   },
   statusPill: {
@@ -688,7 +688,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 8,
-    backgroundColor: THEME.accent,
+    backgroundColor: themeConfig.accent,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 8,
@@ -705,15 +705,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  userBubble: { backgroundColor: THEME.userBubble, borderBottomRightRadius: 4 },
+  userBubble: { backgroundColor: themeConfig.userBubble, borderBottomRightRadius: 4 },
   aiBubble: {
-    backgroundColor: THEME.aiBubble,
+    backgroundColor: themeConfig.aiBubble,
     borderBottomLeftRadius: 4,
     borderWidth: 1,
-    borderColor: THEME.border,
+    borderColor: themeConfig.border,
   },
 
-  userText: { color: THEME.textUser, fontSize: 15, lineHeight: 24 },
+  userText: { color: themeConfig.textUser, fontSize: 15, lineHeight: 24 },
 
   attachmentPill: {
     flexDirection: "row",
@@ -727,7 +727,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
   attachmentPillText: {
     fontSize: 12,
-    color: THEME.muted,
+    color: themeConfig.muted,
     marginLeft: 6,
     fontWeight: "600",
     maxWidth: 180,
@@ -742,7 +742,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "rgba(0,0,0,0.05)",
   },
-  timestamp: { fontSize: 10, color: THEME.muted, fontWeight: "600" },
+  timestamp: { fontSize: 10, color: themeConfig.muted, fontWeight: "600" },
   actionRow: { flexDirection: "row", gap: 14 },
   actionIcon: { padding: 2 },
 
@@ -780,7 +780,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     elevation: 1,
   },
   qrText: {
-    color: THEME.userBubble,
+    color: themeConfig.userBubble,
     fontSize: 13,
     fontWeight: "600",
     marginLeft: 6,
@@ -788,7 +788,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
 
   inputContainer: {
     paddingHorizontal: 16,
-    backgroundColor: THEME.bg,
+    backgroundColor: themeConfig.bg,
     paddingTop: 8,
   },
   attachedFileToast: {
@@ -806,7 +806,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   attachedFileToastText: {
     fontSize: 13,
     fontWeight: "600",
-    color: THEME.userBubble,
+    color: themeConfig.userBubble,
     flexShrink: 1,
     marginHorizontal: 8,
   },
@@ -814,7 +814,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   floatingInputWrapper: {
     flexDirection: "row",
     alignItems: "flex-end",
-    backgroundColor: THEME.surface,
+    backgroundColor: themeConfig.surface,
     borderRadius: 28,
     paddingHorizontal: 6,
     paddingVertical: 6,
@@ -824,7 +824,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     shadowRadius: 24,
     elevation: 8,
     borderWidth: 1,
-    borderColor: THEME.border,
+    borderColor: themeConfig.border,
   },
   attachBtn: { padding: 10, marginBottom: 2 },
   textInput: {
@@ -832,7 +832,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     minHeight: 40,
     maxHeight: 120,
     fontSize: 15,
-    color: THEME.textAI,
+    color: themeConfig.textAI,
     paddingTop: 12,
     paddingBottom: 12,
     paddingHorizontal: 8,

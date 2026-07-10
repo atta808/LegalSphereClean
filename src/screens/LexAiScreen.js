@@ -512,7 +512,7 @@ export default function LexAiScreen() {
             style={styles.iconButton}
             activeOpacity={0.7}
           >
-            <Ionicons name="arrow-back" size={20} color={colors.text} />
+            <Ionicons name="arrow-back" size={20} color={resolvedTheme === 'dark' ? colors.primary : colors.surface} />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <Text style={styles.headerTitle}>Lex Workspace</Text>
@@ -524,7 +524,7 @@ export default function LexAiScreen() {
           style={styles.iconButton}
           activeOpacity={0.7}
         >
-          <Ionicons name="trash-outline" size={18} color={colors.placeholder} />
+          <Ionicons name="trash-outline" size={18} color={resolvedTheme === 'dark' ? colors.danger : colors.surface} />
         </TouchableOpacity>
       </View>
 
@@ -655,7 +655,9 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    backgroundColor: colors.background,
+    backgroundColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: resolvedTheme === 'dark' ? colors.border : colors.primary,
     zIndex: 10,
   },
   headerLeft: {
@@ -669,7 +671,9 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.border,
+    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
+    borderWidth: 1,
+    borderColor: resolvedTheme === 'dark' ? colors.border : "rgba(255,255,255,0.1)",
   },
   headerTitleContainer: {
     flexDirection: "row",
@@ -679,7 +683,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.text,
+    color: resolvedTheme === 'dark' ? colors.primary : colors.surface,
     letterSpacing: -0.3,
   },
   statusDot: {
@@ -726,19 +730,23 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     borderRadius: 20,
   },
   userBubble: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primary,
     borderBottomRightRadius: 4,
   },
   aiBubble: {
     backgroundColor: colors.surface,
     borderBottomLeftRadius: 4,
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.02,
-    shadowRadius: 4,
-    elevation: 1,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 4,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   messageText: {
     fontSize: 15,
@@ -796,13 +804,17 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 24,
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.02,
-    shadowRadius: 3,
-    elevation: 1,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 3,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
   quickActionLabel: {
     fontSize: 13,
@@ -819,7 +831,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 20,
     borderBottomLeftRadius: 4,
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderColor: colors.border,
     alignSelf: "flex-start",
   },
@@ -874,11 +886,17 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 30,
     gap: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.1,
+      shadowRadius: 16,
+      elevation: 5,
+    } : {
+      elevation: 0,
+    }),
   },
   loadingText: {
     fontSize: 14,
@@ -904,11 +922,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.05,
+      shadowRadius: 12,
+      elevation: 3,
+    } : {
+      elevation: 0,
+    }),
   },
   inputInner: {
     flexDirection: "row",

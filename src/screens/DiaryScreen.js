@@ -444,11 +444,17 @@ export default function DiaryScreen({ profile }) {
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: colors.border },
   premiumHeader: {
-    backgroundColor: colors.surface,
+    backgroundColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
     paddingBottom: 25,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
-    elevation: 5,
+    ...(resolvedTheme === 'dark' ? {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderTopWidth: 0,
+    } : {
+      elevation: 5,
+    }),
   },
   headerRow: {
     flexDirection: "row",
@@ -459,15 +465,15 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: colors.background,
+    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: resolvedTheme === 'dark' ? colors.border : "rgba(255,255,255,0.1)",
   },
-  backIcon: { color: colors.primary, fontSize: 28, marginTop: -4 },
+  backIcon: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 28, marginTop: -4 },
   titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
+  headerTitleText: { fontSize: 18, fontWeight: "700", color: resolvedTheme === 'dark' ? colors.primary : colors.surface },
   jurisdictionPill: {
     backgroundColor: colors.border,
     paddingHorizontal: 12,
@@ -510,7 +516,17 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     padding: 20,
     marginBottom: 16,
     borderLeftWidth: 6,
-    elevation: 2,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 2,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+    } : {
+      elevation: 0,
+      borderWidth: 1,
+      borderColor: colors.border,
+    }),
   },
   activeBorder: { borderLeftColor: colors.primary },
   pendingBorder: { borderLeftColor: colors.danger },
@@ -568,7 +584,17 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: 30,
     padding: 25,
-    elevation: 20,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 20,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.2,
+      shadowRadius: 20,
+    } : {
+      elevation: 0,
+      borderWidth: 1,
+      borderColor: colors.border,
+    }),
   },
   modalTitle: {
     fontSize: 20,

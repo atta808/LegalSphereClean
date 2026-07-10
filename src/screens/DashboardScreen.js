@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme } from "../theme/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -26,16 +27,16 @@ import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday } from "../utils/date";
 
 const quickActions = [
-  { label: "Add Case", icon: "➕", action: "addCase" },
-  { label: "Diary", icon: "📓", action: "diary" },
-  { label: "Calendar", icon: "📅", action: "calendar" },
-  { label: "Fees", icon: "💰", action: "fees" },
-  { label: "Process Fee", icon: "⚖️", action: "processFee" },
-  { label: "Clients", icon: "👥", action: "clients" },
-  { label: "Masters", icon: "🛠️", action: "masters" },
-  { label: "Archive", icon: "📁", action: "archive" },
-  { label: "Quick Links", icon: "🔗", action: "quickLinks" },
-  { label: "Settings", icon: "⚙️", action: "settings" },
+  { label: "Add Case", icon: "add-circle-outline", action: "addCase" },
+  { label: "Diary", icon: "journal-outline", action: "diary" },
+  { label: "Calendar", icon: "calendar-outline", action: "calendar" },
+  { label: "Fees", icon: "cash-outline", action: "fees" },
+  { label: "Process Fee", icon: "scale-outline", action: "processFee" },
+  { label: "Clients", icon: "people-outline", action: "clients" },
+  { label: "Masters", icon: "build-outline", action: "masters" },
+  { label: "Archive", icon: "archive-outline", action: "archive" },
+  { label: "Quick Links", icon: "link-outline", action: "quickLinks" },
+  { label: "Settings", icon: "settings-outline", action: "settings" },
 ];
 
 export default function DashboardScreen({ profile, onLogout }) {
@@ -537,7 +538,7 @@ export default function DashboardScreen({ profile, onLogout }) {
               onPress={() => handleQuickAction(item.action)}
             >
               <View style={styles.iconCircle}>
-                <Text style={styles.actionIcon}>{item.icon}</Text>
+                <Ionicons name={item.icon} size={20} color={colors.primary} />
               </View>
               <Text style={styles.actionLabel}>{item.label}</Text>
             </TouchableOpacity>
@@ -551,11 +552,16 @@ export default function DashboardScreen({ profile, onLogout }) {
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainWrapper: { flex: 1, backgroundColor: colors.background },
   premiumHeader: {
-    backgroundColor: colors.primary,
+    backgroundColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
     paddingHorizontal: 20,
     paddingBottom: 50,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
+    ...(resolvedTheme === 'dark' ? {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderTopWidth: 0,
+    } : {}),
   },
   headerRow: {
     flexDirection: "row",
@@ -567,62 +573,86 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: resolvedTheme === 'dark' ? colors.primaryLight : "rgba(255,255,255,0.2)",
     justifyContent: "center",
     alignItems: "center",
   },
-  avatarText: { color: colors.surface, fontSize: 20, fontWeight: "800" },
-  welcomeLabel: { color: colors.text, fontSize: 11 },
-  lawyerName: { color: colors.surface, fontSize: 17, fontWeight: "900" },
+  avatarText: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 20, fontWeight: "800" },
+  welcomeLabel: { color: resolvedTheme === 'dark' ? colors.secondaryText : "rgba(255,255,255,0.8)", fontSize: 11 },
+  lawyerName: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 17, fontWeight: "700" },
   glassLogout: {
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
+    ...(resolvedTheme === 'dark' ? {
+      borderWidth: 1,
+      borderColor: colors.border,
+    } : {}),
   },
-  logoutText: { color: colors.surface, fontSize: 12, fontWeight: "600" },
+  logoutText: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 12, fontWeight: "600" },
   jurisdictionContainer: {
     marginTop: 15,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.1)",
     padding: 8,
     borderRadius: 10,
+    ...(resolvedTheme === 'dark' ? {
+      borderWidth: 1,
+      borderColor: colors.border,
+    } : {}),
   },
-  jurisdictionText: { color: colors.text, fontSize: 12 },
+  jurisdictionText: { color: resolvedTheme === 'dark' ? colors.text : colors.surface, fontSize: 12 },
   scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 120 },
   floatingStats: {
     flexDirection: "row",
-    backgroundColor: colors.text,
+    backgroundColor: resolvedTheme === 'dark' ? colors.card : colors.text,
     borderRadius: 24,
     padding: 20,
     justifyContent: "space-between",
     marginTop: -35,
     marginBottom: 20,
-    elevation: 4,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 4,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+    } : {
+      elevation: 0,
+    }),
   },
   statMini: { flex: 1, alignItems: "center" },
-  statMiniVal: { color: colors.surface, fontSize: 20, fontWeight: "900" },
-  statMiniLabel: { color: colors.placeholder, fontSize: 11, marginTop: 2 },
+  statMiniVal: { color: resolvedTheme === 'dark' ? colors.text : colors.surface, fontSize: 20, fontWeight: "700" },
+  statMiniLabel: { color: colors.placeholder, fontSize: 11, marginTop: 2, fontWeight: "500" },
   statDivider: {
     width: 1,
-    backgroundColor: colors.text,
+    backgroundColor: colors.border,
     height: "70%",
     alignSelf: "center",
   },
   litigationCard: {
     backgroundColor: colors.surface,
-    borderRadius: 22,
+    borderRadius: 16,
     padding: 20,
     marginBottom: 15,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 2,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+    } : {
+      elevation: 0,
+    }),
   },
 
   litigationTitle: {
     fontSize: 16,
-    fontWeight: "900",
+    fontWeight: "700",
     color: colors.text,
     marginBottom: 18,
   },
@@ -640,14 +670,14 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
 
   litigationValue: {
     fontSize: 24,
-    fontWeight: "900",
+    fontWeight: "700",
     color: colors.primary,
   },
 
   litigationLabel: {
     marginTop: 6,
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "500",
     color: colors.secondaryText,
   },
 
@@ -658,15 +688,25 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
   workflowCard: {
     backgroundColor: colors.surface,
-    borderRadius: 22,
+    borderRadius: 16,
     padding: 20,
     marginBottom: 15,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 2,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+    } : {
+      elevation: 0,
+    }),
   },
 
   workflowTitle: {
     fontSize: 16,
-    fontWeight: "900",
+    fontWeight: "700",
     color: colors.text,
     marginBottom: 15,
   },
@@ -682,12 +722,12 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
 
   workflowName: {
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "500",
     color: colors.text,
   },
 
   workflowCount: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 999,
@@ -695,31 +735,42 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
 
   workflowCountText: {
     color: colors.primary,
-    fontWeight: "900",
+    fontWeight: "700",
     fontSize: 12,
   },
 
   workflowEmpty: {
     color: colors.placeholder,
     fontSize: 13,
+    fontWeight: "500",
   },
   dailyTaskCard: {
     backgroundColor: colors.surface,
-    borderRadius: 22,
+    borderRadius: 16,
     padding: 20,
     marginBottom: 15,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 2,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+    } : {
+      elevation: 0,
+    }),
   },
   taskHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  taskTitle: { fontWeight: "800", fontSize: 15, color: colors.text },
-  taskCount: { color: colors.text, fontWeight: "700" },
+  taskTitle: { fontWeight: "700", fontSize: 15, color: colors.text },
+  taskCount: { color: colors.secondaryText, fontWeight: "500" },
   statValue: {
     fontSize: 24,
-    fontWeight: "900",
+    fontWeight: "700",
     color: colors.primary,
     marginTop: 10,
   },
@@ -731,11 +782,11 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primary,
     borderRadius: 4,
   },
-  taskHint: { marginTop: 10, fontSize: 13, color: colors.secondaryText },
-  alertRibbon: { padding: 15, borderRadius: 18, marginBottom: 12 },
+  taskHint: { marginTop: 10, fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
+  alertRibbon: { padding: 15, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: colors.border },
   pendingBox: { backgroundColor: colors.surface },
   todayBox: { backgroundColor: colors.surface },
   alertHeader: {
@@ -743,18 +794,18 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  alertTitle: { fontWeight: "800", fontSize: 15 },
+  alertTitle: { fontWeight: "700", fontSize: 15 },
   alertItem: {
     marginTop: 12,
     paddingLeft: 12,
     borderLeftWidth: 3,
     borderLeftColor: colors.border,
   },
-  caseName: { fontSize: 15, fontWeight: "800", color: colors.text },
-  caseCourt: { fontSize: 13, color: colors.secondaryText, marginTop: 2 },
+  caseName: { fontSize: 15, fontWeight: "700", color: colors.text },
+  caseCourt: { fontSize: 13, color: colors.secondaryText, marginTop: 2, fontWeight: "500" },
   sectionHeading: {
-    fontSize: 20,
-    fontWeight: "900",
+    fontSize: 18,
+    fontWeight: "700",
     marginVertical: 15,
     color: colors.text,
   },
@@ -768,29 +819,32 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     width: "48.5%",
     height: 80,
     backgroundColor: colors.surface,
-    borderRadius: 18,
+    borderRadius: 16,
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
     borderWidth: 1,
     borderColor: colors.border,
-    elevation: 2,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 2,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 4,
+    } : {
+      elevation: 0,
+    }),
   },
   iconCircle: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primaryLight,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
-  actionIcon: { fontSize: 20 },
   actionLabel: { fontWeight: "700", fontSize: 15, color: colors.primary, flex: 1 },
 
   glassButton: {
@@ -804,13 +858,23 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   iconText: { fontSize: 18, color: colors.surface },
   profileCard: {
     backgroundColor: colors.surface,
-    borderRadius: 22,
+    borderRadius: 16,
     padding: 16,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 15,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...(resolvedTheme === 'light' ? {
+      elevation: 2,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 6,
+    } : {
+      elevation: 0,
+    }),
   },
   profileLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
   profileImage: { width: 54, height: 54, borderRadius: 27 },
@@ -818,13 +882,13 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryLight,
     justifyContent: "center",
     alignItems: "center",
   },
-  profileAvatarText: { color: colors.surface, fontWeight: "800", fontSize: 20 },
-  profileName: { fontSize: 17, fontWeight: "800", color: colors.text },
-  profileSub: { fontSize: 13, color: colors.secondaryText },
+  profileAvatarText: { color: colors.primary, fontWeight: "700", fontSize: 20 },
+  profileName: { fontSize: 17, fontWeight: "700", color: colors.text },
+  profileSub: { fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
   shareBtn: {
     backgroundColor: colors.primary,
     paddingHorizontal: 16,

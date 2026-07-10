@@ -81,7 +81,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
 
   // Floating Label Pill
   labelPill: {
-    backgroundColor: resolvedTheme === "dark" ? colors.card : "#F3EFDF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 10,
@@ -90,7 +90,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
 
   focusedLabelPill: {
-    backgroundColor: resolvedTheme === "dark" ? colors.card : "#F3EFDF",
+    backgroundColor: colors.surface,
     borderColor: colors.primary,
   },
 
@@ -98,7 +98,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   label: {
     color: colors.secondaryText,
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "500",
     letterSpacing: 0.4,
     textTransform: "capitalize",
   },
@@ -118,33 +118,35 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     maxHeight: 80,
     justifyContent: "center",
 
-    shadowColor: colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 3,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.04,
+      shadowRadius: 12,
+      elevation: 2,
+    } : {
+      elevation: 0,
+    }),
   },
 
   // Focus State
   focusedWrapper: {
     borderColor: colors.primary,
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 12,
-    elevation: 6,
+    ...(resolvedTheme === 'light' ? {
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 4,
+    } : {
+      elevation: 0,
+    }),
   },
 
   // Disabled State
   disabledWrapper: {
     opacity: 0.5,
-    backgroundColor: resolvedTheme === "dark" ? "#333333" : "rgba(226,232,240,0.5)",
+    backgroundColor: colors.disabled,
   },
 
   // Input Text

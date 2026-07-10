@@ -23,6 +23,7 @@ import {
   getProfile,
   updateCaseStatus,
 } from "../services/sqliteService";
+import { updateCaseNotifications, cancelCaseNotifications } from "../services/reminderScheduler";
 import { exportCauseListPdf } from "../utils/causeListPdf";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday, toDisplay } from "../utils/date";
@@ -140,6 +141,7 @@ export default function DiaryScreen({ profile }) {
         onPress: async () => {
           try {
             await updateCaseStatus(caseId, "archived");
+            await cancelCaseNotifications(caseId);
             await loadCases();
           } catch (_) {
             Alert.alert("Error", "Failed to archive.");
@@ -280,6 +282,7 @@ export default function DiaryScreen({ profile }) {
                       onPress={async () => {
                         try {
                           await updateCaseStatus(item.id, "active");
+                          await updateCaseNotifications(item.id);
                           await loadCases();
                         } catch (_) {
                           Alert.alert("Error", "Failed to activate.");

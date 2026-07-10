@@ -44,6 +44,7 @@ import {
   updateCaseNumber,
   ensureMasterItemExists,
 } from "../services/sqliteService";
+import { updateCaseNotifications } from "../services/reminderScheduler";
 
 export default function UpdateCaseHearingScreen({ profile }) {
   const { colors, resolvedTheme } = useTheme();
@@ -240,7 +241,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
     }
   }, [route?.params?.newJudge, navigation]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
       if (!selectedDate) {
         Alert.alert("Date Required", "Please select a date from the calendar.");
@@ -303,6 +304,9 @@ export default function UpdateCaseHearingScreen({ profile }) {
       updateCaseNumber(caseId, editableCaseNo);
       // ✅ RECALCULATE (VERY IMPORTANT)
       recalculateNextHearing(caseId);
+
+      // ✅ UPDATE NOTIFICATIONS
+      await updateCaseNotifications(caseId, { preserveFeeReminder: true });
 
       if (caseStatus === "disposed") {
         Alert.alert(

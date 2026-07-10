@@ -61,6 +61,8 @@ export default function DashboardScreen({ profile, onLogout }) {
   const [totalCases, setTotalCases] = useState(0);
   const [imageKey, setImageKey] = useState(Date.now());
   const [currentProfile, setCurrentProfile] = useState(profile || {});
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+  const [recentNotifications, setRecentNotifications] = useState([]);
   const locale = currentProfile?.locale || "en-PK";
   const currency = getCurrency(currentProfile);
   const navigation = useNavigation();
@@ -86,6 +88,10 @@ export default function DashboardScreen({ profile, onLogout }) {
       setWorkflowStats(workflows.map((w) => [w.workflowType, w.total]));
 
       setTotalCases(dashboardStats.totalCases);
+
+      const { getUnreadNotificationCount, getRecentNotifications } = require('../services/notificationService');
+      setUnreadNotificationsCount(getUnreadNotificationCount());
+      setRecentNotifications(getRecentNotifications(3));
 
       const todayList = [];
       const pendingList = [];
@@ -222,6 +228,20 @@ export default function DashboardScreen({ profile, onLogout }) {
           <View style={{ flexDirection: "row", gap: 10 }}>
             <TouchableOpacity
               style={styles.glassButton}
+              onPress={() => navigation.navigate("NotificationCenter")}
+            >
+              <Ionicons name="notifications-outline" size={22} color="#FFFFFF" />
+              {unreadNotificationsCount > 0 && (
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>
+                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.glassButton}
               onPress={handleTodayPDF}
             >
               <Text style={styles.iconText}>📄</Text>
@@ -248,6 +268,44 @@ export default function DashboardScreen({ profile, onLogout }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
+        {/* RECENT NOTIFICATIONS PREVIEW */}
+        {recentNotifications.length > 0 && (
+          <View style={styles.notificationsPreviewContainer}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Recent Notifications</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("NotificationCenter")}>
+                <Text style={styles.seeAllText}>See All</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.notificationsList}>
+              {recentNotifications.map((notif, index) => (
+                <TouchableOpacity
+                  key={notif.id || index.toString()}
+                  style={[styles.notificationMiniCard, notif.isRead === 0 && styles.notificationMiniUnread]}
+                  onPress={() => {
+                    const { markNotificationAsRead } = require('../services/notificationService');
+                    if (notif.isRead === 0) {
+                      markNotificationAsRead(notif.id);
+                    }
+                    if (notif.caseId) {
+                      navigation.navigate("CaseDetail", { caseId: notif.caseId });
+                    } else {
+                      navigation.navigate("NotificationCenter");
+                    }
+                  }}
+                >
+                  <Ionicons name="notifications-outline" size={16} color={colors.primary} />
+                  <View style={{ flex: 1, marginLeft: 8 }}>
+                    <Text style={styles.notifTitle} numberOfLines={1}>{notif.title}</Text>
+                    <Text style={styles.notifBody} numberOfLines={1}>{notif.body}</Text>
+                  </View>
+                  {notif.isRead === 0 && <View style={styles.unreadDotMini} />}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* FLOATING STATS */}
         <View style={styles.floatingStats}>
           <View style={styles.statMini}>
@@ -568,6 +626,24 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  badgeContainer: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#EF4444',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
   profileSection: { flexDirection: "row", alignItems: "center", gap: 12 },
   avatarGlow: {
     width: 48,
@@ -603,6 +679,45 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
   jurisdictionText: { color: resolvedTheme === 'dark' ? colors.text : colors.surface, fontSize: 12 },
   scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 120 },
+  notificationsPreviewContainer: {
+    marginTop: -20,
+    marginBottom: 20,
+    zIndex: 10,
+  },
+  notificationsList: {
+    marginTop: 10,
+  },
+  notificationMiniCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  notificationMiniUnread: {
+    backgroundColor: colors.primaryLight || `${colors.primary}10`,
+    borderColor: colors.primary,
+  },
+  notifTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  notifBody: {
+    fontSize: 12,
+    color: colors.secondaryText,
+    marginTop: 2,
+  },
+  unreadDotMini: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.primary,
+    marginLeft: 8,
+  },
   floatingStats: {
     flexDirection: "row",
     backgroundColor: resolvedTheme === 'dark' ? colors.card : colors.text,

@@ -30,6 +30,7 @@ import UpdateCaseHearingScreen from "../screens/UpdateCaseHearingScreen";
 import DocumentVaultScreen from "../screens/DocumentVaultScreen";
 import AIChatRoomScreen from "../screens/AIChatRoomScreen";
 import LexAiScreen from "../screens/LexAiScreen";
+import NotificationCenterScreen from "../screens/NotificationCenterScreen";
 import { useTheme } from "../theme/ThemeContext";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -82,7 +83,9 @@ function MainTabs({ profile, onLogout }) {
 // =======================
 // 🧭 ROOT NAVIGATOR
 // =======================
-export default function AppNavigator({ user, profile, onLogout }) {
+import React, { forwardRef } from 'react';
+
+const AppNavigator = forwardRef(({ user, profile, onLogout }, ref) => {
   const { colors, resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -103,7 +106,7 @@ export default function AppNavigator({ user, profile, onLogout }) {
   };
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer theme={navigationTheme} ref={ref}>
       {user ? (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {/* MAIN */}
@@ -138,6 +141,7 @@ export default function AppNavigator({ user, profile, onLogout }) {
           />
           <Stack.Screen name="AIChatRoom" component={AIChatRoomScreen} />
           <Stack.Screen name="LexAi" component={LexAiScreen} />
+          <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} />
         </Stack.Navigator>
       ) : (
         // 🔥 THIS IS THE KEY PART
@@ -145,4 +149,6 @@ export default function AppNavigator({ user, profile, onLogout }) {
       )}
     </NavigationContainer>
   );
-}
+});
+
+export default AppNavigator;

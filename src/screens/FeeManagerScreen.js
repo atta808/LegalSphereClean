@@ -20,7 +20,7 @@ import {
   getProfile,
   updateCasePayment,
 } from "../services/sqliteService";
-
+import { updateCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency } from "../utils/currency";
 export default function FeeManagerScreen({ profile, onBack }) {
   const { colors, resolvedTheme } = useTheme();
@@ -123,6 +123,8 @@ export default function FeeManagerScreen({ profile, onBack }) {
         selectedCase.feePaid,
         selectedCase.feeBalance,
       );
+
+      await updateCaseNotifications(selectedCase.id);
 
       await loadCases();
 

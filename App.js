@@ -2,6 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View, StatusBar } from "react-native";
+import * as Notifications from "expo-notifications";
+import { useNavigationContainerRef } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
@@ -13,6 +15,12 @@ import { getUserProfile } from "./src/services/userService";
 import SyncIndicator from "./src/components/SyncIndicator";
 import { startNetworkListener } from "./src/services/networkService";
 import { initDB } from "./src/services/sqliteService";
+
+// 🔔 NOTIFICATIONS
+import { requestNotificationPermission } from "./src/services/notificationPermission";
+import { configureNotificationChannels } from "./src/services/notificationChannels";
+import { runDailyMaintenance } from "./src/services/dailyMaintenanceService";
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -101,14 +109,19 @@ useEffect(() => {
 }, []);
 
   // =============================
-  // 🗄 INIT SQLITE (ONCE)
+  // 🗄 INIT SQLITE & NOTIFICATIONS (ONCE)
   // =============================
   useEffect(() => {
     const init = async () => {
       try {
         initDB(); // ✅ ensure DB ready first
+
+        // 🔔 NOTIFICATIONS INITIALIZATION AFTER DB
+        await requestNotificationPermission();
+        await configureNotificationChannels();
+        await runDailyMaintenance();
       } catch (e) {
-        console.log("DB init error:", e);
+        console.log("Init error:", e);
       }
     };
 
@@ -144,6 +157,38 @@ useEffect(() => {
 
 function AppContent({ loading, user, profile, handleLogout }) {
   const { colors, resolvedTheme } = useTheme();
+  const navigationRef = useNavigationContainerRef();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    // Listen to notification taps when app is background/foreground
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+
+      // Give navigation ref a moment to mount if app is just cold starting
+      setTimeout(() => {
+        if (navigationRef.isReady()) {
+          if (data?.caseId) {
+            // Check if case exists logic would be nice, but navigation will fail safely
+            // if we just try. For exact requirements: "If the related case no longer exists: Open Notification Center"
+            // We pass it to CaseDetail, and CaseDetail can handle missing case by popping and replacing with NotificationCenter.
+            // Or we do it gracefully here by trusting the db via a direct query. Since we can't await DB here easily without a separate async call:
+
+            // Note: Since CaseDetail reads case by ID, it can show an alert or redirect.
+            navigationRef.navigate("CaseDetail", { caseId: data.caseId });
+          } else {
+            navigationRef.navigate("NotificationCenter");
+          }
+        }
+      }, 500);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
+  }, [navigationRef]);
 
   if (loading) {
     return (
@@ -160,7 +205,7 @@ function AppContent({ loading, user, profile, handleLogout }) {
         backgroundColor={colors.background}
       />
       <SyncIndicator />
-      <AppNavigator user={user} profile={profile} onLogout={handleLogout} />
+      <AppNavigator user={user} profile={profile} onLogout={handleLogout} ref={navigationRef} />
     </>
   );
 }

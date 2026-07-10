@@ -21,7 +21,7 @@ export class CaseRouter {
     static async route(request) {
         try {
             AIEvents.emitRequestStarted('CaseAI');
-            const { caseId, query, fileParams } = request;
+            const { caseId, query, attachment, history } = request;
 
             if (!caseId) throw new Error('CaseRouter requires a caseId.');
 
@@ -30,13 +30,13 @@ export class CaseRouter {
 
             // 2. Handle Attachments
             let ocrText = '';
-            if (fileParams) {
-                 const docResult = await DocumentReader.read(fileParams);
+            if (attachment) {
+                 const docResult = await DocumentReader.read(attachment);
                  if (docResult) ocrText = docResult.text;
             }
 
             // 3. Build Prompt
-            const prompt = PromptManager.buildCaseAI(query, context, ocrText);
+            const prompt = PromptManager.buildCaseAI(query, context, ocrText, history);
 
             // 4. Execute LLM via Registry
             const llm = ProviderRegistry.getLLMProvider();

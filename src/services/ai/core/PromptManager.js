@@ -6,12 +6,12 @@
 import { PromptBuilder } from '../prompts/PromptBuilder';
 
 export class PromptManager {
-    static buildLexAI(query, context, ocrText) {
-        return PromptBuilder.buildLexAIPrompt(query, context, ocrText);
+    static buildLexAI(query, context, ocrText, history = []) {
+        return PromptBuilder.buildLexAIPrompt(query, context, ocrText, history);
     }
 
-    static buildCaseAI(query, context, ocrText) {
-        return PromptBuilder.buildChatRoomPrompt(query, context, ocrText);
+    static buildCaseAI(query, context, ocrText, history = []) {
+        return PromptBuilder.buildChatRoomPrompt(query, context, ocrText, history);
     }
 
     static buildDocumentVault(ocrText, context) {

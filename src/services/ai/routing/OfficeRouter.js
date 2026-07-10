@@ -22,7 +22,7 @@ export class OfficeRouter {
     static async route(request) {
         try {
             AIEvents.emitRequestStarted('LexAI');
-            const { query, fileParams } = request;
+            const { query, attachment, history } = request;
 
             // 1. Detect Intent
             const intent = IntentDetector.detect(query);
@@ -32,13 +32,13 @@ export class OfficeRouter {
 
             // 3. Handle Attachments
             let ocrText = '';
-            if (fileParams) {
-                 const docResult = await DocumentReader.read(fileParams);
+            if (attachment) {
+                 const docResult = await DocumentReader.read(attachment);
                  if (docResult) ocrText = docResult.text;
             }
 
             // 4. Build Prompt
-            const prompt = PromptManager.buildLexAI(query, context, ocrText);
+            const prompt = PromptManager.buildLexAI(query, context, ocrText, history);
 
             // 5. Execute LLM via Registry
             const llm = ProviderRegistry.getLLMProvider();

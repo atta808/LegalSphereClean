@@ -20,9 +20,10 @@ export class PromptBuilder {
      * @param {string} userMessage - The query from the user.
      * @param {Object} context - The structured office context.
      * @param {string} [ocrText=''] - Optional text extracted from an attached document.
+     * @param {Array} [history=[]] - Structured conversation history.
      * @returns {string} The fully constructed prompt ready for the LLM.
      */
-    static buildLexAIPrompt(userMessage, context, ocrText = '') {
+    static buildLexAIPrompt(userMessage, context, ocrText = '', history = []) {
         // Stringify context safely
         let contextString = '';
         if (context && typeof context === 'object') {
@@ -36,7 +37,7 @@ export class PromptBuilder {
         }
 
         const systemInstruction = `${OfficePrompts.ROLE}\n\n${SystemPrompts.BASE_GUIDELINES}`;
-        const userInstruction = GeneralPrompts.formatUserQuery(contextString, ocrText, userMessage);
+        const userInstruction = GeneralPrompts.formatUserQuery(contextString, ocrText, userMessage, history);
 
         // Combine into a single string for standard DeepSeek input
         return `${systemInstruction}\n\n${userInstruction}`;
@@ -48,9 +49,10 @@ export class PromptBuilder {
      * @param {string} userMessage - The query from the user.
      * @param {Object} caseContext - The structured context for the specific case.
      * @param {string} [ocrText=''] - Optional text extracted from an attached document.
+     * @param {Array} [history=[]] - Structured conversation history.
      * @returns {string} The fully constructed prompt ready for the LLM.
      */
-    static buildChatRoomPrompt(userMessage, caseContext, ocrText = '') {
+    static buildChatRoomPrompt(userMessage, caseContext, ocrText = '', history = []) {
         let contextString = '';
         if (caseContext && typeof caseContext === 'object') {
             try {
@@ -61,7 +63,7 @@ export class PromptBuilder {
         }
 
         const systemInstruction = `${CasePrompts.ROLE}\n\n${CasePrompts.RESTRICTIONS}`;
-        const userInstruction = GeneralPrompts.formatUserQuery(contextString, ocrText, userMessage);
+        const userInstruction = GeneralPrompts.formatUserQuery(contextString, ocrText, userMessage, history);
 
         return `${systemInstruction}\n\n${userInstruction}`;
     }

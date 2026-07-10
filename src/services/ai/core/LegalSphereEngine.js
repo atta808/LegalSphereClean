@@ -18,13 +18,11 @@ export class LegalSphereEngine {
      * PRODUCT 1: Lex AI (Universal Assistant)
      * Processes a query for the office-wide universal assistant.
      *
-     * @param {string} query - The user's message.
-     * @param {Object} [fileParams=null] - Optional file attachment (uri, type, name, base64).
+     * @param {LexAIRequest} request - The Lex AI request object containing query, optional history, and optional fileParams.
      * @returns {Promise<import('./models/Responses').AIResponse>} An object with `userFacing` (Markdown) and `metadata`.
      */
-    static async processLexAI(query, fileParams = null) {
+    static async processLexAI(request) {
         try {
-            const request = new LexAIRequest({ query, fileParams });
             const rawResponse = await AIRouter.routeLexAI(request);
             return ResponseFormatter.formatChatResponse(rawResponse);
         } catch (error) {
@@ -38,14 +36,11 @@ export class LegalSphereEngine {
      * PRODUCT 2: AI ChatRoom (Single-Case Intelligence)
      * Processes a query specifically bound to a single legal case.
      *
-     * @param {number|string} caseId - The ID of the current case.
-     * @param {string} query - The user's message.
-     * @param {Object} [fileParams=null] - Optional file attachment.
+     * @param {CaseAIRequest} request - The Case AI request object.
      * @returns {Promise<import('./models/Responses').AIResponse>} An object with `userFacing` (Markdown) and `metadata`.
      */
-    static async processAIChatRoom(caseId, query, fileParams = null) {
+    static async processAIChatRoom(request) {
         try {
-            const request = new CaseAIRequest({ caseId, query, fileParams });
             const rawResponse = await AIRouter.routeCaseAI(request);
             return ResponseFormatter.formatChatResponse(rawResponse);
         } catch (error) {
@@ -59,12 +54,11 @@ export class LegalSphereEngine {
      * PRODUCT 3: Document Vault AI
      * Automatically analyzes a document and returns structured metadata.
      *
-     * @param {Object} fileParams - The document to analyze (must contain uri, type).
+     * @param {DocumentVaultRequest} request - The Document Vault request object.
      * @returns {Promise<import('./models/Responses').AIResponse>} An object containing `structuredData`, `userFacing` (Markdown), and `metadata`.
      */
-    static async processDocumentVault(fileParams) {
+    static async processDocumentVault(request) {
         try {
-            const request = new DocumentVaultRequest({ fileParams });
             const structuredData = await AIRouter.routeDocumentVault(request);
 
             return ResponseFormatter.formatDocumentVaultResponse(structuredData);

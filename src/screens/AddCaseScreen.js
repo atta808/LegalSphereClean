@@ -24,7 +24,9 @@ import {
   insertCase,
   getProfile,
   ensureMasterItemExists,
+  getCaseById,
 } from "../services/sqliteService";
+import { scheduleCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency, getLocale } from "../utils/currency";
 import { normalizeDateInput, toDatePickerDate, toISO } from "../utils/date";
 export default function AddCaseScreen({ route, profile }) {
@@ -302,6 +304,18 @@ export default function AddCaseScreen({ route, profile }) {
 
       // ✅ ALWAYS save locally
       await insertCase(caseData);
+
+      // ✅ Fetch the saved case (to get its new SQLite ID)
+      // Since insertCase doesn't return the ID, and relies on auto-increment, we can fetch the latest inserted case for this client/title
+      // However, it's safer to fetch the last inserted row. Assuming we can't reliably get the ID from insertCase directly in this exact flow,
+      // we can do a lookup or adjust sqliteService to return lastInsertRowId if possible.
+      // Since we shouldn't change existing DB logic drastically, let's fetch the most recent case:
+      // A robust way without changing insertCase:
+      const { db } = require("../services/sqliteService");
+      const latestCase = db.getFirstSync("SELECT * FROM cases ORDER BY id DESC LIMIT 1");
+      if (latestCase) {
+        await scheduleCaseNotifications(latestCase);
+      }
 
       Alert.alert("Success", "Case saved locally.");
 

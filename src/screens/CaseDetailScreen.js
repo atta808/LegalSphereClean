@@ -36,6 +36,7 @@ import {
   updateAiChatLink,
   addCaseNote,
 } from "../services/sqliteService";
+import { updateCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 import { getCallLink, getSMSLink, getWhatsAppLink } from "../utils/phone";
@@ -74,6 +75,12 @@ export default function CaseDetailScreen({ profile }) {
       setLoading(true);
 
       const result = getCaseById(caseId);
+
+      if (!result || result.isDeleted === 1) {
+        Alert.alert("Case Not Found", "This case may have been deleted.");
+        navigation.replace("NotificationCenter");
+        return;
+      }
 
       if (result?.status === "archived") {
         navigation.goBack();

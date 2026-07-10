@@ -20,6 +20,7 @@ import {
   updateCaseStatus,
   getProfile,
 } from "../services/sqliteService";
+import { updateCaseNotifications, cancelCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 
@@ -63,9 +64,10 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
       { text: "Cancel", style: "cancel" },
       {
         text: "Restore",
-        onPress: () => {
+        onPress: async () => {
           try {
             updateCaseStatus(caseId, "active");
+            await updateCaseNotifications(caseId);
             loadArchivedCases();
             Alert.alert("Success", "Case restored successfully.");
           } catch (_) {
@@ -85,9 +87,10 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => {
+          onPress: async () => {
             try {
               deleteCase(caseId);
+              await cancelCaseNotifications(caseId);
               loadArchivedCases();
               Alert.alert("Deleted", "Case permanently deleted.");
             } catch (_) {

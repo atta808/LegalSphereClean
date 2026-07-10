@@ -4,7 +4,7 @@ export const db = SQLite.openDatabaseSync("legal_app.db");
 // =============================
 // 🔧 DB VERSIONING / MIGRATION
 // =============================
-const CURRENT_DB_VERSION = 32; // Incremented for new indexes and schema changes
+const CURRENT_DB_VERSION = 33; // Incremented for new indexes and schema changes
 
 const getDBVersion = () => {
   try {
@@ -170,6 +170,21 @@ CREATE TABLE IF NOT EXISTS cases (
 ON hearings(remoteId);
 `);
     db.execSync(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        caseId INTEGER,
+        hearingId INTEGER,
+        title TEXT,
+        body TEXT,
+        type TEXT,
+        scheduledFor TEXT,
+        notificationIdentifier TEXT,
+        status TEXT DEFAULT 'pending',
+        isRead INTEGER DEFAULT 0,
+        createdAt INTEGER,
+        updatedAt INTEGER
+      );
+
   CREATE TABLE IF NOT EXISTS timeline (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     remoteId TEXT,
@@ -314,6 +329,9 @@ CREATE TABLE IF NOT EXISTS document_vault (
   CREATE INDEX IF NOT EXISTS idx_hearings_sync ON hearings(syncStatus);
   CREATE INDEX IF NOT EXISTS idx_notes_sync ON case_notes(syncStatus);
   CREATE INDEX IF NOT EXISTS idx_links_sync ON quick_links(syncStatus);
+  CREATE INDEX IF NOT EXISTS idx_notifications_caseId ON notifications(caseId);
+  CREATE INDEX IF NOT EXISTS idx_notifications_isRead ON notifications(isRead);
+  CREATE INDEX IF NOT EXISTS idx_notifications_status ON notifications(status);
 `);
     // =============================
     // 🔥 MIGRATION (ADD MISSING COLUMNS)

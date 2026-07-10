@@ -1,4 +1,4 @@
-import { NOTIFICATION_CONFIG } from '../config/notificationConfig';
+import { NOTIFICATION_CONFIG, NOTIFICATION_FEATURES } from '../config/notificationConfig';
 import {
   scheduleLocalNotification,
   cancelLocalNotification,
@@ -7,6 +7,14 @@ import {
   updateNotificationRecordStatus
 } from './notificationService';
 import { db } from './sqliteService';
+
+
+const applyTimeToString = (dateStr, timeStr) => {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const date = new Date(dateStr);
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+};
 
 // Helper to calculate reminder dates
 const calculateReminderDates = (hearingDateISO) => {
@@ -17,16 +25,24 @@ const calculateReminderDates = (hearingDateISO) => {
   const now = new Date();
   const reminders = [];
 
-  NOTIFICATION_CONFIG.hearingOffsets.forEach(offset => {
-    const reminderDate = new Date(hearingDate.getTime() - offset.value);
-    // Only schedule if it's in the future
-    if (reminderDate > now) {
-      reminders.push({
-        date: reminderDate,
-        label: offset.label
-      });
-    }
-  });
+  // Tomorrow's Hearing Reminder
+  const tomorrowReminder = applyTimeToString(hearingDateISO, NOTIFICATION_CONFIG.tomorrowReminderTime);
+  tomorrowReminder.setDate(tomorrowReminder.getDate() - 1);
+  if (tomorrowReminder > now) {
+    reminders.push({
+      date: tomorrowReminder,
+      label: 'tomorrow'
+    });
+  }
+
+  // Today's Hearing Reminder
+  const todayReminder = applyTimeToString(hearingDateISO, NOTIFICATION_CONFIG.todayReminderTime);
+  if (todayReminder > now) {
+    reminders.push({
+      date: todayReminder,
+      label: 'today'
+    });
+  }
 
   return reminders;
 };
@@ -72,7 +88,7 @@ export const scheduleCaseNotifications = async (caseData, options = {}) => {
   }
 
   // 1. Hearing Reminders
-  if (caseData.nextHearingISO) {
+  if (NOTIFICATION_FEATURES.hearingReminders && caseData.nextHearingISO) {
     const reminders = calculateReminderDates(caseData.nextHearingISO);
     for (const reminder of reminders) {
       const title = `Hearing Reminder: ${caseData.title || 'Case'}`;
@@ -99,35 +115,69 @@ export const scheduleCaseNotifications = async (caseData, options = {}) => {
     }
   }
 
-  // 2. Fee Reminders
-  const existingFeeNotif = options.preserveFeeReminder
-    ? pending.find(n => n.type === 'fee' && n.status === 'pending')
-    : null;
+  // 2. Overdue Hearing Reminder
+  if (NOTIFICATION_FEATURES.overdueReminder && caseData.nextHearingISO) {
+    const now = new Date();
+    const overdueReminder = applyTimeToString(caseData.nextHearingISO, NOTIFICATION_CONFIG.overdueReminderTime);
 
-  if (!existingFeeNotif && caseData.feeBalance && Number(caseData.feeBalance) > 0) {
-    const feeReminderDate = new Date();
-    feeReminderDate.setDate(feeReminderDate.getDate() + NOTIFICATION_CONFIG.feeReminderIntervalDays);
+    // Only schedule if it's in the future
+    if (overdueReminder > now) {
+      const title = `Hearing Overdue: ${caseData.title || 'Case'}`;
+      const body = `Please update proceedings for case ${caseData.caseNo || ''}.`;
 
-    const title = `Fee Reminder: ${caseData.title || 'Case'}`;
-    const body = `You have an outstanding fee balance of ${caseData.feeBalance}.`;
-
-    const identifier = await scheduleLocalNotification({
-      title,
-      body,
-      date: feeReminderDate,
-      data: { caseId: caseData.id, type: 'fee' }
-    });
-
-    if (identifier) {
-      insertNotificationRecord({
-        caseId: caseData.id,
-        hearingId: null,
+      const identifier = await scheduleLocalNotification({
         title,
         body,
-        type: 'fee',
-        scheduledFor: feeReminderDate.toISOString(),
-        notificationIdentifier: identifier
+        date: overdueReminder,
+        data: { caseId: caseData.id, type: 'overdue' }
       });
+
+      if (identifier) {
+        insertNotificationRecord({
+          caseId: caseData.id,
+          hearingId: null,
+          title,
+          body,
+          type: 'overdue',
+          scheduledFor: overdueReminder.toISOString(),
+          notificationIdentifier: identifier
+        });
+      }
+    }
+  }
+
+  // 3. Fee Reminders
+  if (NOTIFICATION_FEATURES.feeReminders) {
+    const existingFeeNotif = options.preserveFeeReminder
+      ? pending.find(n => n.type === 'fee' && n.status === 'pending')
+      : null;
+
+    if (!existingFeeNotif && caseData.feeBalance && Number(caseData.feeBalance) > 0) {
+      const feeReminderDate = new Date();
+      // Hardcoded fallback since feeReminderIntervalDays is removed from NOTIFICATION_CONFIG for V1
+      feeReminderDate.setDate(feeReminderDate.getDate() + 30);
+
+      const title = `Fee Reminder: ${caseData.title || 'Case'}`;
+      const body = `You have an outstanding fee balance of ${caseData.feeBalance}.`;
+
+      const identifier = await scheduleLocalNotification({
+        title,
+        body,
+        date: feeReminderDate,
+        data: { caseId: caseData.id, type: 'fee' }
+      });
+
+      if (identifier) {
+        insertNotificationRecord({
+          caseId: caseData.id,
+          hearingId: null,
+          title,
+          body,
+          type: 'fee',
+          scheduledFor: feeReminderDate.toISOString(),
+          notificationIdentifier: identifier
+        });
+      }
     }
   }
 };

@@ -1,7 +1,6 @@
 // services/ocrService.js
 import axios from "axios";
-
-const OCR_API_KEY = "K85664157688957";
+import { AIConfig } from "../../config/AIConfig";
 
 /**
  * High-performance OCR pipeline utilizing structural multi-page extraction.
@@ -19,7 +18,7 @@ export const extractTextWithOCR = async (
   try {
     const formData = new FormData();
 
-    formData.append("apikey", OCR_API_KEY);
+    formData.append("apikey", AIConfig.getOCRSpaceKey() || "");
     formData.append("language", language);
     formData.append("isOverlayRequired", "false");
     formData.append("isCreateSearchablePdf", "false");

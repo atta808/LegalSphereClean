@@ -1,8 +1,13 @@
 import OpenAI from "openai";
+import { AIConfig } from "../config/AIConfig";
 
+// Create client dynamically to ensure env vars are evaluated at runtime if needed,
+// but for standard top-level it should work as long as AIConfig.getDeepSeekKey() isn't called before process.env is populated.
+// Expo statically injects EXPO_PUBLIC_* variables, so it's fine.
 const client = new OpenAI({
-  baseURL: "https://api.deepseek.com",
-  apiKey: "sk-758caca222404081af81da2e1005bbef",
+  baseURL: "https://api.deepseek.com", // OpenAI SDK appends /v1/chat/completions automatically
+  apiKey: AIConfig.getDeepSeekKey() || "", // Using AIConfig centralized getter
+  dangerouslyAllowBrowser: true, // often needed in RN when using openAI sdk without a node env
 });
 
 export const askDeepSeek = async (prompt) => {

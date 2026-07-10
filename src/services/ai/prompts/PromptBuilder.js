@@ -56,7 +56,16 @@ export class PromptBuilder {
         let contextString = '';
         if (caseContext && typeof caseContext === 'object') {
             try {
-                contextString = JSON.stringify(caseContext, null, 2);
+                // Limit context size intelligently
+                const optimizedContext = {
+                    ...caseContext,
+                    hearings: caseContext.hearings?.slice(0, 10), // Limit to last 10
+                    notes: caseContext.notes?.slice(0, 10),
+                    timeline: caseContext.timeline?.slice(0, 5),
+                    documentsSummary: caseContext.documentsSummary?.slice(0, 10),
+                    citations: caseContext.citations?.slice(0, 10)
+                };
+                contextString = JSON.stringify(optimizedContext, null, 2);
             } catch (e) {
                  contextString = 'Context formatting error.';
             }

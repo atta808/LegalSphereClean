@@ -31,17 +31,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Markdown from "react-native-markdown-display"; // ✅ Added Markdown support
 
 // Services
-import { askDeepSeek } from "../services/deepseekService";
-import { extractDocumentText } from "../services/ai/documentReaders";
-import {
-  getCaseNotes,
-  getCitationsByCaseId,
-  getTimelineByCaseId,
-  getDocumentsByCaseId,
-  addCaseNote,
-} from "../services/sqliteService";
+import { addCaseNote } from "../services/sqliteService";
 
 // Components
+import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
+import { AIEvents } from "../services/ai/core/AIEvents";
+import { CaseAIRequest } from "../services/ai/core/models/Requests";
+import { addCaseNote } from "../services/sqliteService";
+
 import LegalInput from "../components/LegalInput";
 
 // Enable LayoutAnimation for Android
@@ -147,17 +144,24 @@ export default function AIChatRoomScreen({ route, navigation }) {
     }
   };
 
-  const loadCaseStats = () => {
-    try {
-      setStats({
-        documents: getDocumentsByCaseId(caseId)?.length || 0,
-        citations: getCitationsByCaseId(caseId)?.length || 0,
-        notes: getCaseNotes(caseId)?.length || 0,
-      });
-    } catch (error) {
-      console.log("Stats Error:", error);
-    }
-  };
+  const loadCaseStats = () => { /* Now managed by engine */ };
+
+  // Listen for AI progress events
+  useEffect(() => {
+    const unsubscribe = AIEvents.subscribe((event) => {
+      if (event.type === 'OCR_STARTED') {
+        setLoadingMessage('Analyzing document...');
+      } else if (event.type === 'AI_REQUEST_STARTED') {
+        setLoadingMessage('Thinking...');
+      } else if (event.type === 'ANALYSIS_COMPLETED') {
+        setLoadingMessage('Synthesizing findings...');
+      } else if (event.type === 'REQUEST_STARTED') {
+        setLoadingMessage('Processing...');
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleAttachDocument = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -203,52 +207,40 @@ export default function AIChatRoomScreen({ route, navigation }) {
     const userMessage = {
       id: generateId(),
       sender: "user",
+      role: "user", // added for standard model
       text: userPrompt,
       timestamp: Date.now(),
       file: attachedFile ? { name: attachedFile.name } : null,
     };
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setMessages((prev) => [...prev, userMessage]);
+    const newHistory = [...messages, userMessage];
+    setMessages(newHistory);
     setInputText("");
-    setAttachedFile(null);
+
+    // Convert to AI core history format
+    const coreHistory = newHistory.map(m => ({
+       id: m.id,
+       role: m.sender === 'user' ? 'user' : 'ai',
+       text: m.text,
+       timestamp: m.timestamp,
+       attachment: m.file
+    }));
+
     setLoading(true);
+    setLoadingMessage("Processing...");
 
     try {
-      const context = {
-        notes: getCaseNotes(caseId) || [],
-        citations: getCitationsByCaseId(caseId) || [],
-        timeline: getTimelineByCaseId(caseId) || [],
-        documents: getDocumentsByCaseId(caseId) || [],
-      };
+      const request = new CaseAIRequest({
+        caseId: caseId,
+        message: userPrompt,
+        history: coreHistory,
+        attachment: attachedFile,
+        sessionId: caseId,
+        timestamp: Date.now()
+      });
 
-      let fullPrompt = `
-YOU ARE LEX AI CHATROOM, A HIGHLY ADVANCED SENIOR LEGAL ASSOCIATE ASSIGNED TO ONE SPECIFIC CASE.
-Your entire purpose and context is restricted to the selected case below. You must act strictly in the best interest of the ${representingSide || "client"}.
-
-Provide highly structured, professional, and precise legal analysis. ALWAYS use Markdown for formatting (bolding, lists, headings) to ensure high readability.
-
-CRITICAL RULES:
-1. NEVER answer general knowledge questions.
-2. NEVER answer office-wide queries or discuss office statistics.
-3. If the user asks something outside the scope of this specific case, politely refuse with exactly this type of message: "I specialize in analysis of the current case. For office-wide questions or general legal and non-legal discussions, please use Lex AI."
-
-[CASE METADATA]
-Title: ${caseTitle} | No: ${caseNumber} | Client: ${clientName} | Court: ${courtName}
-Domain: ${litigationDomain} | Stage: ${stage} | Status: ${caseStatus}
-
-[CASE CONTEXT]
-Notes: ${context.notes.map((n) => n.text).join(" | ")}
-Citations: ${context.citations.map((c) => c.citation).join(" | ")}
-Timeline: ${context.timeline.map((t) => t.stage).join(" -> ")}
-Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
-`;
-      if (userMessage.file) {
-        fullPrompt += `\n[ATTACHED DOCUMENT: ${userMessage.file.name}]\n${userMessage.file.text}\n`;
-      }
-      fullPrompt += `\n[COUNSEL REQUEST]\n${userPrompt}`;
-
-      const aiReply = await askDeepSeek(fullPrompt);
+      const response = await LegalSphereEngine.processAIChatRoom(request);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setMessages((prev) => [
@@ -256,15 +248,17 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
         {
           id: generateId(),
           sender: "ai",
-          text: aiReply,
+          role: "ai", // added for standard model
+          text: response.userFacing,
           timestamp: Date.now(),
         },
       ]);
+      setAttachedFile(null);
     } catch (error) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
-        "Network Error",
-        "Lex AI failed to respond. Check your connection.",
+        "AI Analysis Error",
+        error.userMessage || "Lex AI encountered an issue."
       );
     } finally {
       setLoading(false);
@@ -287,7 +281,7 @@ Documents Vault: ${context.documents.map((d) => d.name).join(", ")}
   };
 
   const renderMessage = ({ item }) => {
-    const isUser = item.sender === "user";
+    const isUser = item.role === "user" || item.sender === "user";
     return (
       <Animated.View
         style={[

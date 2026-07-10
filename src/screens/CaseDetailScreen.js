@@ -418,9 +418,9 @@ Notes: ${caseData?.notes || "-"}`;
           </View>
           <View style={styles.divider} />
 
-          <Row styles={styles}  label="Current Stage" value={caseData.stage} />
-          <Row styles={styles}  label="Proceeding" value={caseData.description} />
-          <Row styles={styles}
+          <Row styles={styles} colors={colors} label="Current Stage" value={caseData.stage} />
+          <Row styles={styles} colors={colors} label="Proceeding" value={caseData.description} />
+          <Row styles={styles} colors={colors}
             label="Next Hearing"
             value={toDisplay(caseData.nextHearingISO, locale)}
             highlight
@@ -452,25 +452,25 @@ Notes: ${caseData?.notes || "-"}`;
           <Text style={styles.sectionTitle}>Case Information</Text>
         </View>
         <View style={styles.card}>
-          {!!caseData?.judge && <Row styles={styles}  label="Judge" value={caseData.judge} />}
+          {!!caseData?.judge && <Row styles={styles} colors={colors} label="Judge" value={caseData.judge} />}
           {!!caseData?.caseType && (
-            <Row styles={styles}  label="Case Type" value={caseData.caseType} />
+            <Row styles={styles} colors={colors} label="Case Type" value={caseData.caseType} />
           )}
           {!!caseData?.litigationDomain && (
-            <Row styles={styles}  label="Litigation Domain" value={caseData.litigationDomain} />
+            <Row styles={styles} colors={colors} label="Litigation Domain" value={caseData.litigationDomain} />
           )}
           {!!caseData?.representingSide && (
-            <Row styles={styles}  label="Representing Side" value={caseData.representingSide} />
+            <Row styles={styles} colors={colors} label="Representing Side" value={caseData.representingSide} />
           )}
           {!!caseData?.opposingCounsel && (
-            <Row styles={styles}  label="Opposing Counsel" value={caseData.opposingCounsel} />
+            <Row styles={styles} colors={colors} label="Opposing Counsel" value={caseData.opposingCounsel} />
           )}
           {!!caseData?.opponent && (
-            <Row styles={styles}  label="Opponent" value={caseData.opponent} />
+            <Row styles={styles} colors={colors} label="Opponent" value={caseData.opponent} />
           )}
-          {!!caseData?.firNo && <Row styles={styles}  label="FIR No" value={caseData.firNo} />}
+          {!!caseData?.firNo && <Row styles={styles} colors={colors} label="FIR No" value={caseData.firNo} />}
           {!!caseData?.firDate && (
-            <Row styles={styles}  label="FIR Date" value={caseData.firDate} />
+            <Row styles={styles} colors={colors} label="FIR Date" value={caseData.firDate} />
           )}
         </View>
 

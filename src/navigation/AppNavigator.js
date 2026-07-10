@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomBar from "../components/BottomBar"; // ✅ ADD THIS
 import LoginScreen from "../screens/LoginScreen";
@@ -85,16 +85,12 @@ function MainTabs({ profile, onLogout }) {
 export default function AppNavigator({ user, profile, onLogout }) {
   const { colors, resolvedTheme } = useTheme();
 
-  const isDark = resolvedTheme === 'dark';
-  const baseTheme = isDark ? DarkTheme : DefaultTheme;
-
   const navigationTheme = {
-    ...baseTheme,
+    dark: resolvedTheme === 'dark',
     colors: {
-      ...baseTheme.colors,
       primary: colors.primary,
       background: colors.background,
-      card: colors.card, // Using card to map appropriately
+      card: colors.card,
       text: colors.text,
       border: colors.border,
       notification: colors.primary,

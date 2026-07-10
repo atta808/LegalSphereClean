@@ -28,16 +28,12 @@ import * as DocumentPicker from "expo-document-picker";
 import * as Haptics from "expo-haptics";
 import { BlurView } from "expo-blur";
 
-import { askDeepSeek } from "../services/deepseekService";
-import { db } from "../services/sqliteService";
+import Markdown from "react-native-markdown-display";
+
 import LegalInput from "../components/LegalInput";
-import {
-  generateSQL,
-  summarizeSQLResults,
-  buildGeneralPrompt,
-} from "../services/ai/promptTemplates";
-import { extractDocumentText } from "../services/ai/documentReaders";
-import { isOfficeQuery } from "../services/ai/intentDetector";
+import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
+import { AIEvents } from "../services/ai/core/AIEvents";
+import { LexAIRequest } from "../services/ai/core/models/Requests";
 
 // Sleek typing animation component
 const TypingIndicator = ({ styles, colors }) => {
@@ -155,6 +151,7 @@ export default function LexAiScreen() {
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [isAttaching, setIsAttaching] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [showQuickActions, setShowQuickActions] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(null);
@@ -163,6 +160,18 @@ export default function LexAiScreen() {
   useEffect(() => {
     loadMessages();
     StatusBar.setBarStyle("dark-content");
+
+    const unsubscribeEvents = AIEvents.subscribe((event) => {
+      if (event.type === 'OCR_STARTED') {
+        setLoadingMessage('Analyzing document...');
+      } else if (event.type === 'AI_REQUEST_STARTED') {
+        setLoadingMessage('Thinking...');
+      } else if (event.type === 'ANALYSIS_COMPLETED') {
+        setLoadingMessage('Synthesizing findings...');
+      } else if (event.type === 'REQUEST_STARTED') {
+        setLoadingMessage('Processing...');
+      }
+    });
 
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
@@ -180,6 +189,7 @@ export default function LexAiScreen() {
     );
 
     return () => {
+      unsubscribeEvents();
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
@@ -312,22 +322,12 @@ USER QUERY: ${prompt}
       const docObj = {
         uri: asset.uri,
         name: asset.name,
-        mimeType: asset.mimeType,
+        type: asset.mimeType, // Map to what engine expects
         size: asset.size,
       };
-      const extractedText = await extractDocumentText(docObj, "eng");
 
-      if (extractedText && extractedText.trim().length > 0) {
-        setInput(
-          `📄 Analyzing document: "${asset.name}"\n\n${extractedText.substring(0, 10000)}\n\nPlease analyze this document and provide key legal insights.`,
-        );
-        inputRef.current?.focus();
-      } else {
-        Alert.alert(
-          "Extraction Failed",
-          "Unable to extract readable text. Please ensure the document contains selectable text.",
-        );
-      }
+      setSelectedFile(docObj);
+      inputRef.current?.focus();
     } catch (error) {
       Alert.alert("Error", "Failed to process the document. Please try again.");
     } finally {
@@ -364,78 +364,30 @@ USER QUERY: ${prompt}
 
     setLoading(true);
     setIsTyping(true);
-    setLoadingMessage("Analyzing query...");
+    setLoadingMessage("Processing...");
 
     try {
-      const dynamicLanguagePrompt = enforceLanguagePolicy(userRawText);
-      const systemDate = getSystemDateString();
-      let ultimateAiResponseText = "";
+      const request = new LexAIRequest({
+        message: userRawText,
+        history: currentHistory,
+        attachment: selectedFile,
+        sessionId: caseId || "global",
+        timestamp: Date.now(),
+      });
 
-      if (isOfficeQuery(userRawText)) {
-        // Office Question detected -> Route to LegalSphere Engine (generate SQL)
-        const initialPrompt = generateSQL(
-          dynamicLanguagePrompt,
-          caseId,
-          systemDate,
-        );
-        const initialResponse = await askDeepSeek(initialPrompt);
-
-        let intentObject;
-        try {
-          const firstBrace = initialResponse.indexOf("{");
-          const lastBrace = initialResponse.lastIndexOf("}");
-
-          if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-            const pureJson = initialResponse.substring(firstBrace, lastBrace + 1);
-            intentObject = JSON.parse(pureJson);
-          } else {
-            intentObject = { type: "answer", text: initialResponse };
-          }
-        } catch (e) {
-          intentObject = {
-            type: "answer",
-            text: initialResponse.replace(/```json|```/g, "").trim(),
-          };
-        }
-
-        if (intentObject.type === "sql" && intentObject.sql) {
-          setLoadingMessage("Querying database...");
-          try {
-            const dataset = db.getAllSync(intentObject.sql);
-            setLoadingMessage("Synthesizing findings...");
-
-            const summaryPrompt = summarizeSQLResults(
-              dynamicLanguagePrompt,
-              JSON.stringify(dataset),
-              systemDate,
-              "Match User's Language (English Default, Urdu if requested)",
-            );
-
-            ultimateAiResponseText = await askDeepSeek(summaryPrompt);
-          } catch (dbError) {
-            ultimateAiResponseText =
-              "⚠️ I encountered an error querying the database. Please refine your query criteria.";
-          }
-        } else {
-          ultimateAiResponseText = intentObject.text || initialResponse;
-        }
-      } else {
-        // Not an Office Question -> Route directly to DeepSeek via buildGeneralPrompt
-        setLoadingMessage("Thinking...");
-        const generalPrompt = buildGeneralPrompt(dynamicLanguagePrompt);
-        ultimateAiResponseText = await askDeepSeek(generalPrompt);
-      }
+      const response = await LegalSphereEngine.processLexAI(request);
 
       const aiMessage = {
         id: `ai_${Date.now()}`,
         role: "ai",
-        text: ultimateAiResponseText,
+        text: response.userFacing,
         timestamp: Date.now(),
       };
       const finalHistory = [...currentHistory, aiMessage];
 
       setMessages(finalHistory);
       await saveMessages(finalHistory);
+      setSelectedFile(null); // Clear selected file after successful send
       scrollToBottom();
     } catch (coreError) {
       Alert.alert("Connection Issue", "Unable to reach the AI service.");
@@ -488,14 +440,20 @@ USER QUERY: ${prompt}
                 isUser ? styles.userBubble : styles.aiBubble,
               ]}
             >
-              <Text
-                style={[
-                  styles.messageText,
-                  isUser ? styles.userText : styles.aiText,
-                ]}
-              >
-                {item.text}
-              </Text>
+              {isUser ? (
+                <Text style={[styles.messageText, styles.userText]}>
+                  {item.text}
+                </Text>
+              ) : (
+                <Markdown
+                  style={{
+                    body: { ...styles.messageText, color: colors.text },
+                    paragraph: { marginTop: 0, marginBottom: 8 },
+                  }}
+                >
+                  {item.text}
+                </Markdown>
+              )}
             </View>
 
             <View
@@ -635,6 +593,17 @@ USER QUERY: ${prompt}
           ]}
         >
           <View style={styles.inputGlass}>
+            {selectedFile && (
+              <View style={styles.selectedFileChip}>
+                <Ionicons name="document-text" size={14} color={colors.primary} />
+                <Text style={styles.selectedFileName} numberOfLines={1}>
+                  {selectedFile.name}
+                </Text>
+                <TouchableOpacity onPress={() => setSelectedFile(null)}>
+                  <Ionicons name="close-circle" size={16} color={colors.placeholder} />
+                </TouchableOpacity>
+              </View>
+            )}
             <View style={styles.inputInner}>
               <TouchableOpacity
                 onPress={handleAttachDocument}
@@ -965,5 +934,22 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 8,
+  },
+  selectedFileChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.background,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginHorizontal: 12,
+    marginTop: 8,
+    gap: 6,
+  },
+  selectedFileName: {
+    flex: 1,
+    fontSize: 12,
+    color: colors.text,
+    fontWeight: "500",
   },
 });

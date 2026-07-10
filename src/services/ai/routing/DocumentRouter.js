@@ -19,15 +19,15 @@ export class DocumentRouter {
     static async route(request) {
         try {
             AIEvents.emitRequestStarted('DocumentVault');
-            const { fileParams } = request;
-            if (!fileParams) throw new Error('DocumentRouter requires file parameters.');
+            const { attachment } = request;
+            if (!attachment) throw new Error('DocumentRouter requires an attachment.');
 
             // 1. Get Context (Metadata)
-            const context = ContextManager.getDocumentContext(fileParams);
+            const context = ContextManager.getDocumentContext(attachment);
 
             // 2. Execute Document Analyzer (OCR -> Prompt -> LLM -> JSON Parse)
             // Returns structured JS object.
-            const result = await DocumentAnalyzer.analyze(fileParams, context);
+            const result = await DocumentAnalyzer.analyze(attachment, context);
 
             AIEvents.emitAnalysisCompleted();
             return result;

@@ -4,24 +4,33 @@
  */
 
 export class LexAIRequest {
-    constructor({ query, fileParams = null }) {
-        this.query = query;
-        this.fileParams = fileParams;
+    constructor({ message, query, history = [], attachment = null, fileParams = null, sessionId = null, timestamp = null }) {
+        this.query = message || query; // backward compatibility for internal use
+        this.attachment = attachment || fileParams;
+        this.history = history;
+        this.sessionId = sessionId;
+        this.timestamp = timestamp || Date.now();
     }
 }
 
 export class CaseAIRequest {
-    constructor({ caseId, query, fileParams = null }) {
+    constructor({ caseId, message, query, history = [], attachment = null, fileParams = null, sessionId = null, timestamp = null }) {
         if (!caseId) throw new Error('CaseAIRequest requires caseId');
         this.caseId = caseId;
-        this.query = query;
-        this.fileParams = fileParams;
+        this.query = message || query;
+        this.attachment = attachment || fileParams;
+        this.history = history;
+        this.sessionId = sessionId;
+        this.timestamp = timestamp || Date.now();
     }
 }
 
 export class DocumentVaultRequest {
-    constructor({ fileParams }) {
-        if (!fileParams) throw new Error('DocumentVaultRequest requires fileParams');
-        this.fileParams = fileParams;
+    constructor({ attachment, fileParams, sessionId = null, timestamp = null }) {
+        const file = attachment || fileParams;
+        if (!file) throw new Error('DocumentVaultRequest requires attachment or fileParams');
+        this.attachment = file;
+        this.sessionId = sessionId;
+        this.timestamp = timestamp || Date.now();
     }
 }

@@ -26,13 +26,18 @@ export class CaseContext {
             const [
                 caseDetails,
                 hearings,
+                timeline,
+                citations,
                 notes,
                 documents
             ] = await Promise.all([
                 sqliteService.getCaseById(caseId),
-                sqliteService.getHearingsByCase(caseId),
-                sqliteService.getNotesByCase(caseId),
-                sqliteService.getDocumentsByCase(caseId)
+                sqliteService.getHearingsByCase ? sqliteService.getHearingsByCase(caseId) : sqliteService.getCaseHearings ? sqliteService.getCaseHearings(caseId) : [],
+                sqliteService.getTimelineByCaseId ? sqliteService.getTimelineByCaseId(caseId) : [],
+                sqliteService.getCitationsByCaseId ? sqliteService.getCitationsByCaseId(caseId) : [],
+
+                sqliteService.getCaseNotes(caseId),
+                sqliteService.getDocumentsByCaseId ? sqliteService.getDocumentsByCaseId(caseId) : []
             ]);
 
             if (!caseDetails) {
@@ -45,6 +50,8 @@ export class CaseContext {
                 timestamp: new Date().toISOString(),
                 details: caseDetails,
                 hearings: hearings || [],
+                timeline: timeline || [],
+                citations: citations || [],
                 notes: notes || [],
                 documentsSummary: documents ? documents.map(d => ({ id: d.id, title: d.title, type: d.type })) : []
             };

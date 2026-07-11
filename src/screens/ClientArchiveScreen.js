@@ -42,7 +42,7 @@ export default function ClientArchiveScreen() {
       {/* 🔹 HEADER */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.backBtn}
           >
@@ -91,7 +91,7 @@ export default function ClientArchiveScreen() {
 
               <View style={styles.row}>
                 {/* ✅ RESTORE */}
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.restoreBtn}
                   onPress={() => {
                     restoreClient(item.id);
@@ -102,7 +102,7 @@ export default function ClientArchiveScreen() {
                 </TouchableOpacity>
 
                 {/* ❌ DELETE FOREVER */}
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.deleteBtn}
                   onPress={() => {
                     Alert.alert(

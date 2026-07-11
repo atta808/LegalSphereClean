@@ -230,7 +230,7 @@ export default function MasterListScreen({ onBack }) {
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{selectedType} Registry</Text>
-          <TouchableOpacity style={styles.addBtn} onPress={openAddModal}>
+          <TouchableOpacity accessibilityRole="button" style={styles.addBtn} onPress={openAddModal}>
             <Text style={styles.addBtnText}>+ Add New</Text>
           </TouchableOpacity>
         </View>
@@ -256,13 +256,13 @@ export default function MasterListScreen({ onBack }) {
             <View key={item.id} style={styles.itemCard}>
               <Text style={styles.itemValueText}>{item.value}</Text>
               <View style={styles.cardActions}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.editAction}
                   onPress={() => openEditModal(item)}
                 >
                   <Text style={styles.editActionText}>Modify</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.deleteAction}
                   onPress={() => handleDelete(item)}
                 >
@@ -297,7 +297,7 @@ export default function MasterListScreen({ onBack }) {
                       ? "Update Configuration"
                       : `Add ${selectedType}`}
                   </Text>
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     onPress={closeModal}
                     style={styles.closeBtn}
                   >
@@ -317,7 +317,7 @@ export default function MasterListScreen({ onBack }) {
                   />
                 </View>
 
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={[styles.saveBtn, saving && { opacity: 0.7 }]}
                   onPress={handleSave}
                   disabled={saving}

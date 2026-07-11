@@ -448,7 +448,7 @@ export default function LexAiScreen() {
               </Text>
 
               {!isUser && (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.copyButton}
                   onPress={() => handleCopyMessage(item.text, item.id)}
                   activeOpacity={0.7}
@@ -477,7 +477,7 @@ export default function LexAiScreen() {
     <View style={styles.quickActionsContainer}>
       <View style={styles.quickActionsGrid}>
         {QUICK_ACTIONS.map((action, index) => (
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             key={index}
             style={styles.quickActionItem}
             onPress={() => handleQuickAction(`${action.prompt} `)}
@@ -507,7 +507,7 @@ export default function LexAiScreen() {
       {/* Clean Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.iconButton}
             activeOpacity={0.7}
@@ -519,7 +519,7 @@ export default function LexAiScreen() {
             <View style={styles.statusDot} />
           </View>
         </View>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={clearChatHistory}
           style={styles.iconButton}
           activeOpacity={0.7}
@@ -580,13 +580,13 @@ export default function LexAiScreen() {
                 <Text style={styles.selectedFileName} numberOfLines={1}>
                   {selectedFile.name}
                 </Text>
-                <TouchableOpacity onPress={() => setSelectedFile(null)}>
+                <TouchableOpacity accessibilityRole="button" onPress={() => setSelectedFile(null)}>
                   <Ionicons name="close-circle" size={16} color={colors.placeholder} />
                 </TouchableOpacity>
               </View>
             )}
             <View style={styles.inputInner}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 onPress={handleAttachDocument}
                 style={styles.attachButton}
                 disabled={loading || isAttaching}
@@ -609,7 +609,7 @@ export default function LexAiScreen() {
                 returnKeyType="default"
               />
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 onPress={handleSendMessage}
                 disabled={!input.trim() || loading || isAttaching}
                 style={[

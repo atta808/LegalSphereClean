@@ -166,7 +166,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
 
       {/* HEADER */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => {
             if (onBack) {
               onBack();
@@ -191,7 +191,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         <View style={styles.card}>
           <View style={styles.labelRow}>
             <Text style={styles.sectionTitle}>Personal Information</Text>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               onPress={handlePickContact}
               activeOpacity={0.7}
               style={{
@@ -226,7 +226,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
           {/* COUNTRY */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Country</Text>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={[styles.input, !isReady && { opacity: 0.5 }]}
               activeOpacity={0.85}
               disabled={!isReady}
@@ -295,7 +295,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Communication</Text>
           <View style={styles.quickActions}>
-            <TouchableOpacity style={styles.waBtn} onPress={handleWhatsApp}>
+            <TouchableOpacity accessibilityRole="button" style={styles.waBtn} onPress={handleWhatsApp}>
               <Ionicons
                 name="logo-whatsapp"
                 size={18}
@@ -308,7 +308,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         </View>
 
         {/* SAVE */}
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSaveOnly}>
+        <TouchableOpacity accessibilityRole="button" style={styles.saveBtn} onPress={handleSaveOnly}>
           <Ionicons
             name="save"
             size={18}

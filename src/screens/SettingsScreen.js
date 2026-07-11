@@ -250,7 +250,7 @@ export default function SettingsScreen({ navigation }) {
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         {/* HEADER */}
         <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-          <TouchableOpacity onPress={pickImage}>
+          <TouchableOpacity accessibilityRole="button" onPress={pickImage}>
             <Image
               source={
                 profile.image
@@ -267,7 +267,7 @@ export default function SettingsScreen({ navigation }) {
             {profile.jurisdiction || "Add Jurisdiction"}
           </Text>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.editBtn}
             onPress={() => navigation.navigate("LawyerProfile")}
           >
@@ -283,7 +283,7 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Country</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -331,7 +331,7 @@ export default function SettingsScreen({ navigation }) {
                 placeholder="https://examplecourt.gov"
               />
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 onPress={addCustomCMS}
                 style={{
                   backgroundColor: colors.primary,
@@ -356,7 +356,7 @@ export default function SettingsScreen({ navigation }) {
               const enabled = profile.activeCMS?.includes(cms.id);
 
               return (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={cms.id}
                   style={[
                     styles.item,
@@ -400,7 +400,7 @@ export default function SettingsScreen({ navigation }) {
               placeholder="https://www.pakistanlawsite.com"
             />
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               onPress={addResearchSource}
               style={{
                 backgroundColor: colors.primary,
@@ -438,7 +438,7 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Default Client Country</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -462,7 +462,7 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Currency</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -486,7 +486,7 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Date Format</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -516,7 +516,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Appearance</Text>
           <View style={styles.item}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.themeRow}
               onPress={() => setTheme("light")}
             >
@@ -528,7 +528,7 @@ export default function SettingsScreen({ navigation }) {
 
             <View style={styles.themeDivider} />
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.themeRow}
               onPress={() => setTheme("dark")}
             >
@@ -540,7 +540,7 @@ export default function SettingsScreen({ navigation }) {
 
             <View style={styles.themeDivider} />
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.themeRow}
               onPress={() => setTheme("system")}
             >
@@ -556,7 +556,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Help</Text>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.item}
             onPress={() => Linking.openURL("mailto:support@technaam.com")}
           >
@@ -567,7 +567,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Cloud & Backup</Text>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.item}
             onPress={() =>
               Alert.alert(
@@ -602,7 +602,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Danger Zone</Text>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.item}
             onPress={() =>
               Alert.alert(
@@ -678,7 +678,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.logoutBtn}
             onPress={() =>
               Alert.alert("Sign Out", "Are you sure you want to sign out?", [

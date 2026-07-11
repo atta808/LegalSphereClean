@@ -174,7 +174,7 @@ export default function LoginScreen({ onLoginSuccess }) {
             {/* COUNTRY */}
             {isRegister && (
               <View>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.pickerWrapper}
                   activeOpacity={0.85}
                   onPress={() => setCountryPickerVisible(true)}
@@ -218,7 +218,7 @@ export default function LoginScreen({ onLoginSuccess }) {
               placeholder="Enter password"
               secureTextEntry
             />
-            <TouchableOpacity onPress={handleForgotPassword}>
+            <TouchableOpacity accessibilityRole="button" onPress={handleForgotPassword}>
               <Text
                 style={{
                   color: colors.text,
@@ -231,7 +231,7 @@ export default function LoginScreen({ onLoginSuccess }) {
               </Text>
             </TouchableOpacity>
             {/* BUTTON */}
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.actionButton}
               onPress={handleSubmit}
             >
@@ -245,7 +245,7 @@ export default function LoginScreen({ onLoginSuccess }) {
             </TouchableOpacity>
 
             {/* TOGGLE */}
-            <TouchableOpacity onPress={() => setIsRegister(!isRegister)}>
+            <TouchableOpacity accessibilityRole="button" onPress={() => setIsRegister(!isRegister)}>
               <Text style={styles.toggleText}>
                 {isRegister ? "Already have account? Login" : "Create Account"}
               </Text>

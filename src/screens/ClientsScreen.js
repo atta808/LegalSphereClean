@@ -90,7 +90,7 @@ export default function ClientsScreen({ profile }) {
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerRow}>
           {/* BACK BUTTON */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
@@ -108,7 +108,7 @@ export default function ClientsScreen({ profile }) {
           {/* RIGHT ACTIONS */}
           <View style={{ flexDirection: "row", gap: 10 }}>
             {/* 🔥 ARCHIVE BUTTON */}
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.archiveBtn}
               onPress={() => navigation.navigate("ClientArchive")}
             >
@@ -116,7 +116,7 @@ export default function ClientsScreen({ profile }) {
             </TouchableOpacity>
 
             {/* ADD BUTTON */}
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.addBtn}
               onPress={() => navigation.navigate("AddClient")}
             >
@@ -158,7 +158,7 @@ export default function ClientsScreen({ profile }) {
                     <Text style={styles.name} numberOfLines={1}>
                       {item.name}
                     </Text>
-                    <TouchableOpacity
+                    <TouchableOpacity accessibilityRole="button"
                       onPress={() => handleArchive(item)}
                       style={{ padding: 10, margin: -10 }}
                     >
@@ -192,7 +192,7 @@ export default function ClientsScreen({ profile }) {
               <View style={styles.cardDivider} />
 
               <View style={styles.actions}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.actionBtn}
                   onPress={() => Linking.openURL(`tel:${item.mobile}`)}
                 >
@@ -207,7 +207,7 @@ export default function ClientsScreen({ profile }) {
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={[styles.actionBtn, styles.waBtn]}
                   onPress={() =>
                     Linking.openURL(

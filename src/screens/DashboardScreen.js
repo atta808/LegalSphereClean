@@ -228,7 +228,7 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
 
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.glassButton}
               onPress={() => navigation.navigate("NotificationCenter")}
             >
@@ -242,14 +242,14 @@ export default function DashboardScreen({ profile, onLogout }) {
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.glassButton}
               onPress={handleTodayPDF}
             >
               <Text style={styles.iconText}>📄</Text>
             </TouchableOpacity>
             {/* NEW LEX AI BUTTON */}
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.glassButton}
               onPress={() => navigation.navigate("LexAi")}
             >
@@ -275,13 +275,13 @@ export default function DashboardScreen({ profile, onLogout }) {
           <View style={styles.notificationsPreviewContainer}>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Recent Notifications</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("NotificationCenter")}>
+              <TouchableOpacity accessibilityRole="button" onPress={() => navigation.navigate("NotificationCenter")}>
                 <Text style={styles.seeAllText}>See All</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.notificationsList}>
               {recentNotifications.map((notif, index) => (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={notif.id || index.toString()}
                   style={[styles.notificationMiniCard, notif.isRead === 0 && styles.notificationMiniUnread]}
                   onPress={() => {
@@ -417,7 +417,7 @@ export default function DashboardScreen({ profile, onLogout }) {
         {/* ALERTS SECTION */}
         {pendingHearings.length > 0 && (
           <View style={[styles.alertRibbon, styles.pendingBox]}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.alertHeader}
               onPress={() =>
                 setActiveSection(activeSection === "pending" ? null : "pending")
@@ -434,7 +434,7 @@ export default function DashboardScreen({ profile, onLogout }) {
               pendingHearings.map((item) => (
                 <View key={item.id} style={styles.alertItemRow}>
                   {/* LEFT → Case Info */}
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     style={{ flex: 1 }}
                     onPress={() =>
                       navigation.navigate("CaseDetail", { caseId: item.id })
@@ -467,7 +467,7 @@ export default function DashboardScreen({ profile, onLogout }) {
                   </TouchableOpacity>
 
                   {/* RIGHT → UPDATE BUTTON */}
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     style={styles.updateBtn}
                     onPress={() =>
                       navigation.navigate("UpdateCaseHearing", {
@@ -486,7 +486,7 @@ export default function DashboardScreen({ profile, onLogout }) {
 
         {todayHearings.length > 0 && (
           <View style={[styles.alertRibbon, styles.todayBox]}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.alertHeader}
               onPress={() =>
                 setActiveSection(activeSection === "today" ? null : "today")
@@ -503,7 +503,7 @@ export default function DashboardScreen({ profile, onLogout }) {
               todayHearings.map((item) => (
                 <View key={item.id} style={styles.alertItemRow}>
                   {/* LEFT → Case Info */}
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     style={{ flex: 1 }}
                     onPress={() =>
                       navigation.navigate("CaseDetail", { caseId: item.id })
@@ -536,7 +536,7 @@ export default function DashboardScreen({ profile, onLogout }) {
                   </TouchableOpacity>
 
                   {/* RIGHT → UPDATE BUTTON */}
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     style={styles.updateBtn}
                     onPress={() =>
                       navigation.navigate("UpdateCaseHearing", {
@@ -555,7 +555,7 @@ export default function DashboardScreen({ profile, onLogout }) {
 
         {/* LAWYER PROFILE CARD */}
         <View style={styles.profileCard}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.profileLeft}
             onPress={() => navigation.navigate("LawyerProfile")}
           >
@@ -580,7 +580,7 @@ export default function DashboardScreen({ profile, onLogout }) {
               </Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.shareBtn}
             onPress={handleShareProfile}
           >
@@ -628,7 +628,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     position: 'absolute',
     top: -5,
     right: -5,
-    backgroundColor: '#EF4444',
+    backgroundColor: colors.danger,
     borderRadius: 10,
     width: 20,
     height: 20,

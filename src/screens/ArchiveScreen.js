@@ -154,7 +154,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
           </View>
         ) : (
           filteredCases.map((item) => (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               key={item.id}
               style={styles.caseCard}
               activeOpacity={0.9}
@@ -196,13 +196,13 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
               </View>
 
               <View style={styles.actionRow}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.restoreBtn}
                   onPress={() => handleRestore(item.id, item.title)}
                 >
                   <Text style={styles.restoreBtnText}>Restore Case</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.deleteBtn}
                   onPress={() => handleDeleteCase(item.id, item.title)}
                 >

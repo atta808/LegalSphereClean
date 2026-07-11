@@ -338,13 +338,13 @@ export default function AIChatRoomScreen({ route, navigation }) {
             </Text>
             {!isUser && (
               <View style={styles.actionRow}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => handleAction("copy", item.text)}
                   style={styles.actionIcon}
                 >
                   <Feather name="copy" size={14} color={colors.placeholder} />
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => handleAction("save", item.text)}
                   style={styles.actionIcon}
                 >
@@ -430,7 +430,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
               contentContainerStyle={[styles.quickReplyScroll, { paddingBottom: 120 }]}
             >
               {quickReplies.map((qr, idx) => (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={idx}
                   style={styles.qrPill}
                   onPress={() => sendMessage(qr.action)}
@@ -456,14 +456,14 @@ export default function AIChatRoomScreen({ route, navigation }) {
               <Text style={styles.attachedFileToastText} numberOfLines={1}>
                 {attachedFile.name}
               </Text>
-              <TouchableOpacity onPress={() => setAttachedFile(null)}>
+              <TouchableOpacity accessibilityRole="button" onPress={() => setAttachedFile(null)}>
                 <Feather name="x-circle" size={16} color={colors.placeholder} />
               </TouchableOpacity>
             </Animated.View>
           )}
 
           <View style={styles.floatingInputWrapper}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               onPress={handleAttachDocument}
               style={styles.attachBtn}
             >
@@ -479,7 +479,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
               style={styles.textInput}
             />
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               disabled={loading || (!inputText.trim() && !attachedFile)}
               onPress={() => sendMessage()}
               style={[

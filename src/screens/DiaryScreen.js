@@ -33,7 +33,7 @@ import { isPast, isToday, toDisplay } from "../utils/date";
 
 // --- PREMIUM GLOSSY COMPONENT ---
 const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => (
-  <TouchableOpacity
+  <TouchableOpacity accessibilityRole="button"
     style={styles.premiumExportBtn}
     activeOpacity={0.7}
     onPress={(e) => {
@@ -185,7 +185,7 @@ export default function DiaryScreen({ profile }) {
       {/* HEADER SECTION */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
@@ -199,7 +199,7 @@ export default function DiaryScreen({ profile }) {
               </Text>
             </View>
           </View>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.glassButton}
             onPress={handleFullDiaryPDF}
           >
@@ -242,7 +242,7 @@ export default function DiaryScreen({ profile }) {
                   </View>
                 </View>
                 {pendingCases.map((item) => (
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     key={item.id}
                     style={[styles.caseCard, styles.pendingBorder]}
                     onPress={() =>
@@ -277,7 +277,7 @@ export default function DiaryScreen({ profile }) {
                   >
                     <Text style={styles.caseTitleText}>{item.title}</Text>
                     <Text style={styles.caseCourtText}>🏛 {item.court}</Text>
-                    <TouchableOpacity
+                    <TouchableOpacity accessibilityRole="button"
                       style={styles.activateBtn}
                       onPress={async () => {
                         try {
@@ -310,7 +310,7 @@ export default function DiaryScreen({ profile }) {
               </View>
 
               {filteredCases.active.map((item) => (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={item.id}
                   style={[styles.caseCard, styles.activeBorder]}
                   onPress={() =>
@@ -364,7 +364,7 @@ export default function DiaryScreen({ profile }) {
                   </View>
 
                   <View style={styles.cardFooter}>
-                    <TouchableOpacity
+                    <TouchableOpacity accessibilityRole="button"
                       onPress={() => handleArchive(item.id, item.title)}
                     >
                       <Text style={styles.archiveLink}>Move to Archive</Text>
@@ -384,7 +384,7 @@ export default function DiaryScreen({ profile }) {
           <View style={styles.exportModalCard}>
             <Text style={styles.modalTitle}>Export Case</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.exportOption}
               onPress={() => {
                 exportCauseListPdf([selectedCase], selectedCase.title);
@@ -395,7 +395,7 @@ export default function DiaryScreen({ profile }) {
               <Text style={styles.exportText}>Export as PDF</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.exportOption}
               onPress={async () => {
                 const text = `Title: ${selectedCase?.title}\nCourt: ${selectedCase?.court}\nNext Hearing: ${toDisplay(selectedCase?.nextHearingISO, locale)}\nBalance: ${formatMoney(selectedCase?.feeBalance, currency, locale)}`;
@@ -408,7 +408,7 @@ export default function DiaryScreen({ profile }) {
               <Text style={styles.exportText}>Copy Full Details</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.exportOption}
               onPress={async () => {
                 await Clipboard.setStringAsync(
@@ -422,7 +422,7 @@ export default function DiaryScreen({ profile }) {
               <Text style={styles.exportText}>Copy Case No</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.cancelBtn}
               onPress={() => setExportModalVisible(false)}
             >

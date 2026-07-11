@@ -220,7 +220,7 @@ export default function QuickLinksScreen({ onBack }) {
         {/* FILTER */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {["all", ...CATEGORIES].map((f) => (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               key={f}
               style={[
                 styles.filterBtn,
@@ -259,7 +259,7 @@ export default function QuickLinksScreen({ onBack }) {
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {CATEGORIES.map((c) => (
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 key={c}
                 style={[styles.catBtn, category === c && styles.catActive]}
                 onPress={() => setCategory(c)}
@@ -271,7 +271,7 @@ export default function QuickLinksScreen({ onBack }) {
             ))}
           </ScrollView>
 
-          <TouchableOpacity style={styles.addBtn} onPress={handleAdd}>
+          <TouchableOpacity accessibilityRole="button" style={styles.addBtn} onPress={handleAdd}>
             <Text style={styles.addText}>+ ADD LINK</Text>
           </TouchableOpacity>
         </View>
@@ -280,7 +280,7 @@ export default function QuickLinksScreen({ onBack }) {
         {linksReady &&
           filteredLinks.map((item) => (
             <View key={item.id} style={styles.linkCard}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={{ flex: 1 }}
                 onPress={() => openLink(item.url)}
               >
@@ -291,7 +291,7 @@ export default function QuickLinksScreen({ onBack }) {
                 </Text>
               </TouchableOpacity>
               <View style={styles.actions}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => {
                     togglePinned(item.id, !item.isPinned);
                     loadLinks();
@@ -300,7 +300,7 @@ export default function QuickLinksScreen({ onBack }) {
                   <Text style={styles.pin}>{item.isPinned ? "📌" : "📍"}</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => {
                     toggleFavorite(item.id, !item.isFavorite);
                     loadLinks();
@@ -311,7 +311,7 @@ export default function QuickLinksScreen({ onBack }) {
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                <TouchableOpacity accessibilityRole="button" onPress={() => handleDelete(item.id)}>
                   <Text style={styles.delete}>Delete</Text>
                 </TouchableOpacity>
               </View>

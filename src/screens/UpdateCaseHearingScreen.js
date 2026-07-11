@@ -337,7 +337,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
 
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
@@ -373,7 +373,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
 
         <View style={styles.card}>
           <View style={styles.statusRow}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={[
                 styles.statusBtn,
                 caseStatus === "active" && styles.btnActive,
@@ -390,7 +390,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={[
                 styles.statusBtn,
                 caseStatus === "disposed" && styles.btnDisposed,
@@ -414,7 +414,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
         </View>
 
         <View style={styles.card}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.pickerContainer}
             activeOpacity={0.85}
             onPress={() => setCmsPickerVisible(true)}
@@ -463,7 +463,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
               : "Next Adjourned Date"}
           </Text>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.dateSelector}
             onPress={() => setShowDatePicker(true)}
           >
@@ -501,7 +501,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Hearing Stage</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setStagePickerVisible(true)}
@@ -528,7 +528,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Proceeding</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setDescriptionPickerVisible(true)}
@@ -555,7 +555,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Adjudicating Court</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setCourtPickerVisible(true)}
@@ -583,7 +583,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Judge</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setJudgePickerVisible(true)}
@@ -627,7 +627,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
         </View>
 
         <View style={{ marginTop: 10 }}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={[
               styles.mainSaveBtn,
               (!hearingStage || !hearingCourt || !selectedDate) && {
@@ -642,7 +642,7 @@ export default function UpdateCaseHearingScreen({ profile }) {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.discardBtn}
             onPress={() => navigation.goBack()}
           >

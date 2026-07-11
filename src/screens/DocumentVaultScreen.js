@@ -510,7 +510,7 @@ Case: ${doc.caseTitle || "—"}
       {/* Premium Header */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.glassBackButton}
           >
@@ -520,7 +520,7 @@ Case: ${doc.caseTitle || "—"}
             <Text style={styles.headerTitleText}>Document Vault</Text>
             {caseTitle && <Text style={styles.caseContext}>{caseTitle}</Text>}
           </View>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.aiCopyButton}
             onPress={async () => {
               const docsInfo = documents
@@ -548,14 +548,14 @@ Case: ${doc.caseTitle || "—"}
       >
         {/* Action Buttons */}
         <View style={styles.actionContainer}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.actionButton}
             onPress={handlePickDocument}
           >
             <Text style={styles.actionIcon}>📄</Text>
             <Text style={styles.actionLabel}>Pick File</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.actionButton}
             onPress={handleTakePhoto}
           >
@@ -575,7 +575,7 @@ Case: ${doc.caseTitle || "—"}
             onChangeText={setSearchQuery}
           />
           {searchQuery !== "" && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <TouchableOpacity accessibilityRole="button" onPress={() => setSearchQuery("")}>
               <Text style={styles.clearIcon}>✕</Text>
             </TouchableOpacity>
           )}
@@ -588,7 +588,7 @@ Case: ${doc.caseTitle || "—"}
           style={styles.categoryScroll}
         >
           {categories.map((cat) => (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               key={cat.id}
               style={[
                 styles.categoryChip,
@@ -628,7 +628,7 @@ Case: ${doc.caseTitle || "—"}
         ) : (
           filteredDocuments.map((doc) => (
             <View key={doc.id} style={styles.documentCard}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.documentContent}
                 onPress={() => handleOpenDocument(doc)}
                 activeOpacity={0.7}
@@ -666,31 +666,31 @@ Case: ${doc.caseTitle || "—"}
                 </View>
               </TouchableOpacity>
               <View style={styles.documentActions}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => handleEditDocument(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>✏️</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => handleShareDocument(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>📤</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => handleAiInsights(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>✨</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => handleDeleteDocument(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>🗑️</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   onPress={() => handleCopyDocumentInfo(doc)}
                   style={styles.actionIconBtn}
                 >
@@ -706,7 +706,7 @@ Case: ${doc.caseTitle || "—"}
       <Modal visible={previewVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.previewContainer}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.closePreviewBtn}
               onPress={() => setPreviewVisible(false)}
             >
@@ -746,7 +746,7 @@ Case: ${doc.caseTitle || "—"}
             />
             <View style={styles.modalCategoryRow}>
               {categories.slice(1).map((cat) => (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={cat.id}
                   style={[
                     styles.modalCategoryChip,
@@ -767,13 +767,13 @@ Case: ${doc.caseTitle || "—"}
               ))}
             </View>
             <View style={styles.modalActionRow}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.modalCancel}
                 onPress={() => setEditModalVisible(false)}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.modalSave}
                 onPress={handleSaveEdit}
               >
@@ -828,28 +828,28 @@ Case: ${doc.caseTitle || "—"}
               </ScrollView>
             )}
             <View style={styles.modalActionRow}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.aiSecondaryButton}
                 onPress={copyAIResponse}
               >
                 <Text style={styles.aiSecondaryText}>📋 Copy</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.aiSecondaryButton}
                 onPress={saveAIToNotes}
               >
                 <Text style={styles.aiSecondaryText}>📝 Save</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.aiSecondaryButton}
                 onPress={shareAIResponse}
               >
                 <Text style={styles.aiSecondaryText}>📤 Share</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.aiPrimaryButton}
                 onPress={() => setAiInsightsVisible(false)}
               >

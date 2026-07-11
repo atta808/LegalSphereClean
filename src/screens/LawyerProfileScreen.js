@@ -1,5 +1,6 @@
 // screens/LawyerProfileScreen.js
 import LegalInput from "../components/LegalInput";
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
@@ -116,28 +117,9 @@ export default function LawyerProfileScreen({ navigation }) {
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.mainWrapper}>
         {/* HEADER */}
-        <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-          <View style={styles.headerRow}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.glassBackButton}
-            >
-              <Text style={styles.backIcon}>‹</Text>
-            </TouchableOpacity>
+        <PremiumPageHeader title="Professional Profile" subtitle="Advocate Identity" />
 
-            <View style={styles.titleCenter}>
-              <Text style={styles.headerTitleText}>Professional Profile</Text>
-
-              <View style={styles.jurisdictionPill}>
-                <Text style={styles.jurisdictionText}>Advocate Identity</Text>
-              </View>
-            </View>
-
-            <View style={{ width: 44 }} />
-          </View>
-        </View>
-
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
           {/* IMAGE */}
           <View style={styles.imageSection}>
             <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>

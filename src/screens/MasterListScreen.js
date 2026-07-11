@@ -1,4 +1,7 @@
 import React from "react";
+import EmptyState from '../components/EmptyState';
+import SkeletonLoader from '../components/SkeletonLoader';
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
@@ -216,48 +219,7 @@ export default function MasterListScreen({ onBack }) {
       />
 
       {/* PREMIUM MINIMAL HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Configurations</Text>
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>Workspace Setup</Text>
-            </View>
-          </View>
-          <View style={{ width: 44 }} />
-        </View>
-
-        {/* SEGMENTED TAB SELECTOR */}
-        <View style={styles.tabContainer}>
-          <View style={styles.tabTrack}>
-            {TYPES.map((type) => (
-              <TouchableOpacity
-                key={type.key}
-                style={[
-                  styles.tabItem,
-                  selectedType === type.key && styles.tabActive,
-                ]}
-                onPress={() => setSelectedType(type.key)}
-              >
-                <Text
-                  style={[
-                    styles.tabLabel,
-                    selectedType === type.key && styles.tabLabelActive,
-                  ]}
-                >
-                  {type.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </View>
+      <PremiumPageHeader title="Configurations" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -275,7 +237,7 @@ export default function MasterListScreen({ onBack }) {
 
         {loading ? (
           <View style={styles.loaderWrap}>
-            <ActivityIndicator size="large" color={colors.primaryDark} />
+            <SkeletonLoader variant="list" count={4} />
             <Text style={styles.loaderText}>Syncing Master Data...</Text>
           </View>
         ) : items.length === 0 ? (

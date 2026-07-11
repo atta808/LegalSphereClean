@@ -1,4 +1,5 @@
 import React from "react";
+import PremiumButton from '../components/PremiumButton';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -214,7 +215,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScrollView contentContainerStyle={{ padding: 20 , paddingBottom: 120 }}>
         {/* CASE PICKER */}
         <TouchableOpacity
           style={styles.input}

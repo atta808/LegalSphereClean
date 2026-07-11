@@ -1,4 +1,6 @@
 import React from "react";
+import PremiumCard from '../components/PremiumCard';
+import PremiumButton from '../components/PremiumButton';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { Ionicons } from "@expo/vector-icons";
@@ -483,10 +485,10 @@ export default function AddCaseScreen({ route, profile }) {
         </View>
 
         <ScrollView
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, { paddingBottom: 120 }]}
           keyboardShouldPersistTaps="handled"
         >
-          {/* ✅ CLIENT PICKER (SEPARATE BLOCK) */}
+          <Text style={styles.sectionHeader}>Client Information</Text>
           <TouchableOpacity
             style={styles.input}
             activeOpacity={0.85}
@@ -583,7 +585,8 @@ export default function AddCaseScreen({ route, profile }) {
                 {litigationDomain || "Select Litigation Domain"}
               </Text>
             </TouchableOpacity>
-            <Text style={styles.inputLabel}>Court</Text>
+            <Text style={styles.sectionHeader}>Case Information</Text>
+          <Text style={styles.inputLabel}>Court</Text>
 
             <TouchableOpacity
               style={styles.input}
@@ -851,15 +854,7 @@ export default function AddCaseScreen({ route, profile }) {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
-            onPress={handleSave}
-            disabled={saving}
-          >
-            <Text style={styles.saveButtonText}>
-              {saving ? "Saving..." : "💾 Save Case"}
-            </Text>
-          </TouchableOpacity>
+          <PremiumButton title="Save Case" onPress={handleSave} loading={saving} style={{ marginTop: 24, marginBottom: 40 }} />
           {showDatePicker && (
             <DateTimePicker
               value={dateObject}
@@ -1114,6 +1109,13 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     fontWeight: "700",
     color: colors.text,
     marginBottom: 14,
+  },
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.primary,
+    marginTop: 24,
+    marginBottom: 16,
   },
   inputLabel: {
     fontSize: 13,

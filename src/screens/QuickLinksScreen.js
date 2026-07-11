@@ -1,4 +1,5 @@
 import React from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useNavigation } from "@react-navigation/native";
@@ -203,29 +204,11 @@ export default function QuickLinksScreen({ onBack }) {
       <StatusBar barStyle="dark-content" translucent />
 
       {/* HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Quick Links</Text>
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>
+      <PremiumPageHeader title="Quick Links" subtitle="
                 Legal Resources & Tools
-              </Text>
-            </View>
-          </View>
+              " />
 
-          <View style={{ width: 44 }} />
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 }]}>
         {/* SEARCH */}
         <LegalInput
           label="Search Links"

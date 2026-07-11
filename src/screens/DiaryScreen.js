@@ -1,4 +1,7 @@
 import React from "react";
+import EmptyState from '../components/EmptyState';
+import SkeletonLoader from '../components/SkeletonLoader';
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
@@ -220,10 +223,7 @@ export default function DiaryScreen({ profile }) {
         ]}
       >
         {loading ? (
-          <View style={styles.loaderWrap}>
-            <ActivityIndicator size="large" color={colors.primaryDark} />
-            <Text style={styles.loaderText}>Syncing Chambers...</Text>
-          </View>
+          <SkeletonLoader variant="card" count={3} />
         ) : (
           <>
             {/* PENDING UPDATES */}

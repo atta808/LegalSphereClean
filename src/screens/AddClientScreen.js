@@ -1,4 +1,5 @@
 import React from "react";
+import PremiumButton from '../components/PremiumButton';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import LegalPicker from "../components/LegalPicker";
@@ -186,7 +187,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 120 }]}>
         <View style={styles.card}>
           <View style={styles.labelRow}>
             <Text style={styles.sectionTitle}>Personal Information</Text>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from '../theme/ThemeContext';
 import {
   View,
@@ -385,31 +386,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         {/* FROSTED HEADER */}
-        <BlurView
-          intensity={90}
-          tint="light"
-          style={[styles.header, { paddingTop: insets.top }]}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.iconButton}
-          >
-            <Feather name="chevron-left" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>Lex AI</Text>
-            <View style={styles.statusPill}>
-              <View style={styles.statusDot} />
-              <Text style={styles.statusText}>Secure Workspace</Text>
-            </View>
-          </View>
-          <TouchableOpacity
-            onPress={() => setMessages([])}
-            style={styles.iconButton}
-          >
-            <Feather name="trash-2" size={18} color={colors.secondaryText} />
-          </TouchableOpacity>
-        </BlurView>
+        <PremiumPageHeader title="Lex AI" subtitle="Secure Workspace" elevationLevel={2} />
 
         {/* CHAT AREA */}
         <FlatList
@@ -450,7 +427,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.quickReplyScroll}
+              contentContainerStyle={[styles.quickReplyScroll, { paddingBottom: 120 }]}
             >
               {quickReplies.map((qr, idx) => (
                 <TouchableOpacity

@@ -155,7 +155,7 @@ export default function LoginScreen({ onLoginSuccess }) {
       </View>
 
       <SafeAreaView style={styles.contentArea}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
           <View style={styles.glassCard}>
             <Text style={styles.formHeader}>
               {isRegister ? "Register Advocate" : "Login"}

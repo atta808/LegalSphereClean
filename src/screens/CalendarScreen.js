@@ -1,4 +1,5 @@
 import React from "react";
+import SkeletonLoader from '../components/SkeletonLoader';
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useState } from "react";
@@ -128,7 +129,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
           style={styles.calendarBorder}
         />
 
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 }]}>
           <View style={styles.agendaHeader}>
             <Text style={styles.agendaTitle}>Hearings & Tasks</Text>
             <Text style={styles.caseCount}>{agendaList.length} Scheduled</Text>
@@ -142,7 +143,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
                 color={colors.placeholder}
                 style={{ marginBottom: 16 }}
               />
-              <Text style={styles.emptyText}>No hearings for this day</Text>
+              <EmptyState icon={<Ionicons name="calendar-outline" size={64} color={colors.placeholder} />} title="No Hearings" description="Enjoy your free day." style={{ minHeight: 200 }} />
             </View>
           ) : (
             agendaList.map((item) => (

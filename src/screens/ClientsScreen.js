@@ -1,4 +1,7 @@
 import React from "react";
+import EmptyState from '../components/EmptyState';
+import SkeletonLoader from '../components/SkeletonLoader';
+import PremiumCard from '../components/PremiumCard';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { Ionicons } from "@expo/vector-icons";
@@ -133,33 +136,17 @@ export default function ClientsScreen({ profile }) {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
       >
         {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            style={{ marginTop: 50 }}
-          />
+          <SkeletonLoader variant="list" count={4} />
         ) : filteredClients.length === 0 ? (
-          <View style={styles.center}>
-            <Ionicons
-              name="people-outline"
-              size={48}
-              color={colors.placeholder}
-              style={{ marginBottom: 12 }}
-            />
-            <Text style={styles.emptyTitle}>No Clients Found</Text>
-          </View>
+          <EmptyState icon={<Ionicons name="people-outline" size={64} color={colors.placeholder} />} title="No Clients Found" description="Add your first client to start organizing their cases and documents." primaryActionTitle="Add Client" onPrimaryAction={() => navigation.navigate("AddClient")} />
         ) : (
           filteredClients.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.card}
-              onPress={() =>
+            <PremiumCard key={item.id} style={{ marginBottom: 20 }} onPress={() =>
                 navigation.navigate("ClientProfile", { client: item })
-              }
-            >
+              } elevationLevel={1}>
               <View style={styles.cardTop}>
                 <View style={styles.avatar}>
                   <Text style={styles.avatarText}>
@@ -241,7 +228,7 @@ export default function ClientsScreen({ profile }) {
                   </View>
                 </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </PremiumCard>
           ))
         )}
       </ScrollView>

@@ -1879,7 +1879,7 @@ export const insertDocument = (data) => {
 
         data.fileSize || 0,
 
-        data.uploadDate || new Date().toISOString(),
+        data.uploadDate || toISO(new Date()),
 
         data.aiSummary || "",
         data.aiTags || "",

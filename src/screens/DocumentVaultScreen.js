@@ -228,7 +228,7 @@ export default function DocumentVaultScreen() {
         fileSize: asset.size,
         fileExt,
         fileCategory: getFileCategory(originalName),
-        uploadDate: new Date().toISOString(),
+        uploadDate: require('../utils/date').toISO(new Date()),
         caseId: caseId || null,
         caseTitle: caseTitle || null,
       };
@@ -289,7 +289,7 @@ export default function DocumentVaultScreen() {
         fileSize: asset.fileSize,
         fileExt,
         fileCategory: "image",
-        uploadDate: new Date().toISOString(),
+        uploadDate: require('../utils/date').toISO(new Date()),
         caseId: caseId || null,
         caseTitle: caseTitle || null,
       };

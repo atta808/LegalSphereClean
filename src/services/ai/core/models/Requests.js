@@ -9,7 +9,8 @@ export class LexAIRequest {
         this.attachment = attachment || fileParams;
         this.history = history;
         this.sessionId = sessionId;
-        this.timestamp = timestamp || Date.now();
+        const { toISO } = require('../../../../utils/date');
+        this.timestamp = timestamp || toISO(new Date());
     }
 }
 
@@ -21,7 +22,8 @@ export class CaseAIRequest {
         this.attachment = attachment || fileParams;
         this.history = history;
         this.sessionId = sessionId;
-        this.timestamp = timestamp || Date.now();
+        const { toISO } = require('../../../../utils/date');
+        this.timestamp = timestamp || toISO(new Date());
     }
 }
 
@@ -31,6 +33,7 @@ export class DocumentVaultRequest {
         if (!file) throw new Error('DocumentVaultRequest requires attachment or fileParams');
         this.attachment = file;
         this.sessionId = sessionId;
-        this.timestamp = timestamp || Date.now();
+        const { toISO } = require('../../../../utils/date');
+        this.timestamp = timestamp || toISO(new Date());
     }
 }

@@ -81,40 +81,12 @@ export default function DiaryScreen({ profile }) {
       setLoading(true);
       const allCases = await getAllCases(); // ✅ Logic Fixed
 
-      const pending = [];
-      const todayCases = [];
-      const upcoming = [];
-      const pipeline = [];
+      const { getHearingCategories } = require('../services/hearing/HearingClassificationService');
+      const categories = getHearingCategories(allCases);
 
-      allCases.forEach((c) => {
-        if (c.status === "archived") return;
-        if (c.status === "pipeline") {
-          pipeline.push(c);
-        } else if (!c.nextHearingISO) {
-          pending.push(c);
-        } else if (isToday(c.nextHearingISO)) {
-          todayCases.push(c);
-        } else if (isPast(c.nextHearingISO)) {
-          pending.push(c);
-        } else {
-          upcoming.push(c);
-        }
-      });
-
-      const sortByDate = (a, b) => {
-        if (!a.nextHearingISO) return 1;
-        if (!b.nextHearingISO) return -1;
-        return a.nextHearingISO.localeCompare(b.nextHearingISO);
-      };
-
-      pending.sort(sortByDate);
-      todayCases.sort(sortByDate);
-      upcoming.sort(sortByDate);
-      pipeline.sort(sortByDate);
-
-      setPendingCases(pending);
-      setCases([...todayCases, ...upcoming]);
-      setPipelineCases(pipeline);
+      setPendingCases(categories.pendingHearings);
+      setCases([...categories.todayHearings, ...categories.tomorrowHearings, ...categories.upcomingHearings]);
+      setPipelineCases(categories.pipelineCases);
     } catch (_) {
       Alert.alert("Error", "Failed to load diary cases.");
     } finally {

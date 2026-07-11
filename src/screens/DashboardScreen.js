@@ -95,28 +95,11 @@ export default function DashboardScreen({ profile, onLogout }) {
       setUnreadNotificationsCount(getUnreadNotificationCount());
       setRecentNotifications(getRecentNotifications(3));
 
-      const todayList = [];
-      const pendingList = [];
+      const { getHearingCategories } = require('../services/hearing/HearingClassificationService');
+      const categories = getHearingCategories(allCases);
 
-      allCases.forEach((c) => {
-        if (c.status === "archived" || c.status === "pipeline") return;
-
-        if (!c.nextHearingISO) {
-          pendingList.push(c);
-        } else if (isToday(c.nextHearingISO)) {
-          todayList.push(c);
-        } else if (isPast(c.nextHearingISO)) {
-          pendingList.push(c);
-        }
-      });
-
-      const safeSort = (a, b) =>
-        (a.nextHearingISO || "9999").localeCompare(b.nextHearingISO || "9999");
-      pendingList.sort(safeSort);
-      todayList.sort(safeSort);
-
-      setTodayHearings(todayList);
-      setPendingHearings(pendingList);
+      setTodayHearings(categories.todayHearings);
+      setPendingHearings(categories.pendingHearings);
     } catch (err) {
       console.log("Dashboard stats error:", err);
     }

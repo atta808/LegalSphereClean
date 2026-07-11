@@ -39,7 +39,8 @@ export const runDailyMaintenance = async () => {
       // Find active cases where nextHearingISO is in the past
       // If proceedings are updated, nextHearingISO will be updated.
       // If the case is still stuck with a past nextHearingISO, it's overdue.
-      const todayIso = new Date().toISOString().split('T')[0];
+      const { toISO } = require('../utils/date');
+      const todayIso = toISO(new Date());
 
       const overdueCases = db.getAllSync(
         `SELECT id, title, caseNo FROM cases

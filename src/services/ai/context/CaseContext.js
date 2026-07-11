@@ -5,6 +5,7 @@
  */
 
 import sqliteService from '../../sqliteService';
+import { toDisplay } from '../../../utils/date';
 
 /**
  * Case Context Builder
@@ -44,13 +45,29 @@ export class CaseContext {
                  throw new Error(`Case with ID ${caseId} not found.`);
             }
 
+            // Inject human-readable display dates to prevent duplicate date math and ensure accuracy
+            if (caseDetails.nextHearingISO) {
+                caseDetails.nextHearingDisplay = toDisplay(caseDetails.nextHearingISO);
+            }
+
+            const formattedHearings = (hearings || []).map(h => ({
+                ...h,
+                dateDisplay: h.date ? toDisplay(h.date) : (h.hearingDateISO ? toDisplay(h.hearingDateISO) : null)
+            }));
+
+            const formattedTimeline = (timeline || []).map(t => ({
+                ...t,
+                dateDisplay: t.date ? toDisplay(t.date) : (t.hearingDate ? toDisplay(t.hearingDate) : null)
+            }));
+
+            const { toISO } = require('../../../utils/date');
             return {
                 contextType: 'SingleCase',
                 caseId: caseId,
-                timestamp: new Date().toISOString(),
+                timestamp: toISO(new Date()),
                 details: caseDetails,
-                hearings: hearings || [],
-                timeline: timeline || [],
+                hearings: formattedHearings,
+                timeline: formattedTimeline,
                 citations: citations || [],
                 notes: notes || [],
                 documentsSummary: documents ? documents.map(d => ({ id: d.id, title: d.title, type: d.type })) : []

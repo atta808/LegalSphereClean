@@ -20,7 +20,8 @@ export class AIError extends Error {
         this.technicalMessage = technicalMessage;
         this.recoverable = recoverable;
         this.source = source;
-        this.timestamp = new Date().toISOString();
+        const { toISO } = require('../../../../utils/date');
+        this.timestamp = toISO(new Date());
     }
 
     /**

@@ -73,7 +73,8 @@ export class ProviderRegistry {
         const health = this._health.get(name);
         if (health) {
             health.availability = 'ONLINE';
-            health.lastSuccess = new Date().toISOString();
+            const { toISO } = require('../../../utils/date');
+            health.lastSuccess = toISO(new Date());
             health.failureCount = 0;
         }
     }

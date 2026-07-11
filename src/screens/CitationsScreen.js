@@ -123,11 +123,12 @@ export default function CitationsScreen({
   };
   const handleAddCitation = () => {
     if (!citation.trim()) return;
+    const { toISO } = require('../utils/date');
     const newCitation = {
       caseId: activeCaseId,
       citation: citation.trim(),
       description: description.trim(),
-      date: new Date().toISOString(),
+      date: toISO(new Date()),
     };
 
     try {

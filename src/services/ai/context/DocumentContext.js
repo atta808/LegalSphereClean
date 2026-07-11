@@ -17,9 +17,10 @@ export class DocumentContext {
     static build(fileParams) {
         if (!fileParams) return {};
 
+        const { toISO } = require('../../../utils/date');
         return {
             contextType: 'DocumentMetadata',
-            timestamp: new Date().toISOString(),
+            timestamp: toISO(new Date()),
             fileName: fileParams.name || 'Unknown',
             fileType: fileParams.type || 'Unknown',
             fileSize: fileParams.size || 'Unknown',

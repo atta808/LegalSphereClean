@@ -12,13 +12,14 @@ export class ResponseFormatter {
      * Generates standard metadata for all AI responses.
      */
     static _generateMetadata() {
+        const { toISO } = require('../../../utils/date');
         return {
             engineVersion: '4.0.0',
             promptVersion: '1.0.0',
             provider: ProviderRegistry.getLLMProvider().name || 'Unknown',
             ocrProvider: ProviderRegistry.getImageOCRProvider().name || 'Unknown',
             aiVersion: '1.0',
-            generatedAt: new Date().toISOString()
+            generatedAt: toISO(new Date())
         };
     }
 
@@ -54,13 +55,14 @@ export class ResponseFormatter {
         const userFacingMessage = error.userMessage
             || `I encountered an error processing your request. Please try again later.`;
 
+        const { toISO } = require('../../../utils/date');
         return {
             // We never expose raw stack traces to the UI
             userFacing: userFacingMessage,
             metadata: {
                 error: true,
                 errorCode: error.code || 'UNKNOWN_ERROR',
-                generatedAt: new Date().toISOString()
+                generatedAt: toISO(new Date())
             }
         };
     }

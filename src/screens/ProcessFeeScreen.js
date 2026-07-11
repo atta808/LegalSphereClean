@@ -166,9 +166,10 @@ export default function ProcessFeeScreen({ profile, onBack }) {
       setLoading(true);
       if (!selectedFeeId) return;
 
+      const { toISO } = require('../utils/date');
       markProcessFeePaid(selectedFeeId, {
         paidTo,
-        paidDate: new Date().toISOString(),
+        paidDate: toISO(new Date()),
       });
 
       setShowPaidModal(false);

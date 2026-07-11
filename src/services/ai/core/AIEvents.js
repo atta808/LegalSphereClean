@@ -15,7 +15,8 @@ export class AIEvents {
     static _emit(eventType, payload) {
         for (const listener of this._listeners) {
             try {
-                listener({ type: eventType, timestamp: new Date().toISOString(), ...payload });
+                const { toISO } = require('../../../utils/date');
+                listener({ type: eventType, timestamp: toISO(new Date()), ...payload });
             } catch (e) {
                 if (__DEV__) console.warn('AIEvents listener error:', e);
             }

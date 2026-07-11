@@ -12,9 +12,10 @@ export class DiagnosticsService {
      * @returns {Object} System report
      */
     static generateReport() {
+        const { toISO } = require('../../../utils/date');
         return {
             aiCoreVersion: '4.0.0-rc1',
-            timestamp: new Date().toISOString(),
+            timestamp: toISO(new Date()),
             engineStatus: 'ACTIVE',
             featureFlags: { ...FeatureFlags },
             providers: ProviderRegistry.getHealthReport(),

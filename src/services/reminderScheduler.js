@@ -7,11 +7,13 @@ import {
   updateNotificationRecordStatus
 } from './notificationService';
 import { db } from './sqliteService';
+import { toDatePickerDate } from '../utils/date';
 
 
 const applyTimeToString = (dateStr, timeStr) => {
   const [hours, minutes] = timeStr.split(':').map(Number);
-  const date = new Date(dateStr);
+  // Use centralized parsing utility (toDatePickerDate) to consistently parse hearing ISO dates into stable local objects without UTC offset shift
+  const date = toDatePickerDate(dateStr);
   date.setHours(hours, minutes, 0, 0);
   return date;
 };
@@ -19,8 +21,6 @@ const applyTimeToString = (dateStr, timeStr) => {
 // Helper to calculate reminder dates
 const calculateReminderDates = (hearingDateISO) => {
   if (!hearingDateISO) return [];
-  const hearingDate = new Date(hearingDateISO);
-  if (isNaN(hearingDate)) return [];
 
   const now = new Date();
   const reminders = [];

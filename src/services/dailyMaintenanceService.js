@@ -5,6 +5,7 @@ import {
   updateNotificationRecordStatus
 } from './notificationService';
 import { db } from './sqliteService';
+import { isPast } from '../utils/date';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LAST_MAINTENANCE_KEY = 'last_maintenance_timestamp';
@@ -39,13 +40,13 @@ export const runDailyMaintenance = async () => {
       // Find active cases where nextHearingISO is in the past
       // If proceedings are updated, nextHearingISO will be updated.
       // If the case is still stuck with a past nextHearingISO, it's overdue.
-      const todayIso = new Date().toISOString().split('T')[0];
-
-      const overdueCases = db.getAllSync(
-        `SELECT id, title, caseNo FROM cases
-         WHERE status='active' AND isDeleted=0 AND nextHearingISO < ?`,
-        [todayIso] // Less than today's date means the hearing has passed
+      const activeCasesWithHearings = db.getAllSync(
+        `SELECT id, title, caseNo, nextHearingISO FROM cases
+         WHERE status='active' AND isDeleted=0 AND nextHearingISO IS NOT NULL AND nextHearingISO != ''`
       );
+
+      // Centralized overdue business rule: overdue cases are those whose next hearing date is in the past.
+      const overdueCases = activeCasesWithHearings.filter(c => isPast(c.nextHearingISO));
 
       for (const c of overdueCases) {
         // Check if an overdue notification is already scheduled to prevent duplicates

@@ -3,6 +3,8 @@
  * @description Standardized error model for the entire AI Core.
  */
 
+import { toISO } from '../../../../utils/date';
+
 export class AIError extends Error {
     /**
      * @param {Object} params
@@ -20,7 +22,7 @@ export class AIError extends Error {
         this.technicalMessage = technicalMessage;
         this.recoverable = recoverable;
         this.source = source;
-        this.timestamp = new Date().toISOString();
+        this.timestamp = toISO(new Date());
     }
 
     /**

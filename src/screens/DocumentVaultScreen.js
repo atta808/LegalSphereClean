@@ -13,6 +13,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
+import { toISO } from "../utils/date";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -228,7 +229,7 @@ export default function DocumentVaultScreen() {
         fileSize: asset.size,
         fileExt,
         fileCategory: getFileCategory(originalName),
-        uploadDate: new Date().toISOString(),
+        uploadDate: toISO(new Date()),
         caseId: caseId || null,
         caseTitle: caseTitle || null,
       };
@@ -289,7 +290,7 @@ export default function DocumentVaultScreen() {
         fileSize: asset.fileSize,
         fileExt,
         fileCategory: "image",
-        uploadDate: new Date().toISOString(),
+        uploadDate: toISO(new Date()),
         caseId: caseId || null,
         caseTitle: caseTitle || null,
       };

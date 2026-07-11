@@ -8,6 +8,7 @@
 import { DeepSeekProvider } from '../providers/DeepSeekProvider';
 import { GoogleVisionProvider } from '../providers/GoogleVisionProvider';
 import { OCRSpaceProvider } from '../providers/OCRSpaceProvider';
+import { toISO } from '../../../utils/date';
 
 export class ProviderRegistry {
     static _providers = new Map();
@@ -73,7 +74,7 @@ export class ProviderRegistry {
         const health = this._health.get(name);
         if (health) {
             health.availability = 'ONLINE';
-            health.lastSuccess = new Date().toISOString();
+            health.lastSuccess = toISO(new Date());
             health.failureCount = 0;
         }
     }

@@ -4,7 +4,10 @@
  * Gathers data from the SQLite database to give the AI an overview of the entire office.
  */
 
+import { getAllCases } from '../../sqliteService';
 import sqliteService from '../../sqliteService';
+import HearingClassificationService from '../../hearing/HearingClassificationService';
+import { toISO } from '../../../utils/date';
 
 /**
  * Office Context Builder
@@ -20,19 +23,19 @@ export class OfficeContext {
             // Note: We use the existing sqliteService for data fetching.
             // A production implementation would optimize these queries.
 
-            const [
-                dashboardStats,
-                recentCases,
-                upcomingHearings
-            ] = await Promise.all([
-                this._fetchDashboardStats(),
-                this._fetchRecentCases(),
-                this._fetchUpcomingHearings()
-            ]);
+            const allCases = await getAllCases();
+
+            const dashboardStats = await this._fetchDashboardStats();
+
+            // Limit to 5 for context size management
+            const recentCases = allCases ? allCases.slice(0, 5) : [];
+
+            const { today, tomorrow } = HearingClassificationService.classifyHearings(allCases);
+            const upcomingHearings = [...today, ...tomorrow];
 
             return {
                 contextType: 'Office',
-                timestamp: new Date().toISOString(),
+                timestamp: toISO(new Date()),
                 dashboard: dashboardStats,
                 recentCases: recentCases,
                 upcomingHearings: upcomingHearings,
@@ -46,7 +49,7 @@ export class OfficeContext {
             return {
                 contextType: 'Office',
                 error: 'Failed to fully load office context.',
-                timestamp: new Date().toISOString(),
+                timestamp: toISO(new Date()),
             };
         }
     }
@@ -57,28 +60,6 @@ export class OfficeContext {
             return result || {};
         } catch (e) {
             return { error: 'Unavailable' };
-        }
-    }
-
-    static async _fetchRecentCases() {
-         try {
-             // Limit to 5 for context size management
-             const cases = await sqliteService.getCases();
-             return cases ? cases.slice(0, 5) : [];
-         } catch (e) {
-             return [];
-         }
-    }
-
-    static async _fetchUpcomingHearings() {
-        try {
-             // Fetch today/tomorrow as an example
-             const hearings = await sqliteService.getHearingsByDate(
-                 new Date().toISOString().split('T')[0]
-             );
-             return hearings || [];
-        } catch (e) {
-             return [];
         }
     }
 }

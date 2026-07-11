@@ -5,6 +5,7 @@
 
 import { ProviderRegistry } from './ProviderRegistry';
 import { FeatureFlags } from '../../../config/FeatureFlags';
+import { toISO } from '../../../utils/date';
 
 export class DiagnosticsService {
     /**
@@ -14,7 +15,7 @@ export class DiagnosticsService {
     static generateReport() {
         return {
             aiCoreVersion: '4.0.0-rc1',
-            timestamp: new Date().toISOString(),
+            timestamp: toISO(new Date()),
             engineStatus: 'ACTIVE',
             featureFlags: { ...FeatureFlags },
             providers: ProviderRegistry.getHealthReport(),

@@ -6,6 +6,7 @@
 
 import { MarkdownFormatter } from '../utils/MarkdownFormatter';
 import { ProviderRegistry } from './ProviderRegistry';
+import { toISO } from '../../../utils/date';
 
 export class ResponseFormatter {
     /**
@@ -18,7 +19,7 @@ export class ResponseFormatter {
             provider: ProviderRegistry.getLLMProvider().name || 'Unknown',
             ocrProvider: ProviderRegistry.getImageOCRProvider().name || 'Unknown',
             aiVersion: '1.0',
-            generatedAt: new Date().toISOString()
+            generatedAt: toISO(new Date())
         };
     }
 
@@ -60,7 +61,7 @@ export class ResponseFormatter {
             metadata: {
                 error: true,
                 errorCode: error.code || 'UNKNOWN_ERROR',
-                generatedAt: new Date().toISOString()
+                generatedAt: toISO(new Date())
             }
         };
     }

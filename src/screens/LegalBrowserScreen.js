@@ -196,7 +196,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
             style={styles.menuItem}
             onPress={() => {
               webViewRef.current?.injectJavaScript(`
- const txt = document.body.innerText;
+ var txt = document.body.innerText;
 
 window.ReactNativeWebView.postMessage(
   JSON.stringify({
@@ -219,7 +219,7 @@ true;
               style={styles.menuItem}
               onPress={() => {
                 webViewRef.current?.injectJavaScript(`
-        const txt = document.body.innerText;
+        var txt = document.body.innerText;
 
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
@@ -243,7 +243,7 @@ true;
               style={styles.menuItem}
               onPress={() => {
                 webViewRef.current?.injectJavaScript(`
-        const txt = document.body.innerText;
+        var txt = document.body.innerText;
 
         window.ReactNativeWebView.postMessage(
           JSON.stringify({

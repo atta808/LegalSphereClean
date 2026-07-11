@@ -1,4 +1,6 @@
 import React from "react";
+import EmptyState from '../components/EmptyState';
+import PremiumCard from '../components/PremiumCard';
 import { useTheme } from "../theme/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -266,7 +268,7 @@ export default function DashboardScreen({ profile, onLogout }) {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
       >
         {/* RECENT NOTIFICATIONS PREVIEW */}
         {recentNotifications.length > 0 && (
@@ -590,16 +592,12 @@ export default function DashboardScreen({ profile, onLogout }) {
         <Text style={styles.sectionHeading}>Practice Management</Text>
         <View style={styles.actionGrid}>
           {quickActions.map((item) => (
-            <TouchableOpacity
-              key={item.label}
-              style={styles.actionCard}
-              onPress={() => handleQuickAction(item.action)}
-            >
+            <PremiumCard key={item.label} style={styles.actionCard} onPress={() => handleQuickAction(item.action)} elevationLevel={1}>
               <View style={styles.iconCircle}>
                 <Ionicons name={item.icon} size={20} color={colors.primary} />
               </View>
               <Text style={styles.actionLabel}>{item.label}</Text>
-            </TouchableOpacity>
+            </PremiumCard>
           ))}
         </View>
       </ScrollView>

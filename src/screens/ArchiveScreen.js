@@ -1,4 +1,7 @@
 import React from "react";
+import EmptyState from '../components/EmptyState';
+import SkeletonLoader from '../components/SkeletonLoader';
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -124,33 +127,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
       />
 
       {/* HEADER: GLASS STYLE */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Archive Vault</Text>
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>Historical Records</Text>
-            </View>
-          </View>
-          <View style={{ width: 44 }} />
-        </View>
-
-        {/* INTEGRATED SEARCH */}
-        <View style={styles.searchWrapper}>
-          <LegalInput
-            label="Archive Search"
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search by Title, Court or #No"
-          />
-        </View>
-      </View>
+      <PremiumPageHeader title="Archive Vault" subtitle="Historical Records" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -161,7 +138,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
       >
         {loading ? (
           <View style={styles.loaderWrap}>
-            <ActivityIndicator size="large" color={colors.primaryDark} />
+            <SkeletonLoader variant="list" count={4} />
             <Text style={styles.loaderText}>Decrypting Records...</Text>
           </View>
         ) : filteredCases.length === 0 ? (

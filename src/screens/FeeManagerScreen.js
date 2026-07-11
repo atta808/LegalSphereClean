@@ -1,4 +1,6 @@
 import React from "react";
+import EmptyState from '../components/EmptyState';
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -146,43 +148,7 @@ export default function FeeManagerScreen({ profile, onBack }) {
         translucent
       />
 
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Fee Manager</Text>
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>
-                Financial Ledger • {profile?.name || "Advocate"}
-              </Text>
-            </View>
-          </View>
-
-          <View style={{ width: 44 }} />
-        </View>
-
-        <View style={styles.summaryGrid}>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>TOTAL RECOVERY</Text>
-            <Text style={[styles.summaryValue, { color: colors.success }]}>
-              {formatMoney(totalReceived, currency, locale)}
-            </Text>
-          </View>
-
-          <View style={[styles.summaryCard, styles.outstandingBg]}>
-            <Text style={styles.summaryLabelLight}>OUTSTANDING</Text>
-            <Text style={styles.summaryValueLight}>
-              {formatMoney(totalOutstanding, currency, locale)}
-            </Text>
-          </View>
-        </View>
-      </View>
+      <PremiumPageHeader title="Fee Manager" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -192,7 +158,7 @@ export default function FeeManagerScreen({ profile, onBack }) {
         ]}
       >
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primaryDark} />
+          <SkeletonLoader variant="list" count={4} />
         ) : (
           cases.map((item) => (
             <View key={item.id} style={styles.caseCard}>

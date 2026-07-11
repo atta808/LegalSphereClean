@@ -1,5 +1,6 @@
 // screens/SettingsScreen.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import LegalPicker from "../components/LegalPicker";
 import LegalInput from "../components/LegalInput";
 import * as ImagePicker from "expo-image-picker";
@@ -245,31 +246,7 @@ export default function SettingsScreen({ navigation }) {
   };
   return (
     <View style={styles.container}>
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => {
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              } else {
-                navigation.navigate("Dashboard");
-              }
-            }}
-            style={styles.glassBackButton}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Settings</Text>
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>App Preferences</Text>
-            </View>
-          </View>
-
-          <View style={{ width: 44 }} />
-        </View>
-      </View>
+      <PremiumPageHeader title="Settings" subtitle="App Preferences" />
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         {/* HEADER */}
         <View style={[styles.header, { paddingTop: insets.top + 20 }]}>

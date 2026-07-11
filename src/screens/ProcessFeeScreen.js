@@ -26,7 +26,7 @@ import {
   markProcessFeePaid,
   updateProcessFee,
 } from "../services/sqliteService";
-import { toDisplay } from "../utils/date";
+import { toDisplay, toDatePickerDate } from "../utils/date";
 
 import { formatMoney, getCurrency } from "../utils/currency";
 
@@ -166,10 +166,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
       setLoading(true);
       if (!selectedFeeId) return;
 
-      markProcessFeePaid(selectedFeeId, {
-        paidTo,
-        paidDate: new Date().toISOString(),
-      });
+      markProcessFeePaid(selectedFeeId, paidTo);
 
       setShowPaidModal(false);
       setPaidTo("");
@@ -335,11 +332,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                     setCourtName(item.court || "");
                     setAmount(String(item.amount || ""));
                     setPurpose(item.purpose || "");
-                    setDateObject(
-                      item.date && !isNaN(new Date(item.date))
-                        ? new Date(item.date)
-                        : new Date(),
-                    );
+                      setDateObject(toDatePickerDate(item.date));
                     setNote(item.note || "");
                     setEditingId(item.id);
                   }}

@@ -27,7 +27,7 @@ import {
   insertCitation,
   getProfile,
 } from "../services/sqliteService";
-import { toDisplay } from "../utils/date";
+import { toDisplay, toISO } from "../utils/date";
 import { useNavigation, useRoute } from "@react-navigation/native";
 const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => {
   return (
@@ -127,7 +127,7 @@ export default function CitationsScreen({
       caseId: activeCaseId,
       citation: citation.trim(),
       description: description.trim(),
-      date: new Date().toISOString(),
+      date: toISO(new Date()),
     };
 
     try {

@@ -5,6 +5,7 @@
  */
 
 import sqliteService from '../../sqliteService';
+import { toISO } from '../../../utils/date';
 
 /**
  * Case Context Builder
@@ -47,7 +48,7 @@ export class CaseContext {
             return {
                 contextType: 'SingleCase',
                 caseId: caseId,
-                timestamp: new Date().toISOString(),
+                timestamp: toISO(new Date()),
                 details: caseDetails,
                 hearings: hearings || [],
                 timeline: timeline || [],

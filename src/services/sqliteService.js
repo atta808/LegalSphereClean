@@ -1639,7 +1639,7 @@ export const markProcessFeePaid = (id, paidTo) => {
     `UPDATE processFees 
      SET paid=1, paidTo=?, paidDate=?, syncStatus='pending', updatedAt=?
      WHERE id=?`,
-    [paidTo, toISO(new Date()), now, id],
+    [paidTo, toISO(now), now, id],
   );
 };
 
@@ -1879,7 +1879,7 @@ export const insertDocument = (data) => {
 
         data.fileSize || 0,
 
-        data.uploadDate || new Date().toISOString(),
+        data.uploadDate || toISO(now),
 
         data.aiSummary || "",
         data.aiTags || "",

@@ -27,6 +27,7 @@ import {
 import { exportCauseListPdf } from "../utils/causeListPdf";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday } from "../utils/date";
+import HearingClassificationService from '../services/hearing/HearingClassificationService';
 
 const quickActions = [
   { label: "Add Case", icon: "add-circle-outline", action: "addCase" },
@@ -95,24 +96,15 @@ export default function DashboardScreen({ profile, onLogout }) {
       setUnreadNotificationsCount(getUnreadNotificationCount());
       setRecentNotifications(getRecentNotifications(3));
 
-      const todayList = [];
-      const pendingList = [];
-
-      allCases.forEach((c) => {
-        if (c.status === "archived" || c.status === "pipeline") return;
-
-        if (!c.nextHearingISO) {
-          pendingList.push(c);
-        } else if (isToday(c.nextHearingISO)) {
-          todayList.push(c);
-        } else if (isPast(c.nextHearingISO)) {
-          pendingList.push(c);
-        }
-      });
+      const { today, overdue, upcoming } = HearingClassificationService.classifyHearings(allCases);
 
       const safeSort = (a, b) =>
         (a.nextHearingISO || "9999").localeCompare(b.nextHearingISO || "9999");
+
+      const pendingList = [...overdue, ...upcoming.filter(c => !c.nextHearingISO)];
       pendingList.sort(safeSort);
+
+      const todayList = [...today];
       todayList.sort(safeSort);
 
       setTodayHearings(todayList);
@@ -162,19 +154,12 @@ export default function DashboardScreen({ profile, onLogout }) {
     }
   };
 
-  const handleTodayPDF = async () => {
+  const handleTodayPDF = () => {
     try {
-      const allCases = await getAllCases();
-      const todayCases = allCases.filter(
-        (c) =>
-          c.status !== "archived" &&
-          c.status !== "pipeline" &&
-          c.nextHearingISO &&
-          isToday(c.nextHearingISO),
-      );
-      if (todayCases.length === 0)
+      if (!todayHearings || todayHearings.length === 0) {
         return Alert.alert("No Hearings", "No hearings today");
-      exportCauseListPdf(todayCases, "Today's Cause List");
+      }
+      exportCauseListPdf(todayHearings, "Today's Cause List");
     } catch {
       Alert.alert("Error", "Failed to generate PDF");
     }

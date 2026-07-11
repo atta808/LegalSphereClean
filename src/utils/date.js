@@ -129,6 +129,19 @@ export const isPast = (date) => {
   return valueUTC < todayUTC;
 };
 
+export const isTomorrow = (date) => {
+  const parts = getDateParts(date);
+  if (!parts) return false;
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return (
+    parts.day === tomorrow.getDate() &&
+    parts.month === tomorrow.getMonth() + 1 &&
+    parts.year === tomorrow.getFullYear()
+  );
+};
+
 // Convert date to YYYY-MM-DD for calendar keys.
 export const toYMD = (date) => {
   const parts = getDateParts(date);

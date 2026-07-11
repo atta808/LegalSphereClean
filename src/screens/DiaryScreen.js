@@ -30,6 +30,7 @@ import { updateCaseNotifications, cancelCaseNotifications } from "../services/re
 import { exportCauseListPdf } from "../utils/causeListPdf";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday, toDisplay } from "../utils/date";
+import HearingClassificationService from '../services/hearing/HearingClassificationService';
 
 // --- PREMIUM GLOSSY COMPONENT ---
 const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => (
@@ -62,10 +63,9 @@ export default function DiaryScreen({ profile }) {
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
 
-  const handleFullDiaryPDF = async () => {
+  const handleFullDiaryPDF = () => {
     try {
-      const allCases = await getAllCases();
-      const diaryCases = allCases.filter((c) => c.status !== "archived");
+      const diaryCases = [...cases, ...pendingCases, ...pipelineCases];
       if (diaryCases.length === 0) {
         Alert.alert("Empty", "No cases available");
         return;
@@ -81,25 +81,7 @@ export default function DiaryScreen({ profile }) {
       setLoading(true);
       const allCases = await getAllCases(); // ✅ Logic Fixed
 
-      const pending = [];
-      const todayCases = [];
-      const upcoming = [];
-      const pipeline = [];
-
-      allCases.forEach((c) => {
-        if (c.status === "archived") return;
-        if (c.status === "pipeline") {
-          pipeline.push(c);
-        } else if (!c.nextHearingISO) {
-          pending.push(c);
-        } else if (isToday(c.nextHearingISO)) {
-          todayCases.push(c);
-        } else if (isPast(c.nextHearingISO)) {
-          pending.push(c);
-        } else {
-          upcoming.push(c);
-        }
-      });
+      const { today, overdue, upcoming, pipeline } = HearingClassificationService.classifyHearings(allCases);
 
       const sortByDate = (a, b) => {
         if (!a.nextHearingISO) return 1;
@@ -107,13 +89,16 @@ export default function DiaryScreen({ profile }) {
         return a.nextHearingISO.localeCompare(b.nextHearingISO);
       };
 
-      pending.sort(sortByDate);
-      todayCases.sort(sortByDate);
-      upcoming.sort(sortByDate);
+      const pendingList = [...overdue, ...upcoming.filter(c => !c.nextHearingISO)];
+      const upcomingList = upcoming.filter(c => c.nextHearingISO);
+
+      pendingList.sort(sortByDate);
+      today.sort(sortByDate);
+      upcomingList.sort(sortByDate);
       pipeline.sort(sortByDate);
 
-      setPendingCases(pending);
-      setCases([...todayCases, ...upcoming]);
+      setPendingCases(pendingList);
+      setCases([...today, ...upcomingList]);
       setPipelineCases(pipeline);
     } catch (_) {
       Alert.alert("Error", "Failed to load diary cases.");

@@ -4,6 +4,8 @@
  * Provides file-level metadata rather than business logic.
  */
 
+import { toISO } from '../../../utils/date';
+
 /**
  * Document Context Builder
  */
@@ -19,7 +21,7 @@ export class DocumentContext {
 
         return {
             contextType: 'DocumentMetadata',
-            timestamp: new Date().toISOString(),
+            timestamp: toISO(new Date()),
             fileName: fileParams.name || 'Unknown',
             fileType: fileParams.type || 'Unknown',
             fileSize: fileParams.size || 'Unknown',

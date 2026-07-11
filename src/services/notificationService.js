@@ -1,5 +1,7 @@
 import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
 import { db } from './sqliteService';
+import { NOTIFICATION_CHANNELS, configureNotificationChannels } from './notificationChannels';
 
 // Tell expo-notifications how to handle incoming notifications when the app is in the foreground
 Notifications.setNotificationHandler({
@@ -12,13 +14,30 @@ Notifications.setNotificationHandler({
 
 export const scheduleLocalNotification = async ({ title, body, date, data }) => {
   try {
+    const channelId = data?.type === 'hearing' || data?.type === 'overdue'
+      ? NOTIFICATION_CHANNELS.REMINDERS
+      : NOTIFICATION_CHANNELS.DEFAULT;
+
+    let trigger;
+    if (Platform.OS === 'android') {
+      // Ensure channel is created before scheduling
+      await configureNotificationChannels();
+
+      trigger = {
+        channelId,
+        date,
+      };
+    } else {
+      trigger = date;
+    }
+
     const identifier = await Notifications.scheduleNotificationAsync({
       content: {
         title,
         body,
         data,
       },
-      trigger: date, // Javascript Date object
+      trigger,
     });
     return identifier;
   } catch (error) {

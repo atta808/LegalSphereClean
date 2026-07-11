@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View, StatusBar } from "react-native";
+import { useEffect, useState, useRef } from "react";
+import { ActivityIndicator, StyleSheet, View, StatusBar, AppState } from "react-native";
 import * as Notifications from "expo-notifications";
 import { useNavigationContainerRef } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -20,8 +20,10 @@ import { initDB } from "./src/services/sqliteService";
 import { requestNotificationPermission } from "./src/services/notificationPermission";
 import { configureNotificationChannels } from "./src/services/notificationChannels";
 import { runDailyMaintenance } from "./src/services/dailyMaintenanceService";
+import { cancelAllLocalNotifications } from "./src/services/notificationService";
 
 export default function App() {
+  const appState = useRef(AppState.currentState);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +46,11 @@ export default function App() {
   }, []);
   const handleLogout = async () => {
     try {
+      await cancelAllLocalNotifications(); // Clear notifications for the user
+
+      // Remove all notification listeners to prevent orphaned callbacks
+      Notifications.removeAllNotificationListeners();
+
       await signOut(auth); // Firebase logout
       await AsyncStorage.multiRemove(["isLoggedIn", "uid", "isRestored"]); // clear local session
 
@@ -126,6 +133,23 @@ useEffect(() => {
     };
 
     init();
+
+    // 🔁 RE-RUN MAINTENANCE ON APP FOREGROUND (APP STATE LISTENER)
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        console.log("🔄 App has come to the foreground! Running maintenance...");
+        runDailyMaintenance().catch((e) => console.log("Foreground maintenance error:", e));
+      }
+
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
   // =============================
   // 🌐 NETWORK LISTENER (SYNC ENGINE)

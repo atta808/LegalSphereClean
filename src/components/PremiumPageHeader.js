@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import PremiumTouchable from './PremiumTouchable';
 
 /**
  * PremiumPageHeader
@@ -58,20 +59,27 @@ const PremiumPageHeader = ({
         {/* Left / Back Button */}
         <View style={styles.leftContainer}>
           {displayBackButton && (
-            <TouchableOpacity
+            <PremiumTouchable
               onPress={handleBackPress}
               style={styles.backButton}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              accessibilityHint="Returns to the previous screen"
             >
               <Ionicons name="chevron-back" size={24} color={colors.primary} />
-            </TouchableOpacity>
+            </PremiumTouchable>
           )}
         </View>
 
         {/* Center / Title & Subtitle */}
         <View style={styles.centerContainer}>
-          <Text style={styles.titleText} numberOfLines={1}>
+          <Text
+            style={styles.titleText}
+            numberOfLines={1}
+            accessibilityRole="header"
+            accessibilityLabel={title}
+          >
             {title}
           </Text>
           {subtitle ? (
@@ -151,8 +159,8 @@ const createStyles = (colors, resolvedTheme, insets, elevationLevel) => {
       justifyContent: 'center',
     },
     backButton: {
-      width: 40,
-      height: 40,
+      width: 44,
+      height: 44,
       borderRadius: 12,
       backgroundColor: isDark ? colors.card : colors.background,
       borderWidth: 1,

@@ -105,7 +105,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
         ]}
       >
         <View style={styles.leftSection}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.iconButton}
             accessibilityLabel="Close Browser"
@@ -124,13 +124,13 @@ export default function LegalBrowserScreen({ route, navigation }) {
         </View>
 
         <View style={styles.rightSection}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.iconButton}
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="remove-outline" size={22} color={colors.primaryDark} />
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.iconButton}
             onPress={() => setShowMenu(!showMenu)}
             accessibilityLabel="More Options"
@@ -154,7 +154,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
       {/* POPUP MENU OVERLAY */}
       {showMenu && (
         <View style={styles.menuDropdown}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.menuItem}
             onPress={() => webViewRef.current?.reload()}
           >
@@ -162,17 +162,17 @@ export default function LegalBrowserScreen({ route, navigation }) {
             <Text style={styles.menuText}>Reload Page</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleCopyLink}>
+          <TouchableOpacity accessibilityRole="button" style={styles.menuItem} onPress={handleCopyLink}>
             <Ionicons name="copy-outline" size={18} color={colors.icon} />
             <Text style={styles.menuText}>Copy Link</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
+          <TouchableOpacity accessibilityRole="button" style={styles.menuItem} onPress={handleShare}>
             <Ionicons name="share-social-outline" size={18} color={colors.icon} />
             <Text style={styles.menuText}>Share Resource</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.menuItem}
             onPress={handleOpenExternal}
           >
@@ -183,7 +183,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
           <View style={styles.menuDivider} />
 
           {/* FUTURE AI & WORKFLOW INTERFACES */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.menuItem}
             onPress={triggerScreenshotOCR}
           >
@@ -192,7 +192,7 @@ export default function LegalBrowserScreen({ route, navigation }) {
               Screenshot OCR (Soon)
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.menuItem}
             onPress={() => {
               webViewRef.current?.injectJavaScript(`
@@ -215,7 +215,7 @@ true;
             </Text>
           </TouchableOpacity>
           {aiMode === "autofillCase" && (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.menuItem}
               onPress={() => {
                 webViewRef.current?.injectJavaScript(`
@@ -239,7 +239,7 @@ true;
             </TouchableOpacity>
           )}
           {aiMode === "syncHearing" && (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.menuItem}
               onPress={() => {
                 webViewRef.current?.injectJavaScript(`
@@ -262,7 +262,7 @@ true;
               </Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.menuItem}
             onPress={handleSaveCitation}
           >
@@ -640,7 +640,7 @@ ${payload.text}
 
       {/* DEDICATED BOTTOM NAVIGATION CONTROLS */}
       <View style={styles.bottomToolbar}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           disabled={!canGoBack}
           onPress={() => webViewRef.current?.goBack()}
           style={[styles.toolbarButton, !canGoBack && styles.disabledButton]}
@@ -652,7 +652,7 @@ ${payload.text}
           />
         </TouchableOpacity>
 
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           disabled={!canGoForward}
           onPress={() => webViewRef.current?.goForward()}
           style={[styles.toolbarButton, !canGoForward && styles.disabledButton]}
@@ -664,7 +664,7 @@ ${payload.text}
           />
         </TouchableOpacity>
 
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => webViewRef.current?.reload()}
           style={styles.toolbarButton}
         >

@@ -72,7 +72,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
     return (
       <View style={styles.center}>
         <Text>Client data not found.</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity accessibilityRole="button" onPress={() => navigation.goBack()}>
           <Text style={{ color: colors.primary, marginTop: 10 }}>Go Back</Text>
         </TouchableOpacity>
       </View>
@@ -85,7 +85,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
 
       {/* PREMIUM HEADER */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => (onBack ? onBack() : navigation.goBack())}
           style={styles.glassBackButton}
         >
@@ -117,7 +117,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
           </Text>
 
           <View style={styles.actionHub}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.callBtn}
               onPress={() => Linking.openURL(`tel:${client.mobile}`)}
             >
@@ -131,7 +131,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 <Text style={styles.btnText}>Call</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.waBtn}
               onPress={() =>
                 Linking.openURL(
@@ -190,7 +190,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
           </View>
         ) : (
           cases.map((item) => (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               key={item.id}
               style={styles.caseCard}
               // ✅ Navigates directly to CaseDetail using the app stack

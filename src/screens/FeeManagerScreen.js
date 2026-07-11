@@ -192,7 +192,7 @@ export default function FeeManagerScreen({ profile, onBack }) {
                 Balance: {formatMoney(item.feeBalance, currency, locale)}
               </Text>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.recordPaymentBtn}
                 onPress={() => openPaymentModal(item)}
               >
@@ -218,7 +218,7 @@ export default function FeeManagerScreen({ profile, onBack }) {
 
             <View style={styles.modalButtonsRow}>
               {/* ❌ DISCARD BUTTON */}
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.modalCancelBtn}
                 onPress={closePaymentModal}
               >
@@ -226,7 +226,7 @@ export default function FeeManagerScreen({ profile, onBack }) {
               </TouchableOpacity>
 
               {/* ✅ SAVE BUTTON */}
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.modalSaveBtn}
                 onPress={handleAddPayment}
                 disabled={saving}

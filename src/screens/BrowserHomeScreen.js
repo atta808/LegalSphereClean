@@ -36,7 +36,7 @@ const PremiumPressable = ({ onPress, children, style }) => {
 
   return (
     <Animated.View style={[{ transform: [{ scale: scaleValue }] }, style]}>
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         activeOpacity={1}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
@@ -183,14 +183,14 @@ export default function BrowserHomeScreen() {
               </View>
             )}
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               onPress={() => toggleFavorite(item.id)}
               style={styles.favoriteButton}
             >
               <Ionicons
                 name={favoriteTools.includes(item.id) ? "star" : "star-outline"}
                 size={18}
-                color={favoriteTools.includes(item.id) ? "#F59E0B" : colors.placeholder}
+                color={favoriteTools.includes(item.id) ? colors.warning : colors.placeholder}
               />
             </TouchableOpacity>
           </View>

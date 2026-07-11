@@ -481,7 +481,7 @@ export default function AddCaseScreen({ route, profile }) {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.header}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.backIconWrap}
             onPress={() => navigation.goBack()}
             activeOpacity={0.8}
@@ -503,7 +503,7 @@ export default function AddCaseScreen({ route, profile }) {
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.sectionHeader}>Client Information</Text>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.input}
             activeOpacity={0.85}
             onPress={() => setClientPickerVisible(true)}
@@ -529,7 +529,7 @@ export default function AddCaseScreen({ route, profile }) {
                 Import case information directly from court CMS systems.
               </Text>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.aiButton}
                 onPress={() => {
                   if (!selectedCMS?.url) {
@@ -548,7 +548,7 @@ export default function AddCaseScreen({ route, profile }) {
               </TouchableOpacity>
             </View>
             <Text style={styles.inputLabel}>CMS System</Text>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setCmsPickerVisible(true)}
@@ -584,7 +584,7 @@ export default function AddCaseScreen({ route, profile }) {
               </>
             ) : null}
             <Text style={styles.inputLabel}>Litigation Domain</Text>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setDomainPickerVisible(true)}
@@ -602,7 +602,7 @@ export default function AddCaseScreen({ route, profile }) {
             <Text style={styles.sectionHeader}>Case Information</Text>
           <Text style={styles.inputLabel}>Court</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setCourtPickerVisible(true)}
@@ -618,7 +618,7 @@ export default function AddCaseScreen({ route, profile }) {
             </TouchableOpacity>
             <Text style={styles.inputLabel}>Judge</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setJudgePickerVisible(true)}
@@ -708,7 +708,7 @@ export default function AddCaseScreen({ route, profile }) {
               multiline
             />
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               onPress={() => setShowDatePicker(true)}
             >
@@ -720,7 +720,7 @@ export default function AddCaseScreen({ route, profile }) {
                 {nextHearingDate || "Select Next Hearing Date"}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setStagePickerVisible(true)}
@@ -736,7 +736,7 @@ export default function AddCaseScreen({ route, profile }) {
             </TouchableOpacity>
             <Text style={styles.inputLabel}>Proceeding</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setDescriptionPickerVisible(true)}
@@ -750,7 +750,7 @@ export default function AddCaseScreen({ route, profile }) {
                 {description || "Select Proceeding"}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setCaseTypePickerVisible(true)}
@@ -771,7 +771,7 @@ export default function AddCaseScreen({ route, profile }) {
             <Text style={styles.sectionTitle}>Case Priority</Text>
 
             <View style={styles.statusRow}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={[
                   styles.statusButton,
                   priority === "normal" && styles.statusButtonActive,
@@ -781,7 +781,7 @@ export default function AddCaseScreen({ route, profile }) {
                 <Text style={styles.statusButtonText}>Normal</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={[
                   styles.statusButton,
                   priority === "important" && styles.statusButtonActive,
@@ -791,7 +791,7 @@ export default function AddCaseScreen({ route, profile }) {
                 <Text style={styles.statusButtonText}>Important</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={[
                   styles.statusButton,
                   priority === "urgent" && styles.statusButtonActive,
@@ -833,7 +833,7 @@ export default function AddCaseScreen({ route, profile }) {
             <Text style={styles.statusLabel}>Status</Text>
             {/* ERROR WAS HERE: Changed <div> to <View> */}
             <View style={styles.statusRow}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={[
                   styles.statusButton,
                   status === "active" && styles.statusButtonActive,
@@ -849,7 +849,7 @@ export default function AddCaseScreen({ route, profile }) {
                   Active
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={[
                   styles.statusButton,
                   status === "pipeline" && styles.statusButtonActive,

@@ -106,7 +106,7 @@ export default function NotificationCenterScreen() {
   });
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       style={[styles.notificationCard, item.isRead === 0 && styles.unreadCard]}
       onPress={() => handlePress(item)}
       onLongPress={() => handleDelete(item)}
@@ -129,11 +129,11 @@ export default function NotificationCenterScreen() {
 
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity accessibilityRole="button" style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
-        <TouchableOpacity style={styles.menuBtn} onPress={handleClearAll}>
+        <TouchableOpacity accessibilityRole="button" style={styles.menuBtn} onPress={handleClearAll}>
           <Ionicons name="trash-outline" size={22} color={colors.danger || '#ef4444'} />
         </TouchableOpacity>
       </View>
@@ -147,7 +147,7 @@ export default function NotificationCenterScreen() {
           keyExtractor={item => item}
           contentContainerStyle={{ paddingHorizontal: 16 }}
           renderItem={({ item }) => (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={[styles.filterChip, activeFilter === item && styles.activeChip]}
               onPress={() => setActiveFilter(item)}
             >
@@ -175,7 +175,7 @@ export default function NotificationCenterScreen() {
       />
 
       {notifications.some(n => n.isRead === 0) && (
-        <TouchableOpacity style={styles.markAllReadBtn} onPress={handleMarkAllRead}>
+        <TouchableOpacity accessibilityRole="button" style={styles.markAllReadBtn} onPress={handleMarkAllRead}>
           <Ionicons name="checkmark-done" size={20} color="#fff" />
           <Text style={styles.markAllReadText}>Mark All as Read</Text>
         </TouchableOpacity>

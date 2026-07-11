@@ -122,7 +122,7 @@ export default function LawyerProfileScreen({ navigation }) {
         <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
           {/* IMAGE */}
           <View style={styles.imageSection}>
-            <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
+            <TouchableOpacity accessibilityRole="button" onPress={pickImage} style={styles.imageContainer}>
               {profile.image ? (
                 <Image
                   source={{ uri: profile.image }}
@@ -237,7 +237,7 @@ export default function LawyerProfileScreen({ navigation }) {
           </View>
 
           {/* SAVE BUTTON */}
-          <TouchableOpacity onPress={save}>
+          <TouchableOpacity accessibilityRole="button" onPress={save}>
             <LinearGradient
               colors={[colors.primaryDark, "#1E40AF"]}
               style={styles.saveBtn}

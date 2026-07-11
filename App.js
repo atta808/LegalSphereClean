@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState, useRef } from "react";
-import { ActivityIndicator, StyleSheet, View, StatusBar, AppState } from "react-native";
+import { ActivityIndicator, StyleSheet, View, StatusBar, AppState, InteractionManager } from "react-native";
 import * as Notifications from "expo-notifications";
 import { useNavigationContainerRef } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -94,7 +94,10 @@ useEffect(() => {
           }
 
           // 🔥 START AUTO SYNC (CORRECT PLACE)
-          startAutoSync();
+          // Defer background sync scheduling
+          InteractionManager.runAfterInteractions(() => {
+            startAutoSync();
+          });
 
         } else {
           setProfile(null);
@@ -123,10 +126,14 @@ useEffect(() => {
       try {
         initDB(); // ✅ ensure DB ready first
 
-        // 🔔 NOTIFICATIONS INITIALIZATION AFTER DB
+        // 🔔 NOTIFICATIONS INITIALIZATION REQUIRED FOR STARTUP
         await requestNotificationPermission();
         await configureNotificationChannels();
-        await runDailyMaintenance();
+
+        // Defer non-critical startup tasks
+        InteractionManager.runAfterInteractions(() => {
+          runDailyMaintenance().catch((e) => console.log("Deferred maintenance error:", e));
+        });
       } catch (e) {
         console.log("Init error:", e);
       }
@@ -151,12 +158,16 @@ useEffect(() => {
       subscription.remove();
     };
   }, []);
+
   // =============================
   // 🌐 NETWORK LISTENER (SYNC ENGINE)
   // =============================
   useEffect(() => {
     try {
-      startNetworkListener();
+      // Defer background network listener
+      InteractionManager.runAfterInteractions(() => {
+        startNetworkListener();
+      });
     } catch (e) {
       console.log("Network listener error:", e);
     }

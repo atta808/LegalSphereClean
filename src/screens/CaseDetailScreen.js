@@ -305,7 +305,7 @@ ${profile?.name || "Advocate"}`;
     return Math.max(score, 5);
   })();
   const healthColor =
-    healthScore >= 75 ? "#22C55E" : healthScore >= 45 ? "#F59E0B" : colors.danger;
+    healthScore >= 75 ? "#22C55E" : healthScore >= 45 ? colors.warning : colors.danger;
   const healthLabel =
     healthScore >= 75
       ? "LOW RISK"
@@ -322,7 +322,7 @@ ${profile?.name || "Advocate"}`;
       {/* HEADER */}
       <View style={[styles.newHeader, { paddingTop: insets.top + 10 }]}>
         <View style={styles.newHeaderRow}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             activeOpacity={0.7}
             onPress={() => navigation.goBack()}
             style={styles.newBackButton}
@@ -333,7 +333,7 @@ ${profile?.name || "Advocate"}`;
           <View style={styles.newHeaderCenter}>
             <Text style={styles.newHeaderTitle}>Case Details</Text>
             {caseData?.caseNo && (
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 activeOpacity={0.7}
                 onPress={() => {
                   Clipboard.setString(String(caseData.caseNo));
@@ -345,7 +345,7 @@ ${profile?.name || "Advocate"}`;
             )}
           </View>
 
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             activeOpacity={0.7}
             style={styles.newAiCopyBtn}
             onPress={async () => {
@@ -489,7 +489,7 @@ Notes: ${caseData?.notes || "-"}`;
         <View style={styles.actionSection}>
           {/* Row 1: Add Hearing (full width) */}
           <View style={styles.actionRow}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnFull]}
               onPress={() =>
@@ -507,7 +507,7 @@ Notes: ${caseData?.notes || "-"}`;
 
           {/* Row 2: AI Room | Lex AI | Timeline */}
           <View style={styles.actionRow}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => {
@@ -522,7 +522,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={styles.actionBtnLabel}>AI Room</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() =>
@@ -535,7 +535,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={styles.actionBtnLabel}>Lex AI</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => {
@@ -550,7 +550,7 @@ Notes: ${caseData?.notes || "-"}`;
 
           {/* Row 3: Documents | Notes | Citations */}
           <View style={styles.actionRow}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() =>
@@ -564,7 +564,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={styles.actionBtnLabel}>Documents</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowNotesScreen(true)}
@@ -577,7 +577,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={styles.actionBtnLabel}>Notes</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowCitationsScreen(true)}
@@ -650,7 +650,7 @@ Notes: ${caseData?.notes || "-"}`;
             </View>
           </View>
           <View style={styles.actionRow}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.actionBtn}
               onPress={handleCallClient}
@@ -659,7 +659,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={styles.actionBtnLabel}>Call</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.waBtn]}
               onPress={handleWhatsAppClient}
@@ -668,7 +668,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={[styles.actionBtnLabel, styles.waText]}>WhatsApp</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.actionBtn}
               onPress={handleSendReminder}
@@ -686,7 +686,7 @@ Notes: ${caseData?.notes || "-"}`;
         {/* FINANCIAL SUMMARY */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Financial Summary</Text>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             activeOpacity={0.7}
             onPress={() => setPaymentModalVisible(true)}
           >
@@ -717,7 +717,7 @@ Notes: ${caseData?.notes || "-"}`;
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Hearings</Text>
           {hearings.length > 2 && (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               onPress={() =>
                 navigation.navigate("Timeline", { caseId: caseData.id })
@@ -744,7 +744,7 @@ Notes: ${caseData?.notes || "-"}`;
                     <Text style={styles.timelineDate}>
                       {toDisplay(item.hearingDate, locale)}
                     </Text>
-                    <TouchableOpacity
+                    <TouchableOpacity accessibilityRole="button"
                       activeOpacity={0.7}
                       onPress={() => handleDeleteHearing(item.id)}
                     >
@@ -762,7 +762,7 @@ Notes: ${caseData?.notes || "-"}`;
             ))
           )}
           {hearings.length > 2 && (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.viewFullButton}
               onPress={() =>
@@ -785,7 +785,7 @@ Notes: ${caseData?.notes || "-"}`;
         {/* ARCHIVE / RESTORE BUTTON */}
         <View style={{ marginTop: 10, marginBottom: 20 }}>
           {isArchived ? (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.mainActionBtn, { backgroundColor: colors.success }]}
               onPress={handleRestore}
@@ -795,7 +795,7 @@ Notes: ${caseData?.notes || "-"}`;
               </Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={[styles.mainActionBtn, { backgroundColor: colors.danger }]}
               onPress={handleArchive}
@@ -815,7 +815,7 @@ Notes: ${caseData?.notes || "-"}`;
             <Text style={styles.modalTitle}>AI Case Assistant</Text>
             <Text style={styles.modalSub}>Choose an AI workflow</Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -865,7 +865,7 @@ ${caseData?.status || "-"}
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -884,7 +884,7 @@ ${caseData?.status || "-"}
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -903,7 +903,7 @@ ${caseData?.status || "-"}
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -946,7 +946,7 @@ ${caseData?.status || "-"}
 
             {generatedSummary ? (
               <>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   activeOpacity={0.7}
                   style={styles.aiActionBtn}
                   onPress={() => {
@@ -972,7 +972,7 @@ ${caseData?.status || "-"}
                     </Text>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   activeOpacity={0.7}
                   style={styles.aiActionBtn}
                   onPress={async () => {
@@ -994,7 +994,7 @@ ${caseData?.status || "-"}
               </>
             ) : null}
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               activeOpacity={0.7}
               style={styles.modalCancel}
               onPress={() => setShowAiAssistant(false)}
@@ -1021,14 +1021,14 @@ ${caseData?.status || "-"}
               style={{ marginBottom: 40 }}
             />
             <View style={styles.modalActionRow}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 activeOpacity={0.7}
                 style={styles.modalCancel}
                 onPress={() => setAiLinkModalVisible(false)}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 activeOpacity={0.7}
                 style={styles.modalSave}
                 onPress={async () => {
@@ -1067,7 +1067,7 @@ ${caseData?.status || "-"}
               style={{ marginBottom: 20 }}
             />
             <View style={styles.modalActionRow}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 activeOpacity={0.7}
                 style={styles.modalCancel}
                 onPress={() => {
@@ -1077,7 +1077,7 @@ ${caseData?.status || "-"}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 activeOpacity={0.7}
                 style={styles.modalSave}
                 onPress={handleAddPayment}
@@ -1108,7 +1108,7 @@ const Row = ({ label, value, highlight, styles, colors }) => (
 );
 
 const ActionIconButton = ({ color, icon, onPress, styles }) => (
-  <TouchableOpacity
+  <TouchableOpacity accessibilityRole="button"
     activeOpacity={0.7}
     style={[styles.actionIconBtn, { backgroundColor: color }]}
     onPress={onPress}

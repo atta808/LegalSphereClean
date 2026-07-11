@@ -31,7 +31,7 @@ import { toDisplay } from "../utils/date";
 import { useNavigation, useRoute } from "@react-navigation/native";
 const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => {
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={() => openExportOptions(item)}
       activeOpacity={0.7}
     >
@@ -295,7 +295,7 @@ ${selectedCitation?.description || ""}`,
       {/* ULTRA PREMIUM HEADER */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={onBack} style={styles.glassBackButton}>
+          <TouchableOpacity accessibilityRole="button" onPress={onBack} style={styles.glassBackButton}>
             <Text style={styles.backIcon}>‹</Text>
           </TouchableOpacity>
 
@@ -354,7 +354,7 @@ ${selectedCitation?.description || ""}`,
                     <Text style={styles.dateText}>
                       Added {toDisplay(c.date)}
                     </Text>
-                    <TouchableOpacity
+                    <TouchableOpacity accessibilityRole="button"
                       onPress={() => handleDeleteCitation(c.id)}
                     >
                       <Text style={styles.deleteLink}>Delete</Text>
@@ -391,7 +391,7 @@ ${selectedCitation?.description || ""}`,
               />
             </View>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={{
                 backgroundColor: colors.text,
                 paddingVertical: 16,
@@ -412,7 +412,7 @@ ${selectedCitation?.description || ""}`,
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.addCitationBtn}
               onPress={handleAddCitation}
               activeOpacity={0.8}
@@ -422,13 +422,13 @@ ${selectedCitation?.description || ""}`,
           </View>
         )}
 
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.researchFab}
           onPress={openResearchSource}
         >
           <Ionicons name="globe-outline" size={28} color={colors.surface} />
         </TouchableOpacity>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={[
             styles.panelToggle,
             showInputPanel
@@ -448,7 +448,7 @@ ${selectedCitation?.description || ""}`,
           <View style={styles.modalOverlay}>
             <View style={styles.exportModalCard}>
               <Text style={styles.modalTitle}>Citation Actions</Text>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.exportOption}
                 onPress={async () => {
                   await exportCitationPdf(selectedCitation);
@@ -458,7 +458,7 @@ ${selectedCitation?.description || ""}`,
                 <FileText color={colors.primaryDark} size={20} />
                 <Text style={styles.exportText}>Export PDF</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.exportOption}
                 onPress={handleCopyFullCitation}
               >
@@ -466,7 +466,7 @@ ${selectedCitation?.description || ""}`,
                 <Text style={styles.exportText}>Copy Full Citation</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.exportOption}
                 onPress={handleShareCitation}
               >
@@ -474,7 +474,7 @@ ${selectedCitation?.description || ""}`,
                 <Text style={styles.exportText}>Share Citation</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.exportOption}
                 onPress={handleEditCitation}
               >
@@ -482,7 +482,7 @@ ${selectedCitation?.description || ""}`,
                 <Text style={styles.exportText}>Edit Citation</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.exportOption}
                 onPress={() => {
                   handleDeleteCitation(selectedCitation?.id);
@@ -500,7 +500,7 @@ ${selectedCitation?.description || ""}`,
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.cancelBtn}
                 onPress={() => setExportModalVisible(false)}
               >

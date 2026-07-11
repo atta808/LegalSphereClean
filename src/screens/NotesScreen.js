@@ -138,7 +138,7 @@ export default function NotesScreen({ caseId, onBack }) {
       {/* HEADER */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={onBack} style={styles.glassBackButton}>
+          <TouchableOpacity accessibilityRole="button" onPress={onBack} style={styles.glassBackButton}>
             <Text style={styles.backIcon}>‹</Text>
           </TouchableOpacity>
 
@@ -183,7 +183,7 @@ export default function NotesScreen({ caseId, onBack }) {
             notes.map((n) => (
               <View key={n.id} style={styles.noteCard}>
                 {n.image && (
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     onPress={() => openImageViewer(n.image)}
                     style={styles.imageContainer}
                   >
@@ -196,10 +196,10 @@ export default function NotesScreen({ caseId, onBack }) {
                 </Text>
 
                 <View style={styles.actionRow}>
-                  <TouchableOpacity onPress={() => editNote(n)}>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => editNote(n)}>
                     <Text style={styles.editText}>Edit</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => deleteNote(n.id)}>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => deleteNote(n.id)}>
                     <Text style={styles.delText}>Delete</Text>
                   </TouchableOpacity>
                 </View>
@@ -220,7 +220,7 @@ export default function NotesScreen({ caseId, onBack }) {
           )}
 
           <View style={styles.composerRow}>
-            <TouchableOpacity onPress={pickImage} style={styles.cameraButton}>
+            <TouchableOpacity accessibilityRole="button" onPress={pickImage} style={styles.cameraButton}>
               <Text style={{ fontSize: 22 }}>📷</Text>
             </TouchableOpacity>
 
@@ -234,7 +234,7 @@ export default function NotesScreen({ caseId, onBack }) {
               />
             </View>
 
-            <TouchableOpacity onPress={handleAddNote}>
+            <TouchableOpacity accessibilityRole="button" onPress={handleAddNote}>
               <LinearGradient
                 colors={["#2A8FEA", "#1E73BE", "#155FA0"]}
                 style={styles.sendBtn}
@@ -258,7 +258,7 @@ export default function NotesScreen({ caseId, onBack }) {
           onSwipeDown={() => setViewerVisible(false)}
           onCancel={() => setViewerVisible(false)}
           renderHeader={() => (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               onPress={() => setViewerVisible(false)}
               style={{
                 position: "absolute",

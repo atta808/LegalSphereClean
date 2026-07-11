@@ -199,7 +199,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
       {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.backBtn}
           >
@@ -217,7 +217,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
 
       <ScrollView contentContainerStyle={{ padding: 20 , paddingBottom: 120 }}>
         {/* CASE PICKER */}
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.input}
           activeOpacity={0.85}
           onPress={() => setCasePickerVisible(true)}
@@ -249,7 +249,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         />
 
         {/* DATE */}
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.input}
           onPress={() => setShowDatePicker(true)}
         >
@@ -287,7 +287,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
           multiline
         />
 
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+        <TouchableOpacity accessibilityRole="button" style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveText}>{editingId ? "UPDATE" : "SAVE"}</Text>
         </TouchableOpacity>
 
@@ -327,7 +327,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
               ) : null}
 
               <View style={styles.row}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.btn}
                   onPress={() => {
                     setSelectedCaseId(item.caseId || null);
@@ -348,7 +348,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                 </TouchableOpacity>
 
                 {!item.paid ? (
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     style={styles.paidBtn}
                     onPress={() => {
                       setSelectedFeeId(item.id);
@@ -359,7 +359,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                   </TouchableOpacity>
                 ) : null}
 
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.deleteBtn}
                   onPress={() => {
                     if (item?.id) {
@@ -391,7 +391,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
             />
 
             <View style={styles.row}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.cancelBtn}
                 onPress={() => {
                   setShowPaidModal(false);
@@ -401,7 +401,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                 <Text>Cancel</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.confirmBtn} onPress={confirmPaid}>
+              <TouchableOpacity accessibilityRole="button" style={styles.confirmBtn} onPress={confirmPaid}>
                 <Text style={{ color: colors.surface }}>Confirm</Text>
               </TouchableOpacity>
             </View>

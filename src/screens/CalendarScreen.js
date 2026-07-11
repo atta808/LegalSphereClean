@@ -41,7 +41,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
         if (!c.nextHearingISO || c.status === "archived") return;
         let color = colors.primary;
         if (c.priority === "urgent") color = colors.danger;
-        else if (c.priority === "important") color = "#F59E0B";
+        else if (c.priority === "important") color = colors.warning;
         else if (c.priority === "normal") color = colors.success;
 
         const dateKey = toYMD(c.nextHearingISO);
@@ -81,7 +81,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
     <View style={styles.container}>
       {/* PREMIUM HEADER */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.glassBackButton}
           onPress={() => {
             if (navigation.canGoBack()) {
@@ -99,7 +99,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
             <Text style={styles.badgeText}>OFFICIAL DIARY</Text>
           </View>
         </View>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.todayBtn}
           onPress={() => setSelectedDate(toYMD(new Date()))}
         >
@@ -147,7 +147,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
             </View>
           ) : (
             agendaList.map((item) => (
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 key={item.id}
                 style={styles.card}
                 onPress={() =>
@@ -228,7 +228,7 @@ const getPriorityBackgroundColor = (p) => {
 
 const getPriorityColor = (p, colors) => {
   if (p === "urgent") return colors.danger;
-  if (p === "important") return "#F59E0B";
+  if (p === "important") return colors.warning;
   return colors.success;
 };
 

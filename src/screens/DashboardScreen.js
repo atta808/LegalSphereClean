@@ -208,25 +208,14 @@ export default function DashboardScreen({ profile, onLogout }) {
         backgroundColor={colors.primaryDark}
       />
 
-      {/* HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <View style={styles.profileSection}>
-            <View style={styles.avatarGlow}>
-              <Text style={styles.avatarText}>
-                {currentProfile?.name?.charAt(0) || "A"}
-              </Text>
-            </View>
-            <View>
-              <Text style={styles.welcomeLabel}>LegalSphere Diary</Text>
-              <Text style={styles.lawyerName}>
-                {currentProfile?.name || "Advocate"}
-              </Text>
-            </View>
-          </View>
-
+            {/* HEADER */}
+      <PremiumPageHeader
+        title="LegalSphere Diary"
+        subtitle={currentProfile?.name || "Advocate"}
+        showBackButton={false}
+        rightComponent={
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <TouchableOpacity
+            <PremiumTouchable
               accessibilityRole="button"
               style={styles.glassButton}
               onPress={() => navigation.navigate("NotificationCenter")}
@@ -234,7 +223,7 @@ export default function DashboardScreen({ profile, onLogout }) {
               <Ionicons
                 name="notifications-outline"
                 size={22}
-                color="#FFFFFF"
+                color={colors.primary}
               />
               {unreadNotificationsCount > 0 && (
                 <View style={styles.badgeContainer}>
@@ -245,34 +234,30 @@ export default function DashboardScreen({ profile, onLogout }) {
                   </Text>
                 </View>
               )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
+            </PremiumTouchable>
+            <PremiumTouchable
               accessibilityRole="button"
               style={styles.glassButton}
               onPress={handleTodayPDF}
             >
               <Text style={styles.iconText}>📄</Text>
-            </TouchableOpacity>
-            {/* NEW LEX AI BUTTON */}
-            <TouchableOpacity
+            </PremiumTouchable>
+            <PremiumTouchable
               accessibilityRole="button"
               style={styles.glassButton}
               onPress={() => navigation.navigate("LexAi")}
             >
               <Text style={styles.iconText}>⚡</Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
-        </View>
-
-        <View style={styles.jurisdictionContainer}>
+        }
+      />
+      <View style={styles.jurisdictionContainer}>
           <Text style={styles.jurisdictionText}>
             📍 {currentProfile?.jurisdiction || "High Court"} •{" "}
             {currentProfile?.country || "Pakistan"}
           </Text>
         </View>
-      </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}

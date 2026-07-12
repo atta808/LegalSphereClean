@@ -319,34 +319,12 @@ ${profile?.name || "Advocate"}`;
     <View style={styles.mainContainer}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
 
-      {/* HEADER */}
-      <View style={[styles.newHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.newHeaderRow}>
-          <TouchableOpacity accessibilityRole="button"
-            activeOpacity={0.7}
-            onPress={() => navigation.goBack()}
-            style={styles.newBackButton}
-          >
-            <Ionicons name="chevron-back" size={24} color={colors.surface} />
-          </TouchableOpacity>
-
-          <View style={styles.newHeaderCenter}>
-            <Text style={styles.newHeaderTitle}>Case Details</Text>
-            {caseData?.caseNo && (
-              <TouchableOpacity accessibilityRole="button"
-                activeOpacity={0.7}
-                onPress={() => {
-                  Clipboard.setString(String(caseData.caseNo));
-                  Alert.alert("Copied", "Case No copied");
-                }}
-              >
-                <Text style={styles.newHeaderSubtitle}>#{caseData.caseNo}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <TouchableOpacity accessibilityRole="button"
-            activeOpacity={0.7}
+            {/* HEADER */}
+      <PremiumPageHeader
+        title="Case Details"
+        subtitle={caseData?.caseNo ? `#${caseData.caseNo}` : undefined}
+        rightComponent={
+          <PremiumTouchable accessibilityRole="button"
             style={styles.newAiCopyBtn}
             onPress={async () => {
               try {
@@ -376,10 +354,10 @@ Notes: ${caseData?.notes || "-"}`;
               }
             }}
           >
-            <Ionicons name="sparkles-outline" size={20} color={colors.surface} />
-          </TouchableOpacity>
-        </View>
-      </View>
+            <Ionicons name="sparkles-outline" size={20} color={colors.primary} />
+          </PremiumTouchable>
+        }
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

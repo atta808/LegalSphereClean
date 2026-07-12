@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from '../theme/ThemeContext';
 import {
   View,
@@ -64,16 +65,10 @@ export default function TimelineScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* HEADER */}
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity accessibilityRole="button" onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>‹</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.title}>Timeline</Text>
-
-        <View style={{ width: 30 }} />
-      </View>
+            {/* HEADER */}
+      <PremiumPageHeader
+        title="Timeline"
+      />
 
       {/* LIST */}
       <FlatList

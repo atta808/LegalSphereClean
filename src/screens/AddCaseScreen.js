@@ -1,5 +1,4 @@
 import React from "react";
-import PremiumCard from '../components/PremiumCard';
 import PremiumButton from '../components/PremiumButton';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
@@ -479,24 +478,11 @@ export default function AddCaseScreen({ route, profile }) {
       <KeyboardAvoidingView
         style={styles.keyboardWrap}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity accessibilityRole="button"
-            style={styles.backIconWrap}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="chevron-back" size={22} color={colors.primary} />
-          </TouchableOpacity>
-
-          <View style={styles.headerTextWrap}>
-            <Text style={styles.headerTitle}>Add Case</Text>
-            <Text style={styles.headerSub}>Create a new legal matter</Text>
-          </View>
-
-          {/* Empty box to balance layout */}
-          <View style={{ width: 40 }} />
-        </View>
+            >
+        <PremiumPageHeader
+          title="Add Case"
+          subtitle="Create a new legal matter"
+        />
 
         <ScrollView
           contentContainerStyle={[styles.content, { paddingBottom: 120 }]}

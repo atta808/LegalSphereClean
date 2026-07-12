@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import {
   View, Text, FlatList, TouchableOpacity,
   StyleSheet, Alert, RefreshControl
@@ -106,7 +108,7 @@ export default function NotificationCenterScreen() {
   });
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity accessibilityRole="button"
+    <PremiumTouchable accessibilityRole="button"
       style={[styles.notificationCard, item.isRead === 0 && styles.unreadCard]}
       onPress={() => handlePress(item)}
       onLongPress={() => handleDelete(item)}
@@ -121,22 +123,21 @@ export default function NotificationCenterScreen() {
         <Text style={styles.timeText}>{toDisplay(item.createdAt)}</Text>
       </View>
       {item.isRead === 0 && <View style={styles.unreadDot} />}
-    </TouchableOpacity>
+    </PremiumTouchable>
   );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
 
-      {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity accessibilityRole="button" style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notifications</Text>
-        <TouchableOpacity accessibilityRole="button" style={styles.menuBtn} onPress={handleClearAll}>
-          <Ionicons name="trash-outline" size={22} color={colors.danger || '#ef4444'} />
-        </TouchableOpacity>
-      </View>
+            {/* HEADER */}
+      <PremiumPageHeader
+        title="Notifications"
+        rightComponent={
+          <PremiumTouchable accessibilityRole="button" style={styles.menuBtn} onPress={handleClearAll}>
+            <Ionicons name="trash-outline" size={22} color={colors.danger || '#ef4444'} />
+          </PremiumTouchable>
+        }
+      />
 
       {/* FILTER BAR */}
       <View style={styles.filterWrapper}>
@@ -147,14 +148,14 @@ export default function NotificationCenterScreen() {
           keyExtractor={item => item}
           contentContainerStyle={{ paddingHorizontal: 16 }}
           renderItem={({ item }) => (
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               style={[styles.filterChip, activeFilter === item && styles.activeChip]}
               onPress={() => setActiveFilter(item)}
             >
               <Text style={[styles.filterText, activeFilter === item && styles.activeFilterText]}>
                 {item}
               </Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
           )}
         />
       </View>
@@ -175,10 +176,10 @@ export default function NotificationCenterScreen() {
       />
 
       {notifications.some(n => n.isRead === 0) && (
-        <TouchableOpacity accessibilityRole="button" style={styles.markAllReadBtn} onPress={handleMarkAllRead}>
+        <PremiumTouchable accessibilityRole="button" style={styles.markAllReadBtn} onPress={handleMarkAllRead}>
           <Ionicons name="checkmark-done" size={20} color="#fff" />
           <Text style={styles.markAllReadText}>Mark All as Read</Text>
-        </TouchableOpacity>
+        </PremiumTouchable>
       )}
     </View>
   );
@@ -201,7 +202,7 @@ const createStyles = (colors, theme) => StyleSheet.create({
   },
   activeChip: { backgroundColor: colors.primary, borderColor: colors.primary },
   filterText: { color: colors.text, fontWeight: '500', fontSize: 13 },
-  activeFilterText: { color: '#fff' },
+  activeFilterText: { color: '#FFFFFF' },
   listContent: { padding: 16, paddingBottom: 100 },
   notificationCard: {
     flexDirection: 'row', backgroundColor: colors.surface, padding: 16,
@@ -228,5 +229,5 @@ const createStyles = (colors, theme) => StyleSheet.create({
     alignItems: 'center', elevation: 4, shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4
   },
-  markAllReadText: { color: '#fff', fontSize: 15, fontWeight: '600', marginLeft: 8 }
+  markAllReadText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600', marginLeft: 8 }
 });

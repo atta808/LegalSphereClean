@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from '../theme/ThemeContext';
 import {
   View,
@@ -95,54 +96,38 @@ export default function LegalBrowserScreen({ route, navigation }) {
       <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
 
       {/* PREMIUM HEADER */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: insets.top + 6,
-            height: insets.top + 66,
-          },
-        ]}
-      >
-        <View style={styles.leftSection}>
-          <TouchableOpacity accessibilityRole="button"
-            onPress={() => navigation.goBack()}
-            style={styles.iconButton}
-            accessibilityLabel="Close Browser"
-          >
-            <Ionicons name="close" size={22} color={colors.primaryDark} />
-          </TouchableOpacity>
+            {/* HEADER */}
+      <PremiumPageHeader
+        title={title || "Legal Workflow"}
+        subtitle={url}
+        onBack={() => navigation.goBack()}
+        rightComponent={
+          <View style={styles.rightSection}>
+            <TouchableOpacity accessibilityRole="button"
+              onPress={() => {
+                if (webViewRef.current) {
+                  webViewRef.current.reload();
+                }
+              }}
+              style={styles.iconButton}
+              accessibilityLabel="Reload Page"
+            >
+              <Ionicons name="reload" size={18} color={colors.primaryDark} />
+            </TouchableOpacity>
 
-          <View style={styles.titleContainer}>
-            <Text numberOfLines={1} style={styles.title}>
-              {title || "Legal Workflow"}
-            </Text>
-            <Text numberOfLines={1} style={styles.url}>
-              {currentUrl}
-            </Text>
+            <TouchableOpacity accessibilityRole="button"
+              onPress={() => {
+                Clipboard.setString(url);
+                Alert.alert("Copied", "URL copied to clipboard.");
+              }}
+              style={styles.iconButton}
+              accessibilityLabel="Copy URL"
+            >
+              <Ionicons name="copy-outline" size={18} color={colors.primaryDark} />
+            </TouchableOpacity>
           </View>
-        </View>
-
-        <View style={styles.rightSection}>
-          <TouchableOpacity accessibilityRole="button"
-            style={styles.iconButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="remove-outline" size={22} color={colors.primaryDark} />
-          </TouchableOpacity>
-          <TouchableOpacity accessibilityRole="button"
-            style={styles.iconButton}
-            onPress={() => setShowMenu(!showMenu)}
-            accessibilityLabel="More Options"
-          >
-            <Ionicons
-              name={showMenu ? "ellipsis-vertical" : "ellipsis-horizontal"}
-              size={20}
-              color={colors.primaryDark}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+        }
+      />
 
       {/* LINEAR PROGRESS INDICATOR */}
       {loading && (

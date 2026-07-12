@@ -2,6 +2,7 @@ import React from "react";
 import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
 import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
@@ -34,7 +35,7 @@ import HearingClassificationService from '../services/hearing/HearingClassificat
 
 // --- PREMIUM GLOSSY COMPONENT ---
 const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => (
-  <TouchableOpacity accessibilityRole="button"
+  <PremiumTouchable accessibilityRole="button"
     style={styles.premiumExportBtn}
     activeOpacity={0.7}
     onPress={(e) => {
@@ -44,7 +45,7 @@ const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => (
   >
     <Share2 color={colors.primary} size={14} strokeWidth={2.5} />
     <Text style={styles.premiumExportText}>Export</Text>
-  </TouchableOpacity>
+  </PremiumTouchable>
 );
 
 export default function DiaryScreen({ profile }) {
@@ -167,31 +168,22 @@ export default function DiaryScreen({ profile }) {
         translucent
       />
 
-      {/* HEADER SECTION */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity accessibilityRole="button"
-            onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Chamber Diary</Text>
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>
-                {profile?.name || "Advocate"} • Practice Workflow
-              </Text>
-            </View>
-          </View>
-          <TouchableOpacity accessibilityRole="button"
+            {/* HEADER SECTION */}
+      <PremiumPageHeader
+        title="Chamber Diary"
+        subtitle={`${profile?.name || "Advocate"} • Practice Workflow`}
+        rightComponent={
+          <PremiumTouchable accessibilityRole="button"
             style={styles.glassButton}
             onPress={handleFullDiaryPDF}
           >
-            <FileText color={colors.primaryDark} size={24} />
-          </TouchableOpacity>
-        </View>
+            <FileText color={colors.primary} size={24} />
+          </PremiumTouchable>
+        }
+      />
 
+      {/* SEARCH BAR (moved out of header) */}
+      <View style={{ backgroundColor: colors.surface, paddingHorizontal: 16, paddingBottom: 16 }}>
         <View style={styles.searchWrapper}>
           <LegalInput
             label="Diary Search"
@@ -227,7 +219,7 @@ export default function DiaryScreen({ profile }) {
                   </View>
                 </View>
                 {pendingCases.map((item) => (
-                  <TouchableOpacity accessibilityRole="button"
+                  <PremiumTouchable accessibilityRole="button"
                     key={item.id}
                     style={[styles.caseCard, styles.pendingBorder]}
                     onPress={() =>
@@ -244,7 +236,7 @@ export default function DiaryScreen({ profile }) {
                         </View>
                       )}
                     </View>
-                  </TouchableOpacity>
+                  </PremiumTouchable>
                 ))}
               </View>
             )}
@@ -262,7 +254,7 @@ export default function DiaryScreen({ profile }) {
                   >
                     <Text style={styles.caseTitleText}>{item.title}</Text>
                     <Text style={styles.caseCourtText}>🏛 {item.court}</Text>
-                    <TouchableOpacity accessibilityRole="button"
+                    <PremiumTouchable accessibilityRole="button"
                       style={styles.activateBtn}
                       onPress={async () => {
                         try {
@@ -277,7 +269,7 @@ export default function DiaryScreen({ profile }) {
                       <Text style={styles.activateBtnText}>
                         ACTIVATE TO DIARY
                       </Text>
-                    </TouchableOpacity>
+                    </PremiumTouchable>
                   </View>
                 ))}
               </View>
@@ -295,7 +287,7 @@ export default function DiaryScreen({ profile }) {
               </View>
 
               {filteredCases.active.map((item) => (
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   key={item.id}
                   style={[styles.caseCard, styles.activeBorder]}
                   onPress={() =>
@@ -349,14 +341,14 @@ export default function DiaryScreen({ profile }) {
                   </View>
 
                   <View style={styles.cardFooter}>
-                    <TouchableOpacity accessibilityRole="button"
+                    <PremiumTouchable accessibilityRole="button"
                       onPress={() => handleArchive(item.id, item.title)}
                     >
                       <Text style={styles.archiveLink}>Move to Archive</Text>
-                    </TouchableOpacity>
+                    </PremiumTouchable>
                     <Text style={styles.tapHint}>Case Details ›</Text>
                   </View>
-                </TouchableOpacity>
+                </PremiumTouchable>
               ))}
             </View>
           </>
@@ -369,7 +361,7 @@ export default function DiaryScreen({ profile }) {
           <View style={styles.exportModalCard}>
             <Text style={styles.modalTitle}>Export Case</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               style={styles.exportOption}
               onPress={() => {
                 exportCauseListPdf([selectedCase], selectedCase.title);
@@ -378,9 +370,9 @@ export default function DiaryScreen({ profile }) {
             >
               <FileText color={colors.primaryDark} size={20} />
               <Text style={styles.exportText}>Export as PDF</Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
 
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               style={styles.exportOption}
               onPress={async () => {
                 const text = `Title: ${selectedCase?.title}\nCourt: ${selectedCase?.court}\nNext Hearing: ${toDisplay(selectedCase?.nextHearingISO, locale)}\nBalance: ${formatMoney(selectedCase?.feeBalance, currency, locale)}`;
@@ -391,9 +383,9 @@ export default function DiaryScreen({ profile }) {
             >
               <Copy color={colors.primaryDark} size={20} />
               <Text style={styles.exportText}>Copy Full Details</Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
 
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               style={styles.exportOption}
               onPress={async () => {
                 await Clipboard.setStringAsync(
@@ -405,14 +397,14 @@ export default function DiaryScreen({ profile }) {
             >
               <Fingerprint color={colors.primaryDark} size={20} />
               <Text style={styles.exportText}>Copy Case No</Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
 
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               style={styles.cancelBtn}
               onPress={() => setExportModalVisible(false)}
             >
               <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
         </View>
       </Modal>
@@ -422,37 +414,8 @@ export default function DiaryScreen({ profile }) {
 
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: colors.border },
-  premiumHeader: {
-    backgroundColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
-    paddingBottom: 25,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
-    ...(resolvedTheme === 'dark' ? {
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderTopWidth: 0,
-    } : {
-      elevation: 5,
-    }),
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  glassBackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: resolvedTheme === 'dark' ? colors.border : "rgba(255,255,255,0.1)",
-  },
   backIcon: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 28, marginTop: -4 },
   titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "700", color: resolvedTheme === 'dark' ? colors.primary : colors.surface },
   jurisdictionPill: {
     backgroundColor: colors.border,
     paddingHorizontal: 12,

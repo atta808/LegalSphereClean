@@ -1,5 +1,4 @@
 import React from "react";
-import PremiumButton from '../components/PremiumButton';
 import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -335,28 +334,11 @@ export default function UpdateCaseHearingScreen({ profile }) {
 
       {/* PREMIUM WHITE HEADER */}
 
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity accessibilityRole="button"
-            onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
-          >
-            <Ionicons name="chevron-back" size={24} color={colors.primary} />
-          </TouchableOpacity>
-
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>
-              {isEditMode ? "Update Hearing" : "Record Proceedings"}
-            </Text>
-
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>Court Hearing Ledger</Text>
-            </View>
-          </View>
-
-          <View style={{ width: 44 }} />
-        </View>
-      </View>
+            {/* PREMIUM WHITE HEADER */}
+      <PremiumPageHeader
+        title={isEditMode ? "Update Hearing" : "Record Proceedings"}
+        subtitle="Court Hearing Ledger"
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

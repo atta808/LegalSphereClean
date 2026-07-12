@@ -1,4 +1,6 @@
 import React from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import EmptyState from "../components/EmptyState";
 import SkeletonLoader from "../components/SkeletonLoader";
 import PremiumCard from "../components/PremiumCard";
@@ -90,29 +92,13 @@ export default function ClientsScreen({ profile }) {
       <StatusBar barStyle="dark-content" translucent />
 
       {/* PREMIUM HEADER WITH BACK BUTTON */}
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          {/* BACK BUTTON */}
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
-          >
-            <Ionicons name="chevron-back" size={24} color={colors.primary} />
-          </TouchableOpacity>
-
-          {/* TITLE */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Client Directory</Text>
-            <Text style={styles.subTitle}>
-              {clients.length} Total Verified Clients
-            </Text>
-          </View>
-
-          {/* RIGHT ACTIONS */}
+      <PremiumPageHeader
+        title="Client Directory"
+        subtitle={`${clients.length} Total Verified Clients`}
+        rightComponent={
           <View style={{ flexDirection: "row", gap: 10 }}>
             {/* 🔥 ARCHIVE BUTTON */}
-            <TouchableOpacity
+            <PremiumTouchable
               accessibilityRole="button"
               style={styles.archiveBtn}
               onPress={() => navigation.navigate("ClientArchive")}
@@ -122,10 +108,10 @@ export default function ClientsScreen({ profile }) {
                 size={20}
                 color={colors.primary}
               />
-            </TouchableOpacity>
+            </PremiumTouchable>
 
             {/* ADD BUTTON */}
-            <TouchableOpacity
+            <PremiumTouchable
               accessibilityRole="button"
               style={styles.addBtn}
               onPress={() => navigation.navigate("AddClient")}
@@ -137,11 +123,13 @@ export default function ClientsScreen({ profile }) {
                   resolvedTheme === "dark" ? colors.surface : colors.primary
                 }
               />
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
-        </View>
+        }
+      />
 
-        {/* INTEGRATED SEARCH */}
+      <View style={{ backgroundColor: colors.surface, paddingHorizontal: 16, paddingBottom: 16 }}>
+      {/* INTEGRATED SEARCH */}
         <LegalInput
           label="Client Search"
           value={search}
@@ -191,7 +179,7 @@ export default function ClientsScreen({ profile }) {
                     <Text style={styles.name} numberOfLines={1}>
                       {item.name}
                     </Text>
-                    <TouchableOpacity
+                    <PremiumTouchable
                       accessibilityRole="button"
                       onPress={() => handleArchive(item)}
                       style={{ padding: 10, margin: -10 }}
@@ -201,7 +189,7 @@ export default function ClientsScreen({ profile }) {
                         size={20}
                         color={colors.danger}
                       />
-                    </TouchableOpacity>
+                    </PremiumTouchable>
                   </View>
                   <View
                     style={{
@@ -226,7 +214,7 @@ export default function ClientsScreen({ profile }) {
               <View style={styles.cardDivider} />
 
               <View style={styles.actions}>
-                <TouchableOpacity
+                <PremiumTouchable
                   accessibilityRole="button"
                   style={styles.actionBtn}
                   onPress={() => Linking.openURL(`tel:${item.mobile}`)}
@@ -240,9 +228,9 @@ export default function ClientsScreen({ profile }) {
                     />
                     <Text style={styles.actionBtnText}>Call</Text>
                   </View>
-                </TouchableOpacity>
+                </PremiumTouchable>
 
-                <TouchableOpacity
+                <PremiumTouchable
                   accessibilityRole="button"
                   style={[styles.actionBtn, styles.waBtn]}
                   onPress={() =>
@@ -264,7 +252,7 @@ export default function ClientsScreen({ profile }) {
                       WhatsApp
                     </Text>
                   </View>
-                </TouchableOpacity>
+                </PremiumTouchable>
               </View>
             </PremiumCard>
           ))

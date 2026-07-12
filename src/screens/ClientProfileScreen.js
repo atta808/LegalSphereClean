@@ -1,4 +1,6 @@
 import React from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { useTheme } from "../theme/ThemeContext";
 import {
   useFocusEffect,
@@ -72,9 +74,9 @@ export default function ClientProfileScreen({ profile, onBack }) {
     return (
       <View style={styles.center}>
         <Text>Client data not found.</Text>
-        <TouchableOpacity accessibilityRole="button" onPress={() => navigation.goBack()}>
+        <PremiumTouchable accessibilityRole="button" onPress={() => navigation.goBack()}>
           <Text style={{ color: colors.primary, marginTop: 10 }}>Go Back</Text>
-        </TouchableOpacity>
+        </PremiumTouchable>
       </View>
     );
   }
@@ -83,17 +85,11 @@ export default function ClientProfileScreen({ profile, onBack }) {
     <View style={styles.mainContainer}>
       <StatusBar barStyle="dark-content" translucent />
 
-      {/* PREMIUM HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity accessibilityRole="button"
-          onPress={() => (onBack ? onBack() : navigation.goBack())}
-          style={styles.glassBackButton}
-        >
-          <Ionicons name="chevron-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitleText}>Client Profile</Text>
-        <View style={{ width: 42 }} />
-      </View>
+            {/* PREMIUM HEADER */}
+      <PremiumPageHeader
+        title="Client Profile"
+        onBack={() => (onBack ? onBack() : navigation.goBack())}
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -117,7 +113,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
           </Text>
 
           <View style={styles.actionHub}>
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               style={styles.callBtn}
               onPress={() => Linking.openURL(`tel:${client.mobile}`)}
             >
@@ -130,8 +126,8 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 />
                 <Text style={styles.btnText}>Call</Text>
               </View>
-            </TouchableOpacity>
-            <TouchableOpacity accessibilityRole="button"
+            </PremiumTouchable>
+            <PremiumTouchable accessibilityRole="button"
               style={styles.waBtn}
               onPress={() =>
                 Linking.openURL(
@@ -148,7 +144,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 />
                 <Text style={styles.btnText}>WhatsApp</Text>
               </View>
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
         </View>
 
@@ -190,7 +186,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
           </View>
         ) : (
           cases.map((item) => (
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               key={item.id}
               style={styles.caseCard}
               // ✅ Navigates directly to CaseDetail using the app stack
@@ -253,7 +249,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
                   {formatMoney(item.feeBalance, currency)}
                 </Text>
               </View>
-            </TouchableOpacity>
+            </PremiumTouchable>
           ))
         )}
       </ScrollView>
@@ -263,26 +259,7 @@ export default function ClientProfileScreen({ profile, onBack }) {
 
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: colors.background },
-  premiumHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    paddingHorizontal: 20,
-    paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-  },
-  glassBackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   backIcon: { fontSize: 30, color: colors.primary, marginTop: -4 },
-  headerTitleText: { fontSize: 18, fontWeight: "700", color: colors.primary },
   scrollContent: { padding: 20 },
   identityCard: {
     backgroundColor: colors.surface,

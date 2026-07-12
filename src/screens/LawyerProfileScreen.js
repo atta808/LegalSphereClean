@@ -1,6 +1,7 @@
 // screens/LawyerProfileScreen.js
 import LegalInput from "../components/LegalInput";
 import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
@@ -122,7 +123,7 @@ export default function LawyerProfileScreen({ navigation }) {
         <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
           {/* IMAGE */}
           <View style={styles.imageSection}>
-            <TouchableOpacity accessibilityRole="button" onPress={pickImage} style={styles.imageContainer}>
+            <PremiumTouchable accessibilityRole="button" onPress={pickImage} style={styles.imageContainer}>
               {profile.image ? (
                 <Image
                   source={{ uri: profile.image }}
@@ -136,7 +137,7 @@ export default function LawyerProfileScreen({ navigation }) {
               <View style={styles.editBadge}>
                 <Ionicons name="camera" size={18} color={colors.surface} />
               </View>
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
 
           {/* PERSONAL DETAILS */}
@@ -237,14 +238,14 @@ export default function LawyerProfileScreen({ navigation }) {
           </View>
 
           {/* SAVE BUTTON */}
-          <TouchableOpacity accessibilityRole="button" onPress={save}>
+          <PremiumTouchable accessibilityRole="button" onPress={save}>
             <LinearGradient
               colors={[colors.primaryDark, "#1E40AF"]}
               style={styles.saveBtn}
             >
               <Text style={styles.saveBtnText}>Save Changes</Text>
             </LinearGradient>
-          </TouchableOpacity>
+          </PremiumTouchable>
         </ScrollView>
       </View>
     </KeyboardAvoidingView>
@@ -254,30 +255,6 @@ export default function LawyerProfileScreen({ navigation }) {
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainWrapper: { flex: 1, backgroundColor: colors.border },
 
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-
-  glassBackButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
   backIcon: {
     fontSize: 28,
     color: colors.primary,
@@ -285,12 +262,6 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   },
 
   titleCenter: { flex: 1, alignItems: "center" },
-
-  headerTitleText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: colors.primary,
-  },
 
   jurisdictionPill: {
     backgroundColor: colors.surface,

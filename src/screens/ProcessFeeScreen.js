@@ -1,5 +1,6 @@
 import React from "react";
-import PremiumButton from '../components/PremiumButton';
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -193,28 +194,15 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         </View>
       ) : null}
 
-      {/* HEADER */}
-      <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity accessibilityRole="button"
-            onPress={() => navigation.goBack()}
-            style={styles.backBtn}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={styles.title}>Process Fee</Text>
-            <Text style={styles.subTitle}>Manage Case Expenses</Text>
-          </View>
-
-          <View style={{ width: 42 }} />
-        </View>
-      </View>
+            {/* HEADER */}
+      <PremiumPageHeader
+        title="Process Fee"
+        subtitle="Manage Case Expenses"
+      />
 
       <ScrollView contentContainerStyle={{ padding: 20 , paddingBottom: 120 }}>
         {/* CASE PICKER */}
-        <TouchableOpacity accessibilityRole="button"
+        <PremiumTouchable accessibilityRole="button"
           style={styles.input}
           activeOpacity={0.85}
           onPress={() => setCasePickerVisible(true)}
@@ -228,7 +216,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
             {cases.find((c) => String(c.id) === String(selectedCaseId))
               ?.title || "Select Case"}
           </Text>
-        </TouchableOpacity>
+        </PremiumTouchable>
 
         {/* AUTO COURT DISPLAY */}
         <View style={styles.input}>
@@ -246,14 +234,14 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         />
 
         {/* DATE */}
-        <TouchableOpacity accessibilityRole="button"
+        <PremiumTouchable accessibilityRole="button"
           style={styles.input}
           onPress={() => setShowDatePicker(true)}
         >
           <Text style={{ color: dateObject ? colors.shadow : colors.placeholder }}>
             {dateObject ? toDisplay(dateObject, locale) : "Select Date"}
           </Text>
-        </TouchableOpacity>
+        </PremiumTouchable>
 
         {showDatePicker && (
           <DateTimePicker
@@ -284,9 +272,9 @@ export default function ProcessFeeScreen({ profile, onBack }) {
           multiline
         />
 
-        <TouchableOpacity accessibilityRole="button" style={styles.saveBtn} onPress={handleSave}>
+        <PremiumTouchable accessibilityRole="button" style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveText}>{editingId ? "UPDATE" : "SAVE"}</Text>
-        </TouchableOpacity>
+        </PremiumTouchable>
 
         <Text style={styles.total}>
           Total: {formatMoney(total, currency, locale)}
@@ -324,7 +312,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
               ) : null}
 
               <View style={styles.row}>
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   style={styles.btn}
                   onPress={() => {
                     setSelectedCaseId(item.caseId || null);
@@ -338,10 +326,10 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                   }}
                 >
                   <Text>Edit</Text>
-                </TouchableOpacity>
+                </PremiumTouchable>
 
                 {!item.paid ? (
-                  <TouchableOpacity accessibilityRole="button"
+                  <PremiumTouchable accessibilityRole="button"
                     style={styles.paidBtn}
                     onPress={() => {
                       setSelectedFeeId(item.id);
@@ -349,10 +337,10 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                     }}
                   >
                     <Text style={{ color: colors.surface }}>Paid</Text>
-                  </TouchableOpacity>
+                  </PremiumTouchable>
                 ) : null}
 
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   style={styles.deleteBtn}
                   onPress={() => {
                     if (item?.id) {
@@ -362,7 +350,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                   }}
                 >
                   <Text>Delete</Text>
-                </TouchableOpacity>
+                </PremiumTouchable>
               </View>
             </View>
           ))}
@@ -384,7 +372,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
             />
 
             <View style={styles.row}>
-              <TouchableOpacity accessibilityRole="button"
+              <PremiumTouchable accessibilityRole="button"
                 style={styles.cancelBtn}
                 onPress={() => {
                   setShowPaidModal(false);
@@ -392,11 +380,11 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                 }}
               >
                 <Text>Cancel</Text>
-              </TouchableOpacity>
+              </PremiumTouchable>
 
-              <TouchableOpacity accessibilityRole="button" style={styles.confirmBtn} onPress={confirmPaid}>
+              <PremiumTouchable accessibilityRole="button" style={styles.confirmBtn} onPress={confirmPaid}>
                 <Text style={{ color: colors.surface }}>Confirm</Text>
-              </TouchableOpacity>
+              </PremiumTouchable>
             </View>
           </View>
         </View>
@@ -426,11 +414,6 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
   },
   subTitle: { fontSize: 11, color: colors.secondaryText, marginTop: 2 },
   backBtn: {

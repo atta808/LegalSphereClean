@@ -513,38 +513,22 @@ export default function LexAiScreen() {
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       {/* Clean Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity
+      <PremiumPageHeader
+        title="Lex Workspace"
+        rightComponent={
+          <PremiumTouchable
             accessibilityRole="button"
-            onPress={() => navigation.goBack()}
+            onPress={clearChatHistory}
             style={styles.iconButton}
-            activeOpacity={0.7}
           >
             <Ionicons
-              name="arrow-back"
-              size={20}
-              color={resolvedTheme === "dark" ? colors.primary : colors.surface}
+              name="trash-outline"
+              size={18}
+              color={resolvedTheme === "dark" ? colors.danger : colors.surface}
             />
-          </TouchableOpacity>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>Lex Workspace</Text>
-            <View style={styles.statusDot} />
-          </View>
-        </View>
-        <TouchableOpacity
-          accessibilityRole="button"
-          onPress={clearChatHistory}
-          style={styles.iconButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name="trash-outline"
-            size={18}
-            color={resolvedTheme === "dark" ? colors.danger : colors.surface}
-          />
-        </TouchableOpacity>
-      </View>
+          </PremiumTouchable>
+        }
+      />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}

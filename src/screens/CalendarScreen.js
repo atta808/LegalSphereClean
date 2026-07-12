@@ -1,4 +1,6 @@
 import React from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import SkeletonLoader from '../components/SkeletonLoader';
 import EmptyState from '../components/EmptyState';
 import { useTheme } from "../theme/ThemeContext";
@@ -80,33 +82,26 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
 
   return (
     <View style={styles.container}>
-      {/* PREMIUM HEADER */}
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity accessibilityRole="button"
-          style={styles.glassBackButton}
-          onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            } else {
-              navigation.navigate("Dashboard"); // or MainTabs
-            }
-          }}
-        >
-          <Ionicons name="chevron-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
-        <View style={{ alignItems: "center" }}>
-          <Text style={styles.title}>Chamber Calendar</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>OFFICIAL DIARY</Text>
-          </View>
-        </View>
-        <TouchableOpacity accessibilityRole="button"
-          style={styles.todayBtn}
-          onPress={() => setSelectedDate(toYMD(new Date()))}
-        >
-          <Text style={styles.todayText}>Today</Text>
-        </TouchableOpacity>
-      </View>
+            {/* PREMIUM HEADER */}
+      <PremiumPageHeader
+        title="Chamber Calendar"
+        subtitle="OFFICIAL DIARY"
+        onBack={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.navigate("Dashboard"); // or MainTabs
+          }
+        }}
+        rightComponent={
+          <PremiumTouchable accessibilityRole="button"
+            style={styles.todayBtn}
+            onPress={() => setSelectedDate(toYMD(new Date()))}
+          >
+            <Text style={styles.todayText}>Today</Text>
+          </PremiumTouchable>
+        }
+      />
 
       {/* EXPANDABLE CALENDAR SECTION */}
       <CalendarProvider
@@ -148,7 +143,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
             </View>
           ) : (
             agendaList.map((item) => (
-              <TouchableOpacity accessibilityRole="button"
+              <PremiumTouchable accessibilityRole="button"
                 key={item.id}
                 style={styles.card}
                 onPress={() =>
@@ -211,7 +206,7 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
                     </View>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </PremiumTouchable>
             ))
           )}
         </ScrollView>
@@ -265,16 +260,6 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
     backgroundColor: colors.surface,
-  },
-  glassBackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
   },
   backIcon: { color: colors.primary, fontSize: 24, fontWeight: "300" },
   title: {

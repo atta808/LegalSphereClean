@@ -1,6 +1,8 @@
 import { getProfile, saveProfile } from "../services/sqliteService";
 import { getLegalSystemByCountry } from "../constants/legalSystems";
 import React, { useRef, useState } from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { useTheme } from '../theme/ThemeContext';
 import {
   View,
@@ -36,14 +38,14 @@ const PremiumPressable = ({ onPress, children, style }) => {
 
   return (
     <Animated.View style={[{ transform: [{ scale: scaleValue }] }, style]}>
-      <TouchableOpacity accessibilityRole="button"
+      <PremiumTouchable accessibilityRole="button"
         activeOpacity={1}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         onPress={onPress}
       >
         {children}
-      </TouchableOpacity>
+      </PremiumTouchable>
     </Animated.View>
   );
 };
@@ -183,7 +185,7 @@ export default function BrowserHomeScreen() {
               </View>
             )}
 
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               onPress={() => toggleFavorite(item.id)}
               style={styles.favoriteButton}
             >
@@ -192,7 +194,7 @@ export default function BrowserHomeScreen() {
                 size={18}
                 color={favoriteTools.includes(item.id) ? colors.warning : colors.placeholder}
               />
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
         </View>
 
@@ -217,21 +219,18 @@ export default function BrowserHomeScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
 
-      {/* SYSTEM HEADER */}
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <View style={styles.headerTopRow}>
-          <View>
-            <Text style={styles.headerTitle}>LegalSphere</Text>
-            <Text style={styles.headerSubtitle}>
-              {legalSystem.countryName} Legal Workspace
-            </Text>
-          </View>
+            {/* SYSTEM HEADER */}
+      <PremiumPageHeader
+        title="LegalSphere"
+        subtitle={`${legalSystem.countryName} Legal Workspace`}
+        showBackButton={false}
+        rightComponent={
           <View style={styles.statusIndicator}>
             <View style={styles.pulseDot} />
             <Text style={styles.statusText}>SECURE NODE</Text>
           </View>
-        </View>
-      </View>
+        }
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

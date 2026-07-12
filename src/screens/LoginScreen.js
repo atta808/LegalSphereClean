@@ -1,4 +1,6 @@
 import React from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -147,12 +149,15 @@ export default function LoginScreen({ onLoginSuccess }) {
     <View style={styles.mainContainer}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
 
-      {/* HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 20 }]}>
-        <Text style={styles.brandIcon}>⚖️</Text>
-        <Text style={styles.mainTitle}>LegalSphere</Text>
-        <Text style={styles.subTitleText}>ADVOCATE PORTAL</Text>
-      </View>
+            {/* HEADER */}
+      <PremiumPageHeader
+        title="LegalSphere"
+        subtitle="ADVOCATE PORTAL"
+        showBackButton={false}
+        rightComponent={
+          <Text style={{ fontSize: 24 }}>⚖️</Text>
+        }
+      />
 
       <SafeAreaView style={styles.contentArea}>
         <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
@@ -174,7 +179,7 @@ export default function LoginScreen({ onLoginSuccess }) {
             {/* COUNTRY */}
             {isRegister && (
               <View>
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   style={styles.pickerWrapper}
                   activeOpacity={0.85}
                   onPress={() => setCountryPickerVisible(true)}
@@ -189,7 +194,7 @@ export default function LoginScreen({ onLoginSuccess }) {
                     {countries.find((c) => c.code === countryCode)?.name ||
                       "Select Country"}
                   </Text>
-                </TouchableOpacity>
+                </PremiumTouchable>
               </View>
             )}
             {isRegister && (
@@ -218,7 +223,7 @@ export default function LoginScreen({ onLoginSuccess }) {
               placeholder="Enter password"
               secureTextEntry
             />
-            <TouchableOpacity accessibilityRole="button" onPress={handleForgotPassword}>
+            <PremiumTouchable accessibilityRole="button" onPress={handleForgotPassword}>
               <Text
                 style={{
                   color: colors.text,
@@ -229,9 +234,9 @@ export default function LoginScreen({ onLoginSuccess }) {
               >
                 Forgot Password?
               </Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
             {/* BUTTON */}
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               style={styles.actionButton}
               onPress={handleSubmit}
             >
@@ -242,14 +247,14 @@ export default function LoginScreen({ onLoginSuccess }) {
                   {isRegister ? "REGISTER" : "LOGIN"}
                 </Text>
               )}
-            </TouchableOpacity>
+            </PremiumTouchable>
 
             {/* TOGGLE */}
-            <TouchableOpacity accessibilityRole="button" onPress={() => setIsRegister(!isRegister)}>
+            <PremiumTouchable accessibilityRole="button" onPress={() => setIsRegister(!isRegister)}>
               <Text style={styles.toggleText}>
                 {isRegister ? "Already have account? Login" : "Create Account"}
               </Text>
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
         </ScrollView>
         <LegalPicker
@@ -278,14 +283,6 @@ export default function LoginScreen({ onLoginSuccess }) {
 }
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: colors.border },
-  premiumHeader: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 24,
-    paddingBottom: 70,
-    alignItems: "center",
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
-  },
   brandBadge: {
     backgroundColor: "rgba(255, 255, 255, 0.15)",
     padding: 12,

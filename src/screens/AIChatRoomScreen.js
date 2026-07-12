@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { useTheme } from '../theme/ThemeContext';
 import {
   View,
@@ -338,18 +339,18 @@ export default function AIChatRoomScreen({ route, navigation }) {
             </Text>
             {!isUser && (
               <View style={styles.actionRow}>
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   onPress={() => handleAction("copy", item.text)}
                   style={styles.actionIcon}
                 >
                   <Feather name="copy" size={14} color={colors.placeholder} />
-                </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                </PremiumTouchable>
+                <PremiumTouchable accessibilityRole="button"
                   onPress={() => handleAction("save", item.text)}
                   style={styles.actionIcon}
                 >
                   <Feather name="bookmark" size={14} color={colors.placeholder} />
-                </TouchableOpacity>
+                </PremiumTouchable>
               </View>
             )}
           </View>
@@ -381,12 +382,21 @@ export default function AIChatRoomScreen({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <StatusBar barStyle="dark-content" />
-      <KeyboardAvoidingView
+            <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         {/* FROSTED HEADER */}
-        <PremiumPageHeader title="Lex AI" subtitle="Secure Workspace" elevationLevel={2} />
+        <PremiumPageHeader
+          title="Case Intelligence"
+          subtitle={`#${caseData?.caseNo || 'New'} - ${caseData?.title || 'Case'}`}
+          elevationLevel={2}
+          rightComponent={
+             <PremiumTouchable accessibilityRole="button" onPress={clearChat} style={styles.clearBtn}>
+                <Ionicons name="trash-outline" size={18} color={colors.danger} />
+             </PremiumTouchable>
+          }
+        />
 
         {/* CHAT AREA */}
         <FlatList
@@ -430,14 +440,14 @@ export default function AIChatRoomScreen({ route, navigation }) {
               contentContainerStyle={[styles.quickReplyScroll, { paddingBottom: 120 }]}
             >
               {quickReplies.map((qr, idx) => (
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   key={idx}
                   style={styles.qrPill}
                   onPress={() => sendMessage(qr.action)}
                 >
                   <Feather name={qr.icon} size={14} color={colors.primary} />
                   <Text style={styles.qrText}>{qr.label}</Text>
-                </TouchableOpacity>
+                </PremiumTouchable>
               ))}
             </ScrollView>
           </View>
@@ -456,19 +466,19 @@ export default function AIChatRoomScreen({ route, navigation }) {
               <Text style={styles.attachedFileToastText} numberOfLines={1}>
                 {attachedFile.name}
               </Text>
-              <TouchableOpacity accessibilityRole="button" onPress={() => setAttachedFile(null)}>
+              <PremiumTouchable accessibilityRole="button" onPress={() => setAttachedFile(null)}>
                 <Feather name="x-circle" size={16} color={colors.placeholder} />
-              </TouchableOpacity>
+              </PremiumTouchable>
             </Animated.View>
           )}
 
           <View style={styles.floatingInputWrapper}>
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               onPress={handleAttachDocument}
               style={styles.attachBtn}
             >
               <Ionicons name="add-circle-outline" size={24} color={colors.secondaryText} />
-            </TouchableOpacity>
+            </PremiumTouchable>
 
             <LegalInput
               value={inputText}
@@ -479,7 +489,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
               style={styles.textInput}
             />
 
-            <TouchableOpacity accessibilityRole="button"
+            <PremiumTouchable accessibilityRole="button"
               disabled={loading || (!inputText.trim() && !attachedFile)}
               onPress={() => sendMessage()}
               style={[
@@ -493,7 +503,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
               >
                 <Feather name="arrow-up" size={18} color={colors.surface} />
               </LinearGradient>
-            </TouchableOpacity>
+            </PremiumTouchable>
           </View>
         </View>
       </KeyboardAvoidingView>

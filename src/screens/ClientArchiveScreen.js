@@ -1,4 +1,6 @@
 import React from "react";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useState } from "react";
@@ -39,24 +41,11 @@ export default function ClientArchiveScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* 🔹 HEADER */}
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity accessibilityRole="button"
-            onPress={() => navigation.goBack()}
-            style={styles.backBtn}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={styles.title}>Archived Clients</Text>
-            <Text style={styles.subTitle}>Restore deleted clients</Text>
-          </View>
-
-          <View style={{ width: 42 }} />
-        </View>
-      </View>
+            {/* 🔹 HEADER */}
+      <PremiumPageHeader
+        title="Archived Clients"
+        subtitle="Restore deleted clients"
+      />
 
       {/* 🔹 CONTENT */}
       <ScrollView
@@ -91,7 +80,7 @@ export default function ClientArchiveScreen() {
 
               <View style={styles.row}>
                 {/* ✅ RESTORE */}
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   style={styles.restoreBtn}
                   onPress={() => {
                     restoreClient(item.id);
@@ -99,10 +88,10 @@ export default function ClientArchiveScreen() {
                   }}
                 >
                   <Text style={styles.restoreText}>Restore</Text>
-                </TouchableOpacity>
+                </PremiumTouchable>
 
                 {/* ❌ DELETE FOREVER */}
-                <TouchableOpacity accessibilityRole="button"
+                <PremiumTouchable accessibilityRole="button"
                   style={styles.deleteBtn}
                   onPress={() => {
                     Alert.alert(
@@ -123,7 +112,7 @@ export default function ClientArchiveScreen() {
                   }}
                 >
                   <Text style={styles.deleteText}>🗑 Delete</Text>
-                </TouchableOpacity>
+                </PremiumTouchable>
               </View>
             </View>
           ))
@@ -150,12 +139,6 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 20,
     elevation: 5,
-  },
-
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
   },
 
   backBtn: {

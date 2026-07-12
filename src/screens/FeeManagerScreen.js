@@ -1,7 +1,7 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
-import SkeletonLoader from '../components/SkeletonLoader';
-import PremiumPageHeader from '../components/PremiumPageHeader';
+import EmptyState from "../components/EmptyState";
+import SkeletonLoader from "../components/SkeletonLoader";
+import PremiumPageHeader from "../components/PremiumPageHeader";
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -27,7 +27,10 @@ import { updateCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency } from "../utils/currency";
 export default function FeeManagerScreen({ profile, onBack }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const insets = useSafeAreaInsets();
 
   const [saving, setSaving] = useState(false);
@@ -171,11 +174,15 @@ export default function FeeManagerScreen({ profile, onBack }) {
               <View
                 style={[
                   styles.priorityBadge,
-                  item.priority === "urgent" && { backgroundColor: colors.danger },
+                  item.priority === "urgent" && {
+                    backgroundColor: colors.danger,
+                  },
                   item.priority === "important" && {
                     backgroundColor: colors.surface,
                   },
-                  item.priority === "normal" && { backgroundColor: colors.border },
+                  item.priority === "normal" && {
+                    backgroundColor: colors.border,
+                  },
                 ]}
               >
                 <Text
@@ -183,7 +190,9 @@ export default function FeeManagerScreen({ profile, onBack }) {
                     styles.priorityText,
                     item.priority === "urgent" && { color: colors.danger },
                     item.priority === "important" && { color: colors.text },
-                    item.priority === "normal" && { color: colors.secondaryText },
+                    item.priority === "normal" && {
+                      color: colors.secondaryText,
+                    },
                   ]}
                 >
                   {item.priority?.toUpperCase()}
@@ -193,7 +202,8 @@ export default function FeeManagerScreen({ profile, onBack }) {
                 Balance: {formatMoney(item.feeBalance, currency, locale)}
               </Text>
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.recordPaymentBtn}
                 onPress={() => openPaymentModal(item)}
               >
@@ -219,7 +229,8 @@ export default function FeeManagerScreen({ profile, onBack }) {
 
             <View style={styles.modalButtonsRow}>
               {/* ❌ DISCARD BUTTON */}
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.modalCancelBtn}
                 onPress={closePaymentModal}
               >
@@ -227,7 +238,8 @@ export default function FeeManagerScreen({ profile, onBack }) {
               </TouchableOpacity>
 
               {/* ✅ SAVE BUTTON */}
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.modalSaveBtn}
                 onPress={handleAddPayment}
                 disabled={saving}
@@ -244,263 +256,285 @@ export default function FeeManagerScreen({ profile, onBack }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: colors.border },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: { flex: 1, backgroundColor: colors.border },
 
-  // Header
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 25,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    zIndex: 10,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  glassBackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  backIcon: {
-    color: colors.primary,
-    fontSize: 28,
-    fontWeight: "300",
-    marginTop: -4,
-  },
-  titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
-  jurisdictionPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-  jurisdictionText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
+    // Header
+    premiumHeader: {
+      backgroundColor: colors.surface,
+      paddingBottom: 25,
+      borderBottomLeftRadius: 35,
+      borderBottomRightRadius: 35,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.05,
+      shadowRadius: 20,
+      zIndex: 10,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 20,
+    },
+    glassBackButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 14,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    backIcon: {
+      color: colors.primary,
+      fontSize: 28,
+      fontWeight: "300",
+      marginTop: -4,
+    },
+    titleCenter: { flex: 1, alignItems: "center" },
+    headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
+    jurisdictionPill: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 12,
+      paddingVertical: 3,
+      borderRadius: 10,
+      marginTop: 4,
+    },
+    jurisdictionText: {
+      fontSize: 9,
+      fontWeight: "800",
+      color: colors.primary,
+      textTransform: "uppercase",
+    },
 
-  // Summary Grid
-  summaryGrid: {
-    flexDirection: "row",
-    gap: 12,
-    paddingHorizontal: 20,
-    marginTop: 25,
-  },
-  summaryCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    padding: 18,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.02,
-    shadowRadius: 10,
-  },
-  outstandingBg: { backgroundColor: colors.primary, borderColor: colors.primary },
-  summaryLabel: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.placeholder,
-    letterSpacing: 0.5,
-  },
-  summaryLabelLight: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: "rgba(255,255,255,0.6)",
-    letterSpacing: 0.5,
-  },
-  summaryValue: { fontSize: 20, fontWeight: "900", marginTop: 4 },
-  summaryValueLight: {
-    fontSize: 20,
-    fontWeight: "900",
-    color: colors.surface,
-    marginTop: 4,
-  },
+    // Summary Grid
+    summaryGrid: {
+      flexDirection: "row",
+      gap: 12,
+      paddingHorizontal: 20,
+      marginTop: 25,
+    },
+    summaryCard: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      padding: 18,
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: colors.border,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.02,
+      shadowRadius: 10,
+    },
+    outstandingBg: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    summaryLabel: {
+      fontSize: 9,
+      fontWeight: "800",
+      color: colors.placeholder,
+      letterSpacing: 0.5,
+    },
+    summaryLabelLight: {
+      fontSize: 9,
+      fontWeight: "800",
+      color: "rgba(255,255,255,0.6)",
+      letterSpacing: 0.5,
+    },
+    summaryValue: { fontSize: 20, fontWeight: "900", marginTop: 4 },
+    summaryValueLight: {
+      fontSize: 20,
+      fontWeight: "900",
+      color: colors.surface,
+      marginTop: 4,
+    },
 
-  scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
 
-  // Case Cards
-  caseCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 28,
-    padding: 22,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 12,
-    elevation: 2,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  caseTitleText: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: colors.text,
-    marginBottom: 2,
-  },
-  statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  statusPillText: { fontSize: 9, fontWeight: "900" },
-  clientEmailText: { fontSize: 13, color: colors.placeholder, fontWeight: "500" },
-  cardDivider: { height: 1, backgroundColor: colors.background, marginVertical: 18 },
+    // Case Cards
+    caseCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 28,
+      padding: 22,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.03,
+      shadowRadius: 12,
+      elevation: 2,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+    },
+    caseTitleText: {
+      fontSize: 17,
+      fontWeight: "800",
+      color: colors.text,
+      marginBottom: 2,
+    },
+    statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+    statusPillText: { fontSize: 9, fontWeight: "900" },
+    clientEmailText: {
+      fontSize: 13,
+      color: colors.placeholder,
+      fontWeight: "500",
+    },
+    cardDivider: {
+      height: 1,
+      backgroundColor: colors.background,
+      marginVertical: 18,
+    },
 
-  feeGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 22,
-  },
-  feeItem: { flex: 1 },
-  feeLabel: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.placeholder,
-    letterSpacing: 0.8,
-  },
-  feeValue: { fontSize: 15, fontWeight: "900", color: colors.text, marginTop: 4 },
+    feeGrid: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 22,
+    },
+    feeItem: { flex: 1 },
+    feeLabel: {
+      fontSize: 9,
+      fontWeight: "800",
+      color: colors.placeholder,
+      letterSpacing: 0.8,
+    },
+    feeValue: {
+      fontSize: 15,
+      fontWeight: "900",
+      color: colors.text,
+      marginTop: 4,
+    },
 
-  recordPaymentBtn: {
-    backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: 20,
-    alignItems: "center",
-    shadowColor: colors.primary,
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 3,
-  },
-  recordBtnText: {
-    fontSize: 13,
-    fontWeight: "900",
-    color: colors.surface,
-    letterSpacing: 1,
-  },
+    recordPaymentBtn: {
+      backgroundColor: colors.primary,
+      paddingVertical: 16,
+      borderRadius: 20,
+      alignItems: "center",
+      shadowColor: colors.primary,
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      elevation: 3,
+    },
+    recordBtnText: {
+      fontSize: 13,
+      fontWeight: "900",
+      color: colors.surface,
+      letterSpacing: 1,
+    },
 
-  // Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(15, 23, 42, 0.7)",
-    justifyContent: "center",
-    padding: 25,
-  },
-  modalCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 32,
-    padding: 30,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.2,
-  },
-  modalHandle: {
-    width: 40,
-    height: 4,
-    backgroundColor: colors.border,
-    borderRadius: 2,
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-  modalTitle: { fontSize: 22, fontWeight: "900", color: colors.text },
-  modalCaseSub: {
-    fontSize: 14,
-    color: colors.secondaryText,
-    marginTop: 4,
-    marginBottom: 30,
-  },
-  modalInputGroup: { marginBottom: 30 },
-  modalInputLabel: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: colors.secondaryText,
-    textTransform: "uppercase",
-    marginBottom: 12,
-    letterSpacing: 1,
-  },
+    // Modal
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(15, 23, 42, 0.7)",
+      justifyContent: "center",
+      padding: 25,
+    },
+    modalCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 32,
+      padding: 30,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.2,
+    },
+    modalHandle: {
+      width: 40,
+      height: 4,
+      backgroundColor: colors.border,
+      borderRadius: 2,
+      alignSelf: "center",
+      marginBottom: 20,
+    },
+    modalTitle: {
+      fontSize: 22,
+      fontWeight: "900",
+      color: colors.text,
+      marginBottom: 22,
+    },
+    modalCaseSub: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      marginTop: 4,
+      marginBottom: 30,
+    },
+    modalInputGroup: { marginBottom: 30 },
+    modalInputLabel: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: colors.secondaryText,
+      textTransform: "uppercase",
+      marginBottom: 12,
+      letterSpacing: 1,
+    },
 
-  emptyBox: { alignItems: "center", marginTop: 80, paddingHorizontal: 40 },
-  emptyIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  emptyEmoji: { fontSize: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
-  emptySub: {
-    fontSize: 14,
-    color: colors.placeholder,
-    marginTop: 8,
-    textAlign: "center",
-    lineHeight: 22,
-  },
+    emptyBox: { alignItems: "center", marginTop: 80, paddingHorizontal: 40 },
+    emptyIconCircle: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    emptyEmoji: { fontSize: 40 },
+    emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
+    emptySub: {
+      fontSize: 14,
+      color: colors.placeholder,
+      marginTop: 8,
+      textAlign: "center",
+      lineHeight: 22,
+    },
 
-  loaderWrap: { paddingVertical: 100, alignItems: "center" },
-  loaderText: { marginTop: 15, color: colors.primary, fontWeight: "700" },
-  priorityBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginTop: 6,
-  },
+    loaderWrap: { paddingVertical: 100, alignItems: "center" },
+    loaderText: { marginTop: 15, color: colors.primary, fontWeight: "700" },
+    priorityBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 8,
+      marginTop: 6,
+    },
 
-  priorityText: {
-    fontSize: 9,
-    fontWeight: "900",
-  },
-  modalButtonsRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 20,
-  },
+    priorityText: {
+      fontSize: 9,
+      fontWeight: "900",
+    },
+    modalButtonsRow: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: 20,
+    },
 
-  modalCancelBtn: {
-    flex: 1,
-    paddingVertical: 16,
-    alignItems: "center",
-    borderRadius: 16,
-    backgroundColor: colors.border,
-  },
+    modalCancelBtn: {
+      flex: 1,
+      paddingVertical: 16,
+      alignItems: "center",
+      borderRadius: 16,
+      backgroundColor: colors.border,
+    },
 
-  modalCancelText: {
-    color: colors.secondaryText,
-    fontWeight: "800",
-    fontSize: 13,
-  },
+    modalCancelText: {
+      color: colors.secondaryText,
+      fontWeight: "800",
+      fontSize: 13,
+    },
 
-  modalSaveBtn: {
-    flex: 2,
-    backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: 16,
-    alignItems: "center",
-  },
+    modalSaveBtn: {
+      flex: 2,
+      backgroundColor: colors.primary,
+      paddingVertical: 16,
+      borderRadius: 16,
+      alignItems: "center",
+    },
 
-  modalSaveText: {
-    color: colors.surface,
-    fontWeight: "900",
-    fontSize: 13,
-  },
-});
+    modalSaveText: {
+      color: colors.surface,
+      fontWeight: "900",
+      fontSize: 13,
+    },
+  });

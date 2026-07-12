@@ -1,6 +1,6 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
-import PremiumCard from '../components/PremiumCard';
+import EmptyState from "../components/EmptyState";
+import PremiumCard from "../components/PremiumCard";
 import { useTheme } from "../theme/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -27,7 +27,7 @@ import {
 import { exportCauseListPdf } from "../utils/causeListPdf";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday } from "../utils/date";
-import HearingClassificationService from '../services/hearing/HearingClassificationService';
+import HearingClassificationService from "../services/hearing/HearingClassificationService";
 
 const quickActions = [
   { label: "Add Case", icon: "add-circle-outline", action: "addCase" },
@@ -44,7 +44,10 @@ const quickActions = [
 
 export default function DashboardScreen({ profile, onLogout }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const insets = useSafeAreaInsets();
   const [stats, setStats] = useState({
     activeCases: 0,
@@ -92,16 +95,23 @@ export default function DashboardScreen({ profile, onLogout }) {
 
       setTotalCases(dashboardStats.totalCases);
 
-      const { getUnreadNotificationCount, getRecentNotifications } = require('../services/notificationService');
+      const {
+        getUnreadNotificationCount,
+        getRecentNotifications,
+      } = require("../services/notificationService");
       setUnreadNotificationsCount(getUnreadNotificationCount());
       setRecentNotifications(getRecentNotifications(3));
 
-      const { today, overdue, upcoming } = HearingClassificationService.classifyHearings(allCases);
+      const { today, overdue, upcoming } =
+        HearingClassificationService.classifyHearings(allCases);
 
       const safeSort = (a, b) =>
         (a.nextHearingISO || "9999").localeCompare(b.nextHearingISO || "9999");
 
-      const pendingList = [...overdue, ...upcoming.filter(c => !c.nextHearingISO)];
+      const pendingList = [
+        ...overdue,
+        ...upcoming.filter((c) => !c.nextHearingISO),
+      ];
       pendingList.sort(safeSort);
 
       const todayList = [...today];
@@ -193,7 +203,10 @@ export default function DashboardScreen({ profile, onLogout }) {
 
   return (
     <View style={styles.mainWrapper}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={colors.primaryDark}
+      />
 
       {/* HEADER */}
       <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
@@ -213,28 +226,37 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
 
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.glassButton}
               onPress={() => navigation.navigate("NotificationCenter")}
             >
-              <Ionicons name="notifications-outline" size={22} color="#FFFFFF" />
+              <Ionicons
+                name="notifications-outline"
+                size={22}
+                color="#FFFFFF"
+              />
               {unreadNotificationsCount > 0 && (
                 <View style={styles.badgeContainer}>
                   <Text style={styles.badgeText}>
-                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                    {unreadNotificationsCount > 9
+                      ? "9+"
+                      : unreadNotificationsCount}
                   </Text>
                 </View>
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.glassButton}
               onPress={handleTodayPDF}
             >
               <Text style={styles.iconText}>📄</Text>
             </TouchableOpacity>
             {/* NEW LEX AI BUTTON */}
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.glassButton}
               onPress={() => navigation.navigate("LexAi")}
             >
@@ -260,31 +282,50 @@ export default function DashboardScreen({ profile, onLogout }) {
           <View style={styles.notificationsPreviewContainer}>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Recent Notifications</Text>
-              <TouchableOpacity accessibilityRole="button" onPress={() => navigation.navigate("NotificationCenter")}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => navigation.navigate("NotificationCenter")}
+              >
                 <Text style={styles.seeAllText}>See All</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.notificationsList}>
               {recentNotifications.map((notif, index) => (
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   key={notif.id || index.toString()}
-                  style={[styles.notificationMiniCard, notif.isRead === 0 && styles.notificationMiniUnread]}
+                  style={[
+                    styles.notificationMiniCard,
+                    notif.isRead === 0 && styles.notificationMiniUnread,
+                  ]}
                   onPress={() => {
-                    const { markNotificationAsRead } = require('../services/notificationService');
+                    const {
+                      markNotificationAsRead,
+                    } = require("../services/notificationService");
                     if (notif.isRead === 0) {
                       markNotificationAsRead(notif.id);
                     }
                     if (notif.caseId) {
-                      navigation.navigate("CaseDetail", { caseId: notif.caseId });
+                      navigation.navigate("CaseDetail", {
+                        caseId: notif.caseId,
+                      });
                     } else {
                       navigation.navigate("NotificationCenter");
                     }
                   }}
                 >
-                  <Ionicons name="notifications-outline" size={16} color={colors.primary} />
+                  <Ionicons
+                    name="notifications-outline"
+                    size={16}
+                    color={colors.primary}
+                  />
                   <View style={{ flex: 1, marginLeft: 8 }}>
-                    <Text style={styles.notifTitle} numberOfLines={1}>{notif.title}</Text>
-                    <Text style={styles.notifBody} numberOfLines={1}>{notif.body}</Text>
+                    <Text style={styles.notifTitle} numberOfLines={1}>
+                      {notif.title}
+                    </Text>
+                    <Text style={styles.notifBody} numberOfLines={1}>
+                      {notif.body}
+                    </Text>
                   </View>
                   {notif.isRead === 0 && <View style={styles.unreadDotMini} />}
                 </TouchableOpacity>
@@ -301,7 +342,19 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statMini}>
-            <Text style={[styles.statMiniVal, { color: colors.text }]}>
+            <Text
+              style={[
+                styles.statMiniVal,
+                {
+                  color:
+                    stats.urgentCases > 0
+                      ? colors.danger
+                      : resolvedTheme === "dark"
+                        ? colors.text
+                        : colors.surface,
+                },
+              ]}
+            >
               {stats.urgentCases}
             </Text>
             <Text style={styles.statMiniLabel}>Urgent</Text>
@@ -313,7 +366,13 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
         </View>
 
-        <Text style={{ marginBottom: 10, color: colors.secondaryText, fontWeight: "600" }}>
+        <Text
+          style={{
+            marginBottom: 10,
+            color: colors.secondaryText,
+            fontWeight: "600",
+          }}
+        >
           Total Cases: {totalCases}
         </Text>
         <View style={styles.litigationCard}>
@@ -402,7 +461,8 @@ export default function DashboardScreen({ profile, onLogout }) {
         {/* ALERTS SECTION */}
         {pendingHearings.length > 0 && (
           <View style={[styles.alertRibbon, styles.pendingBox]}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.alertHeader}
               onPress={() =>
                 setActiveSection(activeSection === "pending" ? null : "pending")
@@ -419,7 +479,8 @@ export default function DashboardScreen({ profile, onLogout }) {
               pendingHearings.map((item) => (
                 <View key={item.id} style={styles.alertItemRow}>
                   {/* LEFT → Case Info */}
-                  <TouchableOpacity accessibilityRole="button"
+                  <TouchableOpacity
+                    accessibilityRole="button"
                     style={{ flex: 1 }}
                     onPress={() =>
                       navigation.navigate("CaseDetail", { caseId: item.id })
@@ -452,7 +513,8 @@ export default function DashboardScreen({ profile, onLogout }) {
                   </TouchableOpacity>
 
                   {/* RIGHT → UPDATE BUTTON */}
-                  <TouchableOpacity accessibilityRole="button"
+                  <TouchableOpacity
+                    accessibilityRole="button"
                     style={styles.updateBtn}
                     onPress={() =>
                       navigation.navigate("UpdateCaseHearing", {
@@ -471,7 +533,8 @@ export default function DashboardScreen({ profile, onLogout }) {
 
         {todayHearings.length > 0 && (
           <View style={[styles.alertRibbon, styles.todayBox]}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.alertHeader}
               onPress={() =>
                 setActiveSection(activeSection === "today" ? null : "today")
@@ -488,7 +551,8 @@ export default function DashboardScreen({ profile, onLogout }) {
               todayHearings.map((item) => (
                 <View key={item.id} style={styles.alertItemRow}>
                   {/* LEFT → Case Info */}
-                  <TouchableOpacity accessibilityRole="button"
+                  <TouchableOpacity
+                    accessibilityRole="button"
                     style={{ flex: 1 }}
                     onPress={() =>
                       navigation.navigate("CaseDetail", { caseId: item.id })
@@ -521,7 +585,8 @@ export default function DashboardScreen({ profile, onLogout }) {
                   </TouchableOpacity>
 
                   {/* RIGHT → UPDATE BUTTON */}
-                  <TouchableOpacity accessibilityRole="button"
+                  <TouchableOpacity
+                    accessibilityRole="button"
                     style={styles.updateBtn}
                     onPress={() =>
                       navigation.navigate("UpdateCaseHearing", {
@@ -540,7 +605,8 @@ export default function DashboardScreen({ profile, onLogout }) {
 
         {/* LAWYER PROFILE CARD */}
         <View style={styles.profileCard}>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.profileLeft}
             onPress={() => navigation.navigate("LawyerProfile")}
           >
@@ -565,11 +631,14 @@ export default function DashboardScreen({ profile, onLogout }) {
               </Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.shareBtn}
             onPress={handleShareProfile}
           >
-            <Text style={{ color: colors.surface, fontWeight: "700" }}>Share</Text>
+            <Text style={{ color: colors.surface, fontWeight: "700" }}>
+              Share
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -577,7 +646,12 @@ export default function DashboardScreen({ profile, onLogout }) {
         <Text style={styles.sectionHeading}>Practice Management</Text>
         <View style={styles.actionGrid}>
           {quickActions.map((item) => (
-            <PremiumCard key={item.label} style={styles.actionCard} onPress={() => handleQuickAction(item.action)} elevationLevel={1}>
+            <PremiumCard
+              key={item.label}
+              style={styles.actionCard}
+              onPress={() => handleQuickAction(item.action)}
+              elevationLevel={1}
+            >
               <View style={styles.iconCircle}>
                 <Ionicons name={item.icon} size={20} color={colors.primary} />
               </View>
@@ -590,455 +664,543 @@ export default function DashboardScreen({ profile, onLogout }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainWrapper: { flex: 1, backgroundColor: colors.background },
-  premiumHeader: {
-    backgroundColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
-    paddingHorizontal: 20,
-    paddingBottom: 50,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
-    ...(resolvedTheme === 'dark' ? {
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainWrapper: { flex: 1, backgroundColor: colors.background },
+    premiumHeader: {
+      backgroundColor:
+        resolvedTheme === "dark" ? colors.surface : colors.primary,
+      paddingHorizontal: 20,
+      paddingBottom: 50,
+      borderBottomLeftRadius: 35,
+      borderBottomRightRadius: 35,
+      ...(resolvedTheme === "dark"
+        ? {
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderTopWidth: 0,
+          }
+        : {}),
+    },
+    headerRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    badgeContainer: {
+      position: "absolute",
+      top: -5,
+      right: -5,
+      backgroundColor: colors.danger,
+      borderRadius: 10,
+      width: 20,
+      height: 20,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: resolvedTheme === "dark" ? colors.surface : colors.primary,
+    },
+    badgeText: {
+      color: "#FFF",
+      fontSize: 10,
+      fontWeight: "bold",
+    },
+    profileSection: { flexDirection: "row", alignItems: "center", gap: 12 },
+    avatarGlow: {
+      width: 48,
+      height: 48,
+      borderRadius: 16,
+      backgroundColor:
+        resolvedTheme === "dark"
+          ? colors.primaryLight
+          : "rgba(255,255,255,0.2)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    avatarText: {
+      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
+      fontSize: 20,
+      fontWeight: "800",
+    },
+    welcomeLabel: {
+      color:
+        resolvedTheme === "dark"
+          ? colors.secondaryText
+          : "rgba(255,255,255,0.8)",
+      fontSize: 11,
+    },
+    lawyerName: {
+      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
+      fontSize: 17,
+      fontWeight: "700",
+    },
+    glassLogout: {
+      backgroundColor:
+        resolvedTheme === "dark" ? colors.card : "rgba(255,255,255,0.15)",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 12,
+      ...(resolvedTheme === "dark"
+        ? {
+            borderWidth: 1,
+            borderColor: colors.border,
+          }
+        : {}),
+    },
+    logoutText: {
+      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
+      fontSize: 12,
+      fontWeight: "600",
+    },
+    jurisdictionContainer: {
+      marginTop: 15,
+      backgroundColor:
+        resolvedTheme === "dark" ? colors.card : "rgba(255,255,255,0.1)",
+      padding: 8,
+      borderRadius: 10,
+      ...(resolvedTheme === "dark"
+        ? {
+            borderWidth: 1,
+            borderColor: colors.border,
+          }
+        : {}),
+    },
+    jurisdictionText: {
+      color: resolvedTheme === "dark" ? colors.text : colors.surface,
+      fontSize: 12,
+    },
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingTop: 20,
+      paddingBottom: 120,
+    },
+    notificationsPreviewContainer: {
+      marginTop: -20,
+      marginBottom: 20,
+      zIndex: 10,
+    },
+    notificationsList: {
+      marginTop: 10,
+    },
+    notificationMiniCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      padding: 12,
+      borderRadius: 12,
+      marginBottom: 8,
       borderWidth: 1,
       borderColor: colors.border,
-      borderTopWidth: 0,
-    } : {}),
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  badgeContainer: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: colors.danger,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
-  },
-  badgeText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  profileSection: { flexDirection: "row", alignItems: "center", gap: 12 },
-  avatarGlow: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: resolvedTheme === 'dark' ? colors.primaryLight : "rgba(255,255,255,0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 20, fontWeight: "800" },
-  welcomeLabel: { color: resolvedTheme === 'dark' ? colors.secondaryText : "rgba(255,255,255,0.8)", fontSize: 11 },
-  lawyerName: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 17, fontWeight: "700" },
-  glassLogout: {
-    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    ...(resolvedTheme === 'dark' ? {
+    },
+    notificationMiniUnread: {
+      backgroundColor: colors.primaryLight || `${colors.primary}10`,
+      borderColor: colors.primary,
+    },
+    notifTitle: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    notifBody: {
+      fontSize: 12,
+      color: colors.secondaryText,
+      marginTop: 2,
+    },
+    unreadDotMini: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.primary,
+      marginLeft: 8,
+    },
+    floatingStats: {
+      flexDirection: "row",
+      backgroundColor: resolvedTheme === "dark" ? colors.card : colors.text,
+      borderRadius: 24,
+      padding: 20,
+      justifyContent: "space-between",
+      marginTop: -35,
+      marginBottom: 20,
       borderWidth: 1,
       borderColor: colors.border,
-    } : {}),
-  },
-  logoutText: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 12, fontWeight: "600" },
-  jurisdictionContainer: {
-    marginTop: 15,
-    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.1)",
-    padding: 8,
-    borderRadius: 10,
-    ...(resolvedTheme === 'dark' ? {
+      ...(resolvedTheme === "light"
+        ? {
+            elevation: 4,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    statMini: { flex: 1, alignItems: "center" },
+    statMiniVal: {
+      color: resolvedTheme === "dark" ? colors.text : colors.surface,
+      fontSize: 20,
+      fontWeight: "700",
+    },
+    statMiniLabel: {
+      color: colors.placeholder,
+      fontSize: 11,
+      marginTop: 2,
+      fontWeight: "500",
+    },
+    statDivider: {
+      width: 1,
+      backgroundColor: colors.border,
+      height: "70%",
+      alignSelf: "center",
+    },
+    litigationCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 15,
       borderWidth: 1,
       borderColor: colors.border,
-    } : {}),
-  },
-  jurisdictionText: { color: resolvedTheme === 'dark' ? colors.text : colors.surface, fontSize: 12 },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 120 },
-  notificationsPreviewContainer: {
-    marginTop: -20,
-    marginBottom: 20,
-    zIndex: 10,
-  },
-  notificationsList: {
-    marginTop: 10,
-  },
-  notificationMiniCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  notificationMiniUnread: {
-    backgroundColor: colors.primaryLight || `${colors.primary}10`,
-    borderColor: colors.primary,
-  },
-  notifTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  notifBody: {
-    fontSize: 12,
-    color: colors.secondaryText,
-    marginTop: 2,
-  },
-  unreadDotMini: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
-    marginLeft: 8,
-  },
-  floatingStats: {
-    flexDirection: "row",
-    backgroundColor: resolvedTheme === 'dark' ? colors.card : colors.text,
-    borderRadius: 24,
-    padding: 20,
-    justifyContent: "space-between",
-    marginTop: -35,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 4,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-    } : {
-      elevation: 0,
-    }),
-  },
-  statMini: { flex: 1, alignItems: "center" },
-  statMiniVal: { color: resolvedTheme === 'dark' ? colors.text : colors.surface, fontSize: 20, fontWeight: "700" },
-  statMiniLabel: { color: colors.placeholder, fontSize: 11, marginTop: 2, fontWeight: "500" },
-  statDivider: {
-    width: 1,
-    backgroundColor: colors.border,
-    height: "70%",
-    alignSelf: "center",
-  },
-  litigationCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 2,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-    } : {
-      elevation: 0,
-    }),
-  },
+      ...(resolvedTheme === "light"
+        ? {
+            elevation: 2,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
 
-  litigationTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 18,
-  },
+    litigationTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 18,
+    },
 
-  litigationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
+    litigationRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
 
-  litigationItem: {
-    flex: 1,
-    alignItems: "center",
-  },
+    litigationItem: {
+      flex: 1,
+      alignItems: "center",
+    },
 
-  litigationValue: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: colors.primary,
-  },
+    litigationValue: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.primary,
+    },
 
-  litigationLabel: {
-    marginTop: 6,
-    fontSize: 12,
-    fontWeight: "500",
-    color: colors.secondaryText,
-  },
+    litigationLabel: {
+      marginTop: 6,
+      fontSize: 12,
+      fontWeight: "500",
+      color: colors.secondaryText,
+    },
 
-  litigationDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: colors.border,
-  },
-  workflowCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 2,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-    } : {
-      elevation: 0,
-    }),
-  },
+    litigationDivider: {
+      width: 1,
+      height: 40,
+      backgroundColor: colors.border,
+    },
+    workflowCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            elevation: 2,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
 
-  workflowTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 15,
-  },
+    workflowTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 15,
+    },
 
-  workflowRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
+    workflowRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  workflowName: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: colors.text,
-  },
+    workflowName: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: colors.text,
+    },
 
-  workflowCount: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 999,
-  },
+    workflowCount: {
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: 12,
+      paddingVertical: 5,
+      borderRadius: 999,
+    },
 
-  workflowCountText: {
-    color: colors.primary,
-    fontWeight: "700",
-    fontSize: 12,
-  },
+    workflowCountText: {
+      color: colors.primary,
+      fontWeight: "700",
+      fontSize: 12,
+    },
 
-  workflowEmpty: {
-    color: colors.placeholder,
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  dailyTaskCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 2,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-    } : {
-      elevation: 0,
-    }),
-  },
-  taskHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  taskTitle: { fontWeight: "700", fontSize: 15, color: colors.text },
-  taskCount: { color: colors.secondaryText, fontWeight: "500" },
-  statValue: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: colors.primary,
-    marginTop: 10,
-  },
-  progressBarBg: {
-    height: 8,
-    backgroundColor: colors.border,
-    borderRadius: 4,
-    marginTop: 12,
-  },
-  progressBarFill: {
-    height: "100%",
-    backgroundColor: colors.primary,
-    borderRadius: 4,
-  },
-  taskHint: { marginTop: 10, fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
-  alertRibbon: { padding: 15, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: colors.border },
-  pendingBox: { backgroundColor: colors.surface },
-  todayBox: { backgroundColor: colors.surface },
-  alertHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  alertTitle: { fontWeight: "700", fontSize: 15 },
-  alertItem: {
-    marginTop: 12,
-    paddingLeft: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.border,
-  },
-  caseName: { fontSize: 15, fontWeight: "700", color: colors.text },
-  caseCourt: { fontSize: 13, color: colors.secondaryText, marginTop: 2, fontWeight: "500" },
-  sectionHeading: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginVertical: 15,
-    color: colors.text,
-  },
+    workflowEmpty: {
+      color: colors.placeholder,
+      fontSize: 13,
+      fontWeight: "500",
+    },
+    dailyTaskCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            elevation: 2,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    taskHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    taskTitle: { fontWeight: "700", fontSize: 15, color: colors.text },
+    taskCount: { color: colors.secondaryText, fontWeight: "500" },
+    statValue: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.primary,
+      marginTop: 10,
+    },
+    progressBarBg: {
+      height: 8,
+      backgroundColor: colors.border,
+      borderRadius: 4,
+      marginTop: 12,
+    },
+    progressBarFill: {
+      height: "100%",
+      backgroundColor: colors.primary,
+      borderRadius: 4,
+    },
+    taskHint: {
+      marginTop: 10,
+      fontSize: 13,
+      color: colors.secondaryText,
+      fontWeight: "500",
+    },
+    alertRibbon: {
+      padding: 15,
+      borderRadius: 16,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    pendingBox: { backgroundColor: colors.surface },
+    todayBox: { backgroundColor: colors.surface },
+    alertHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    alertTitle: { fontWeight: "700", fontSize: 15 },
+    alertItem: {
+      marginTop: 12,
+      paddingLeft: 12,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.border,
+    },
+    caseName: { fontSize: 15, fontWeight: "700", color: colors.text },
+    caseCourt: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      marginTop: 2,
+      fontWeight: "500",
+    },
+    sectionHeading: {
+      fontSize: 18,
+      fontWeight: "700",
+      marginVertical: 15,
+      color: colors.text,
+    },
 
-  actionGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  actionCard: {
-    width: "48.5%",
-    height: 80,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 2,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 4,
-    } : {
-      elevation: 0,
-    }),
-  },
-  iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: colors.primaryLight,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  actionLabel: { fontWeight: "700", fontSize: 15, color: colors.primary, flex: 1 },
+    actionGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+    },
+    actionCard: {
+      width: "48.5%",
+      height: 80,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            elevation: 2,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 4,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    iconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: colors.primaryLight,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 12,
+    },
+    actionLabel: {
+      fontWeight: "700",
+      fontSize: 15,
+      color: colors.primary,
+      flex: 1,
+    },
 
-  glassButton: {
-    backgroundColor: "rgba(255,255,255,0.15)",
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  iconText: { fontSize: 18, color: colors.surface },
-  profileCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 2,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-    } : {
-      elevation: 0,
-    }),
-  },
-  profileLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
-  profileImage: { width: 54, height: 54, borderRadius: 27 },
-  profileAvatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: colors.primaryLight,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  profileAvatarText: { color: colors.primary, fontWeight: "700", fontSize: 20 },
-  profileName: { fontSize: 17, fontWeight: "700", color: colors.text },
-  profileSub: { fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
-  shareBtn: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  domainBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    marginTop: 6,
-  },
+    glassButton: {
+      backgroundColor: "rgba(255,255,255,0.15)",
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    iconText: { fontSize: 18, color: colors.surface },
+    profileCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            elevation: 2,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    profileLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+    profileImage: { width: 54, height: 54, borderRadius: 27 },
+    profileAvatar: {
+      width: 54,
+      height: 54,
+      borderRadius: 27,
+      backgroundColor: colors.primaryLight,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    profileAvatarText: {
+      color: colors.primary,
+      fontWeight: "700",
+      fontSize: 20,
+    },
+    profileName: { fontSize: 17, fontWeight: "700", color: colors.text },
+    profileSub: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      fontWeight: "500",
+    },
+    shareBtn: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 12,
+    },
+    domainBadge: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 999,
+      marginTop: 6,
+    },
 
-  civilBadge: {
-    backgroundColor: colors.surface,
-  },
+    civilBadge: {
+      backgroundColor: colors.surface,
+    },
 
-  criminalBadge: {
-    backgroundColor: colors.danger,
-  },
+    criminalBadge: {
+      backgroundColor: colors.danger,
+    },
 
-  familyBadge: {
-    backgroundColor: colors.surface,
-  },
+    familyBadge: {
+      backgroundColor: colors.surface,
+    },
 
-  domainBadgeText: {
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 0.5,
-    color: colors.text,
-  },
-  alertItemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 12,
-    paddingLeft: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.border,
-  },
+    domainBadgeText: {
+      fontSize: 10,
+      fontWeight: "900",
+      letterSpacing: 0.5,
+      color: colors.text,
+    },
+    alertItemRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 12,
+      paddingLeft: 12,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.border,
+    },
 
-  updateBtn: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    marginLeft: 10,
-  },
+    updateBtn: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 10,
+      marginLeft: 10,
+    },
 
-  updateBtnText: {
-    color: colors.surface,
-    fontWeight: "700",
-    fontSize: 12,
-  },
-});
+    updateBtnText: {
+      color: colors.surface,
+      fontWeight: "700",
+      fontSize: 12,
+    },
+  });

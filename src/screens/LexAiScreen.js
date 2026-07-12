@@ -1,6 +1,6 @@
 // screens/LexAiScreen.js
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { useTheme } from '../theme/ThemeContext';
+import { useTheme } from "../theme/ThemeContext";
 import {
   ActivityIndicator,
   FlatList,
@@ -136,7 +136,10 @@ const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 export default function LexAiScreen() {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -162,14 +165,14 @@ export default function LexAiScreen() {
     StatusBar.setBarStyle("dark-content");
 
     const unsubscribeEvents = AIEvents.subscribe((event) => {
-      if (event.type === 'OCR_STARTED') {
-        setLoadingMessage('Analyzing document...');
-      } else if (event.type === 'AI_REQUEST_STARTED') {
-        setLoadingMessage('Thinking...');
-      } else if (event.type === 'ANALYSIS_COMPLETED') {
-        setLoadingMessage('Synthesizing findings...');
-      } else if (event.type === 'REQUEST_STARTED') {
-        setLoadingMessage('Processing...');
+      if (event.type === "OCR_STARTED") {
+        setLoadingMessage("Analyzing document...");
+      } else if (event.type === "AI_REQUEST_STARTED") {
+        setLoadingMessage("Thinking...");
+      } else if (event.type === "ANALYSIS_COMPLETED") {
+        setLoadingMessage("Synthesizing findings...");
+      } else if (event.type === "REQUEST_STARTED") {
+        setLoadingMessage("Processing...");
       }
     });
 
@@ -216,7 +219,8 @@ export default function LexAiScreen() {
         ]);
       }
     } catch (e) {
-      if (__DEV__) console.log("❌ Failed to resolve message cache storage:", e);
+      if (__DEV__)
+        console.log("❌ Failed to resolve message cache storage:", e);
     }
   };
 
@@ -227,7 +231,8 @@ export default function LexAiScreen() {
         : "chat_history_global";
       await AsyncStorage.setItem(storageKey, JSON.stringify(updatedList));
     } catch (e) {
-      if (__DEV__) console.log("❌ Error synchronizing local state persistence cache:", e);
+      if (__DEV__)
+        console.log("❌ Error synchronizing local state persistence cache:", e);
     }
   };
 
@@ -370,7 +375,8 @@ export default function LexAiScreen() {
       setSelectedFile(null); // Clear selected file after successful send
       scrollToBottom();
     } catch (coreError) {
-      const errorMsg = coreError.userMessage || "Unable to reach the AI service.";
+      const errorMsg =
+        coreError.userMessage || "Unable to reach the AI service.";
       Alert.alert("Analysis Error", errorMsg);
     } finally {
       setLoading(false);
@@ -448,7 +454,8 @@ export default function LexAiScreen() {
               </Text>
 
               {!isUser && (
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   style={styles.copyButton}
                   onPress={() => handleCopyMessage(item.text, item.id)}
                   activeOpacity={0.7}
@@ -477,7 +484,8 @@ export default function LexAiScreen() {
     <View style={styles.quickActionsContainer}>
       <View style={styles.quickActionsGrid}>
         {QUICK_ACTIONS.map((action, index) => (
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             key={index}
             style={styles.quickActionItem}
             onPress={() => handleQuickAction(`${action.prompt} `)}
@@ -507,24 +515,34 @@ export default function LexAiScreen() {
       {/* Clean Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             onPress={() => navigation.goBack()}
             style={styles.iconButton}
             activeOpacity={0.7}
           >
-            <Ionicons name="arrow-back" size={20} color={resolvedTheme === 'dark' ? colors.primary : colors.surface} />
+            <Ionicons
+              name="arrow-back"
+              size={20}
+              color={resolvedTheme === "dark" ? colors.primary : colors.surface}
+            />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <Text style={styles.headerTitle}>Lex Workspace</Text>
             <View style={styles.statusDot} />
           </View>
         </View>
-        <TouchableOpacity accessibilityRole="button"
+        <TouchableOpacity
+          accessibilityRole="button"
           onPress={clearChatHistory}
           style={styles.iconButton}
           activeOpacity={0.7}
         >
-          <Ionicons name="trash-outline" size={18} color={resolvedTheme === 'dark' ? colors.danger : colors.surface} />
+          <Ionicons
+            name="trash-outline"
+            size={18}
+            color={resolvedTheme === "dark" ? colors.danger : colors.surface}
+          />
         </TouchableOpacity>
       </View>
 
@@ -576,17 +594,29 @@ export default function LexAiScreen() {
           <View style={styles.inputGlass}>
             {selectedFile && (
               <View style={styles.selectedFileChip}>
-                <Ionicons name="document-text" size={14} color={colors.primary} />
+                <Ionicons
+                  name="document-text"
+                  size={14}
+                  color={colors.primary}
+                />
                 <Text style={styles.selectedFileName} numberOfLines={1}>
                   {selectedFile.name}
                 </Text>
-                <TouchableOpacity accessibilityRole="button" onPress={() => setSelectedFile(null)}>
-                  <Ionicons name="close-circle" size={16} color={colors.placeholder} />
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => setSelectedFile(null)}
+                >
+                  <Ionicons
+                    name="close-circle"
+                    size={16}
+                    color={colors.placeholder}
+                  />
                 </TouchableOpacity>
               </View>
             )}
             <View style={styles.inputInner}>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 onPress={handleAttachDocument}
                 style={styles.attachButton}
                 disabled={loading || isAttaching}
@@ -609,7 +639,8 @@ export default function LexAiScreen() {
                 returnKeyType="default"
               />
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 onPress={handleSendMessage}
                 disabled={!input.trim() || loading || isAttaching}
                 style={[
@@ -644,315 +675,328 @@ export default function LexAiScreen() {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: "row",
-    height: 56,
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    backgroundColor: resolvedTheme === 'dark' ? colors.surface : colors.primary,
-    borderBottomWidth: 1,
-    borderBottomColor: resolvedTheme === 'dark' ? colors.border : colors.primary,
-    zIndex: 10,
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
-    borderWidth: 1,
-    borderColor: resolvedTheme === 'dark' ? colors.border : "rgba(255,255,255,0.1)",
-  },
-  headerTitleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: resolvedTheme === 'dark' ? colors.primary : colors.surface,
-    letterSpacing: -0.3,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.success,
-  },
-  messageContainer: {
-    flexDirection: "row",
-    width: "100%",
-    marginBottom: 6,
-  },
-  userAlign: {
-    justifyContent: "flex-end",
-  },
-  aiAlign: {
-    justifyContent: "flex-start",
-  },
-  avatarContainer: {
-    marginRight: 10,
-    alignSelf: "flex-end",
-    marginBottom: 20,
-  },
-  aiAvatar: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.border,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bubbleWrapper: {
-    maxWidth: "80%",
-  },
-  userBubbleWrapper: {
-    maxWidth: "75%",
-  },
-  messageBubble: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  userBubble: {
-    backgroundColor: colors.primary,
-    borderBottomRightRadius: 4,
-  },
-  aiBubble: {
-    backgroundColor: colors.surface,
-    borderBottomLeftRadius: 4,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 4,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  messageText: {
-    fontSize: 15,
-    lineHeight: 22,
-    fontWeight: "400",
-  },
-  userText: {
-    color: colors.surface,
-  },
-  aiText: {
-    color: colors.text,
-  },
-  messageFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 6,
-    paddingHorizontal: 4,
-    gap: 12,
-  },
-  messageFooterUser: {
-    justifyContent: "flex-end",
-  },
-  timestamp: {
-    fontSize: 11,
-    color: colors.placeholder,
-    fontWeight: "500",
-  },
-  copyButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  copyText: {
-    fontSize: 11,
-    color: colors.placeholder,
-    fontWeight: "600",
-  },
-  copyTextActive: {
-    color: colors.success,
-  },
-  quickActionsContainer: {
-    paddingBottom: 16,
-    paddingTop: 8,
-  },
-  quickActionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  quickActionItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: colors.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 3,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  quickActionLabel: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: colors.text,
-  },
-  typingWrapper: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
-  typingBubble: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 20,
-    borderBottomLeftRadius: 4,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignSelf: "flex-start",
-  },
-  typingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  attachButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-    backgroundColor: colors.border,
-    marginRight: 8,
-  },
-  textInputModifier: {
-    flex: 1,
-    fontSize: 15,
-    color: colors.text,
-    maxHeight: 100,
-    minHeight: 40,
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingHorizontal: 8,
-  },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 8,
-  },
-  sendActive: {
-    backgroundColor: colors.surface,
-  },
-  sendDisabled: {
-    backgroundColor: colors.border,
-  },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 999,
-  },
-  loadingPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 30,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.1,
-      shadowRadius: 16,
-      elevation: 5,
-    } : {
-      elevation: 0,
-    }),
-  },
-  loadingText: {
-    fontSize: 14,
-    color: colors.text,
-    fontWeight: "500",
-  },
-  scrollWindow: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 140, // Increased significantly for keyboard space
-    gap: 16,
-    flexGrow: 1,
-  },
-  bottomInputWrapper: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    backgroundColor: colors.background,
-    borderTopWidth: 0,
-    // Removed absolute positioning
-  },
-  inputGlass: {
-    borderRadius: 32,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.05,
-      shadowRadius: 12,
-      elevation: 3,
-    } : {
-      elevation: 0,
-    }),
-  },
-  inputInner: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-  },
-  selectedFileChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.background,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginHorizontal: 12,
-    marginTop: 8,
-    gap: 6,
-  },
-  selectedFileName: {
-    flex: 1,
-    fontSize: 12,
-    color: colors.text,
-    fontWeight: "500",
-  },
-});
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: "row",
+      height: 56,
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      backgroundColor:
+        resolvedTheme === "dark" ? colors.surface : colors.primary,
+      borderBottomWidth: 1,
+      borderBottomColor:
+        resolvedTheme === "dark" ? colors.border : colors.primary,
+      zIndex: 10,
+    },
+    headerLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    iconButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor:
+        resolvedTheme === "dark" ? colors.card : "rgba(255,255,255,0.15)",
+      borderWidth: 1,
+      borderColor:
+        resolvedTheme === "dark" ? colors.border : "rgba(255,255,255,0.1)",
+    },
+    headerTitleContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    headerTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
+      letterSpacing: -0.3,
+    },
+    statusDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.success,
+    },
+    messageContainer: {
+      flexDirection: "row",
+      width: "100%",
+      marginBottom: 6,
+    },
+    userAlign: {
+      justifyContent: "flex-end",
+    },
+    aiAlign: {
+      justifyContent: "flex-start",
+    },
+    avatarContainer: {
+      marginRight: 10,
+      alignSelf: "flex-end",
+      marginBottom: 20,
+    },
+    aiAvatar: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.border,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    bubbleWrapper: {
+      maxWidth: "80%",
+    },
+    userBubbleWrapper: {
+      maxWidth: "75%",
+    },
+    messageBubble: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderRadius: 20,
+    },
+    userBubble: {
+      backgroundColor: colors.primary,
+      borderBottomRightRadius: 4,
+    },
+    aiBubble: {
+      backgroundColor: colors.surface,
+      borderBottomLeftRadius: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 4,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    messageText: {
+      fontSize: 15,
+      lineHeight: 22,
+      fontWeight: "400",
+    },
+    userText: {
+      color: colors.surface,
+    },
+    aiText: {
+      color: colors.text,
+    },
+    messageFooter: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 6,
+      paddingHorizontal: 4,
+      gap: 12,
+    },
+    messageFooterUser: {
+      justifyContent: "flex-end",
+    },
+    timestamp: {
+      fontSize: 11,
+      color: colors.placeholder,
+      fontWeight: "500",
+    },
+    copyButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    copyText: {
+      fontSize: 11,
+      color: colors.placeholder,
+      fontWeight: "600",
+    },
+    copyTextActive: {
+      color: colors.success,
+    },
+    quickActionsContainer: {
+      paddingBottom: 16,
+      paddingTop: 8,
+    },
+    quickActionsGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    quickActionItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: colors.surface,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 3,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    quickActionLabel: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.text,
+    },
+    typingWrapper: {
+      paddingHorizontal: 16,
+      paddingBottom: 8,
+    },
+    typingBubble: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      borderRadius: 20,
+      borderBottomLeftRadius: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignSelf: "flex-start",
+    },
+    typingContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    attachButton: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 20,
+      backgroundColor: colors.border,
+      marginRight: 8,
+    },
+    textInputModifier: {
+      flex: 1,
+      fontSize: 15,
+      color: colors.text,
+      maxHeight: 100,
+      minHeight: 40,
+      paddingTop: 10,
+      paddingBottom: 10,
+      paddingHorizontal: 8,
+    },
+    sendButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      marginLeft: 8,
+    },
+    sendActive: {
+      backgroundColor: colors.primary,
+    },
+    sendDisabled: {
+      backgroundColor: colors.border,
+    },
+    loadingOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 999,
+    },
+    loadingPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 30,
+      gap: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.1,
+            shadowRadius: 16,
+            elevation: 5,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    loadingText: {
+      fontSize: 14,
+      color: colors.text,
+      fontWeight: "500",
+    },
+    scrollWindow: {
+      paddingHorizontal: 16,
+      paddingTop: 16,
+      paddingBottom: 140, // Increased significantly for keyboard space
+      gap: 16,
+      flexGrow: 1,
+    },
+    bottomInputWrapper: {
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      backgroundColor: colors.background,
+      borderTopWidth: 0,
+      // Removed absolute positioning
+    },
+    inputGlass: {
+      borderRadius: 32,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.05,
+            shadowRadius: 12,
+            elevation: 3,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    inputInner: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 8,
+      paddingVertical: 8,
+    },
+    selectedFileChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 16,
+      marginHorizontal: 12,
+      marginTop: 8,
+      gap: 6,
+    },
+    selectedFileName: {
+      flex: 1,
+      fontSize: 12,
+      color: colors.text,
+      fontWeight: "500",
+    },
+  });

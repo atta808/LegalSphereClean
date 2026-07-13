@@ -130,7 +130,7 @@ export default function AIChatRoomScreen({ route, navigation }) {
       if (saved) {
         setMessages(JSON.parse(saved));
       } else {
-        const greeting = `### Welcome to Lex AI\n\nI have securely loaded the file for **${caseTitle || "this matter"}**. I am ready to assist with:\n\n* **Drafting** structured pleadings\n* **Analyzing** evidence and vaults\n* **Formulating** cross-examination strategy\n\nHow shall we proceed, Counsel?`;
+        const greeting = `### Case Intelligence\n\nThe complete litigation context has been loaded.\n\n**Available intelligence**\n\n• Hearings\n• Timeline\n• Notes\n• Documents\n• Citations\n• Litigation Strategy\n\nAsk anything regarding this case.`;
         setMessages([
           {
             id: generateId(),
@@ -360,23 +360,15 @@ export default function AIChatRoomScreen({ route, navigation }) {
   };
 
   const quickReplies = [
-    {
-      icon: "file-text",
-      label: "Summarize Case",
-      action: "Provide a comprehensive executive summary of this case.",
-    },
-    {
-      icon: "book-open",
-      label: "Find Precedents",
-      action:
-        "Identify relevant Pakistani case law and precedents for this specific matter.",
-    },
-    {
-      icon: "crosshair",
-      label: "Draft Cross-Exam",
-      action:
-        "Draft strategic cross-examination questions based on the current evidence.",
-    },
+    { icon: "file-text", label: "Case Summary", action: "Provide a comprehensive executive summary of this case." },
+    { icon: "clock", label: "Timeline", action: "Provide a detailed timeline of events for this case." },
+    { icon: "search", label: "Evidence Review", action: "Review and summarize all evidence for this case." },
+    { icon: "crosshair", label: "Cross Examination", action: "Draft strategic cross-examination questions based on the current evidence." },
+    { icon: "edit-3", label: "Draft Arguments", action: "Draft strong legal arguments for our side." },
+    { icon: "trending-up", label: "Case Strengths", action: "What are the primary strengths of our case?" },
+    { icon: "trending-down", label: "Weaknesses", action: "What are the primary weaknesses or risks in this case?" },
+    { icon: "calendar", label: "Next Hearing Preparation", action: "Help me prepare for the next hearing." },
+    { icon: "book-open", label: "Research Authorities", action: "Identify relevant case law and precedents for this specific matter." },
   ];
 
   return (

@@ -9,19 +9,13 @@ Your sole responsibility is to extract critical information from the provided do
 
     JSON_STRUCTURE: `You must return a JSON object exactly matching this structure (use empty arrays/strings for missing data):
 {
-    "summary": "Brief 2-3 sentence overview.",
+    "executiveSummary": "Brief 2-3 sentence overview.",
     "documentType": "e.g., Contract, Pleading, Medical Report",
     "parties": ["List of extracted parties"],
     "importantDates": ["List of extracted dates"],
-    "importantNumbers": ["List of monetary values or key numbers"],
-    "keyFacts": ["List of key facts"],
     "legalIssues": ["List of legal issues identified"],
-    "clauses": ["Important clauses extracted"],
-    "evidenceValue": "Assessment of evidential value.",
     "risks": ["List of identified risks"],
-    "missingInformation": ["List of critical information missing from the document"],
     "recommendations": ["Recommended actions"],
-    "keywords": ["List of keywords"],
     "confidence": "High/Medium/Low"
 }`,
 };

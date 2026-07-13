@@ -24,12 +24,22 @@ export class DocumentReader {
             // 1. Execute OCR Pipeline
             const rawText = await OCRPipeline.execute(fileParams);
 
-            if (!rawText) {
-                throw new Error('No text could be extracted from the document.');
+            if (!rawText || !rawText.trim()) {
+                 return {
+                     language: 'unknown',
+                     text: "No readable text was detected.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis."
+                 };
             }
 
             // 2. Process Text through Language Pipeline
             const { language, normalizedText } = LanguagePipeline.process(rawText);
+
+            if (!normalizedText || !normalizedText.trim()) {
+                 return {
+                     language: 'unknown',
+                     text: "No readable text was detected after processing.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis."
+                 };
+            }
 
             return {
                 language,
@@ -39,6 +49,15 @@ export class DocumentReader {
             if (__DEV__) {
                 console.error('DocumentReader Error:', error.message);
             }
+
+            // Handle OCR Failures gracefully without throwing to LLM processing errors if possible
+            if (error.code && error.code.startsWith('OCR_')) {
+                 return {
+                     language: 'unknown',
+                     text: "No readable text was detected.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis."
+                 };
+            }
+
             throw new Error(`Failed to read document: ${error.message}`);
         }
     }

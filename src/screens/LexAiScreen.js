@@ -110,26 +110,15 @@ const TypingIndicator = ({ styles, colors }) => {
 };
 
 const QUICK_ACTIONS = [
-  {
-    icon: "scale-balance",
-    label: "Case Law",
-    prompt: "Find relevant case law about",
-  },
-  {
-    icon: "file-document",
-    label: "Review Doc",
-    prompt: "Review this legal document:",
-  },
-  {
-    icon: "gavel",
-    label: "Precedents",
-    prompt: "Research legal precedent for",
-  },
-  {
-    icon: "clock-time",
-    label: "Limitations",
-    prompt: "What's the statute of limitations for",
-  },
+  { icon: "calendar-today", label: "Today's Hearings", prompt: "Show me today's hearings" },
+  { icon: "calendar-arrow-right", label: "Tomorrow's Hearings", prompt: "Show me tomorrow's hearings" },
+  { icon: "view-dashboard", label: "Office Dashboard", prompt: "Show me the office dashboard" },
+  { icon: "clock-alert", label: "Pending Hearings", prompt: "Show me pending hearings" },
+  { icon: "format-list-bulleted", label: "Pipeline Cases", prompt: "Show me pipeline cases" },
+  { icon: "account-group", label: "Client Summary", prompt: "Show me the client summary" },
+  { icon: "currency-usd", label: "Fee Summary", prompt: "Show me the fee summary" },
+  { icon: "file-document-edit", label: "Draft Application", prompt: "Help me draft an application for" },
+  { icon: "scale-balance", label: "Legal Research", prompt: "Help me with legal research regarding" },
 ];
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -213,7 +202,7 @@ export default function LexAiScreen() {
           {
             id: "welcome",
             role: "ai",
-            text: "Welcome to your AI Workspace. I am Lex, your intelligent legal assistant.\n\nI operate in English by default for optimal legal precision, but feel free to ask questions in Urdu or any other language if you prefer.",
+            text: `### Welcome to Lex AI\n\nYour intelligent legal office assistant.\n\n**Available capabilities**\n\n• Today's Hearings\n• Tomorrow's Hearings\n• Office Dashboard\n• Drafting\n• Legal Research\n• Document Analysis\n• Office Statistics\n\nHow may I assist you today?`,
             timestamp: Date.now(),
           },
         ]);

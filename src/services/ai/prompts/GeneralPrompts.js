@@ -13,10 +13,15 @@ export const GeneralPrompts = {
 
         if (history && Array.isArray(history) && history.length > 0) {
             finalMessage += `--- Conversation History ---\n`;
-            // Take the last 10 messages for token budget
-            const recentHistory = history.slice(-10);
+            // Take the last 6 messages for tighter token budget and relevance
+            const recentHistory = history.slice(-6);
             recentHistory.forEach(msg => {
-                finalMessage += `${msg.role === 'user' ? 'User' : 'Lex'}: ${msg.text}\n`;
+                // Ensure we don't duplicate context if the previous response was long
+                let msgText = msg.text;
+                if (msgText.length > 1000) {
+                    msgText = msgText.substring(0, 1000) + "... [truncated for length]";
+                }
+                finalMessage += `${msg.role === 'user' ? 'User' : 'Lex'}: ${msgText}\n`;
             });
             finalMessage += `----------------------------\n\n`;
         }

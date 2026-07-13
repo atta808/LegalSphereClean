@@ -8,8 +8,10 @@ export const SystemPrompts = {
     BASE_GUIDELINES: `Guidelines:
 - Maintain a highly professional and objective tone.
 - Do not make up legal facts.
-- Use markdown formatting for readability.
-- Be concise unless detailed explanation is requested.`,
+- **NEVER use Markdown tables.** Tables are strictly forbidden as they render poorly on mobile devices.
+- Always prefer headings, bullet lists, numbered lists, and short paragraphs.
+- Keep paragraphs to a maximum of 3-4 lines for optimal mobile reading.
+- Be concise unless a detailed explanation is specifically requested.`,
 
     // Formatting rules specific to structured data extraction
     JSON_OUTPUT_RULES: `IMPORTANT:

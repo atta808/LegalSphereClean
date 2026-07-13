@@ -51,9 +51,14 @@ export class ResponseFormatter {
      * @param {import('./models/AIError').AIError|Error} error
      */
     static formatError(error) {
-        // If it's a standardized AIError, use its user-friendly message
-        const userFacingMessage = error.userMessage
-            || `I encountered an error processing your request. Please try again later.`;
+        // Handle specific OCR errors gracefully before falling back to generic
+        let userFacingMessage = error.userMessage;
+
+        if (error.code && error.code.startsWith('OCR_')) {
+             userFacingMessage = "No readable text was detected.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis.";
+        } else {
+             userFacingMessage = userFacingMessage || `I encountered an error processing your request. Please try again later.`;
+        }
 
         return {
             // We never expose raw stack traces to the UI

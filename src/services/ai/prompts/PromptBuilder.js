@@ -56,14 +56,14 @@ export class PromptBuilder {
         let contextString = '';
         if (caseContext && typeof caseContext === 'object') {
             try {
-                // Limit context size intelligently
+                // Limit context size intelligently to avoid token overflow
                 const optimizedContext = {
                     ...caseContext,
-                    hearings: caseContext.hearings?.slice(0, 10), // Limit to last 10
-                    notes: caseContext.notes?.slice(0, 10),
+                    hearings: caseContext.hearings?.slice(0, 5), // Trim to last 5
+                    notes: caseContext.notes?.slice(0, 5),
                     timeline: caseContext.timeline?.slice(0, 5),
-                    documentsSummary: caseContext.documentsSummary?.slice(0, 10),
-                    citations: caseContext.citations?.slice(0, 10)
+                    documentsSummary: caseContext.documentsSummary?.slice(0, 5),
+                    citations: caseContext.citations?.slice(0, 5)
                 };
                 contextString = JSON.stringify(optimizedContext, null, 2);
             } catch (e) {

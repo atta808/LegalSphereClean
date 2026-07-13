@@ -27,11 +27,16 @@ export class OfficeContext {
 
             const dashboardStats = await this._fetchDashboardStats();
 
-            // Limit to 5 for context size management
-            const recentCases = allCases ? allCases.slice(0, 5) : [];
+            // Limit to 3 for context size management (tighter limits for production)
+            const recentCases = allCases ? allCases.slice(0, 3).map(c => ({
+                id: c.id, caseNo: c.caseNo, title: c.title, status: c.status
+            })) : [];
 
             const { today, tomorrow } = HearingClassificationService.classifyHearings(allCases);
-            const upcomingHearings = [...today, ...tomorrow];
+
+            // Trim hearing details to keep context small
+            const mapHearing = h => ({ date: h.date, title: h.title, court: h.court });
+            const upcomingHearings = [...today.map(mapHearing), ...tomorrow.map(mapHearing)];
 
             return {
                 contextType: 'Office',

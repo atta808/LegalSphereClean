@@ -25,12 +25,35 @@ export class DocumentAnalyzer {
             // 1. OCR Extraction
             const rawText = await OCRPipeline.execute(fileParams);
 
-            if (!rawText) {
-                 throw new Error('Analysis failed: No text extracted.');
+            if (!rawText || !rawText.trim()) {
+                 // Return empty state directly for MarkdownFormatter to render
+                 return {
+                     executiveSummary: "No readable text was detected.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis.",
+                     documentType: "Unreadable",
+                     parties: [],
+                     importantDates: [],
+                     legalIssues: [],
+                     risks: [],
+                     recommendations: ["Upload a clearer image or PDF for analysis."],
+                     confidence: "Low"
+                 };
             }
 
             // 2. Process Text through Language Pipeline
             const { normalizedText } = LanguagePipeline.process(rawText);
+
+            if (!normalizedText || !normalizedText.trim()) {
+                return {
+                     executiveSummary: "No readable text was detected after processing.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis.",
+                     documentType: "Unreadable",
+                     parties: [],
+                     importantDates: [],
+                     legalIssues: [],
+                     risks: [],
+                     recommendations: ["Upload a clearer image or PDF for analysis."],
+                     confidence: "Low"
+                 };
+            }
 
             // 3. Prompt Building
             const prompt = PromptManager.buildDocumentVault(normalizedText, documentContext);

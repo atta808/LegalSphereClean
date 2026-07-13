@@ -24,16 +24,14 @@ export class MarkdownFormatter {
         // Helper to add sections if they exist and aren't empty
         const addSection = (title, content, format = 'text') => {
             if (!content) return;
-
             if (Array.isArray(content) && content.length === 0) return;
-
             if (typeof content === 'object' && !Array.isArray(content) && Object.keys(content).length === 0) return;
 
-            markdown += `### ${title}\n\n`;
+            markdown += `${title}\n\n━━━━━━━━━━━━━━━━━━\n\n`;
 
             if (format === 'list' && Array.isArray(content)) {
                 content.forEach(item => {
-                    markdown += `- ${item}\n`;
+                    markdown += `• ${item}\n`;
                 });
             } else if (format === 'text') {
                  markdown += `${content}\n`;
@@ -45,40 +43,18 @@ export class MarkdownFormatter {
             markdown += '\n';
         };
 
-        // Title/Summary Section
-        if (data.documentType) {
-            markdown += `## Document Analysis: ${data.documentType}\n\n`;
-        } else {
-            markdown += `## Document Analysis Report\n\n`;
-        }
+        markdown += `### Document Analysis\n\n━━━━━━━━━━━━━━━━━━\n\n`;
 
-        addSection('Summary', data.summary);
-
-        // Key Metadata
-        addSection('Parties Involved', data.parties, 'list');
+        addSection('Executive Summary', data.executiveSummary);
+        addSection('Document Type', data.documentType);
+        addSection('Parties', data.parties, 'list');
         addSection('Important Dates', data.importantDates, 'list');
-        addSection('Important Numbers', data.importantNumbers, 'list');
-
-        // Detailed Analysis
-        addSection('Key Facts', data.keyFacts, 'list');
         addSection('Legal Issues', data.legalIssues, 'list');
-        addSection('Important Clauses', data.clauses, 'list');
-
-        // Evaluation
-        addSection('Evidence Value', data.evidenceValue);
-        addSection('Identified Risks', data.risks, 'list');
-        addSection('Missing Information', data.missingInformation, 'list');
-
-        // Actions
-        addSection('Recommended Actions', data.recommendations, 'list');
-
-        // Metadata footer
-        if (data.keywords && data.keywords.length > 0) {
-            markdown += `**Keywords:** ${data.keywords.join(', ')}\n\n`;
-        }
+        addSection('Risks', data.risks, 'list');
+        addSection('Recommendations', data.recommendations, 'list');
 
         if (data.confidence) {
-             markdown += `*AI Confidence Level: ${data.confidence}*\n`;
+             markdown += `Confidence\n\n━━━━━━━━━━━━━━━━━━\n\n*${data.confidence}*\n`;
         }
 
         return markdown.trim();
@@ -101,6 +77,15 @@ export class MarkdownFormatter {
         }
 
         // Do NOT blindly replace all ``` as Lex AI handles programming questions
+
+        // Strip markdown tables, since they are forbidden in this context.
+        // Identify table rows (starting and ending with pipe, or containing multiple pipes)
+        // and table separator rows (like |---|---|). We avoid stripping standard dashes `-` used in bullets.
+        cleaned = cleaned.replace(/^\|.*\|$/gm, '').replace(/^\|?(?:\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?$/gm, '').trim();
+
+        // Also clean up multiple blank lines left by removing tables
+        cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+
         return cleaned.trim();
     }
 }

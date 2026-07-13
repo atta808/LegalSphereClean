@@ -2,7 +2,6 @@ import React from "react";
 import PremiumButton from '../components/PremiumButton';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
-import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import LegalPicker from "../components/LegalPicker";
 import { useNavigation } from "@react-navigation/native";
@@ -30,6 +29,7 @@ import {
 import { scheduleCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency, getLocale } from "../utils/currency";
 import { normalizeDateInput, toDatePickerDate, toISO } from "../utils/date";
+import PremiumPageHeader from '../components/PremiumPageHeader';
 export default function AddCaseScreen({ route, profile }) {
   const { colors, resolvedTheme } = useTheme();
   const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);

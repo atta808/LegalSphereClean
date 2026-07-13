@@ -1,7 +1,6 @@
 import React from "react";
 import PremiumPageHeader from '../components/PremiumPageHeader';
 import PremiumTouchable from '../components/PremiumTouchable';
-import SkeletonLoader from '../components/SkeletonLoader';
 import EmptyState from '../components/EmptyState';
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";

@@ -24,7 +24,6 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as Clipboard from "expo-clipboard";

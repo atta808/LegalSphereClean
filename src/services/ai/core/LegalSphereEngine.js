@@ -6,7 +6,6 @@
 
 import { AIRouter } from './AIRouter';
 import { ResponseFormatter } from './ResponseFormatter';
-import { LexAIRequest, CaseAIRequest, DocumentVaultRequest } from './models/Requests';
 import { AIEvents } from './AIEvents';
 
 /**

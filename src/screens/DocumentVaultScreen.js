@@ -1,6 +1,4 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
-import SkeletonLoader from '../components/SkeletonLoader';
 import { useTheme } from "../theme/ThemeContext";
 // screens/DocumentVaultScreen.js
 import {
@@ -12,7 +10,6 @@ import * as Clipboard from "expo-clipboard";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { toISO } from "../utils/date";
 import { useCallback, useState } from "react";
 import {
@@ -42,7 +39,6 @@ import {
 } from "../services/sqliteService";
 import * as ImagePicker from "expo-image-picker";
 import * as IntentLauncher from "expo-intent-launcher";
-import * as IntentLauncherAndroid from "expo-intent-launcher";
 import * as Sharing from "expo-sharing";
 import Markdown from "react-native-markdown-display";
 import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";

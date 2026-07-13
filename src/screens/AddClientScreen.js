@@ -1,5 +1,4 @@
 import React from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import LegalPicker from "../components/LegalPicker";

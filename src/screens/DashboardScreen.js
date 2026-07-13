@@ -1,5 +1,4 @@
 import React from "react";
-import EmptyState from "../components/EmptyState";
 import PremiumCard from "../components/PremiumCard";
 import { useTheme } from "../theme/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,8 +25,9 @@ import {
 } from "../services/sqliteService";
 import { exportCauseListPdf } from "../utils/causeListPdf";
 import { formatMoney, getCurrency } from "../utils/currency";
-import { isPast, isToday } from "../utils/date";
 import HearingClassificationService from "../services/hearing/HearingClassificationService";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 
 const quickActions = [
   { label: "Add Case", icon: "add-circle-outline", action: "addCase" },

@@ -34,6 +34,8 @@ import LegalInput from "../components/LegalInput";
 import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
 import { AIEvents } from "../services/ai/core/AIEvents";
 import { LexAIRequest } from "../services/ai/core/models/Requests";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 
 // Sleek typing animation component
 const TypingIndicator = ({ styles, colors }) => {

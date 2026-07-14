@@ -1,9 +1,7 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
 import PremiumPageHeader from '../components/PremiumPageHeader';
 import { useTheme } from "../theme/ThemeContext";
-import LegalInput from "../components/LegalInput";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {

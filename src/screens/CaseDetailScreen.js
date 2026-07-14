@@ -36,12 +36,13 @@ import {
   updateAiChatLink,
   addCaseNote,
 } from "../services/sqliteService";
-import { updateCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 import { getCallLink, getSMSLink, getWhatsAppLink } from "../utils/phone";
 import CitationsScreen from "./CitationsScreen";
 import NotesScreen from "./NotesScreen";
+import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumTouchable from '../components/PremiumTouchable';
 
 export default function CaseDetailScreen({ profile }) {
   const { colors, resolvedTheme } = useTheme();

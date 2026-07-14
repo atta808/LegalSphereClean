@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 
 export const elevation = {
   getElevation: (level, colors, isDark) => {

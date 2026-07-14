@@ -5,7 +5,6 @@ import {
   updateNotificationRecordStatus
 } from './notificationService';
 import { db } from './sqliteService';
-import { isPast } from '../utils/date';
 import HearingClassificationService from './hearing/HearingClassificationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

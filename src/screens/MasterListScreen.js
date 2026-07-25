@@ -1,7 +1,7 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
-import SkeletonLoader from '../components/SkeletonLoader';
-import PremiumPageHeader from '../components/PremiumPageHeader';
+import EmptyState from "../components/EmptyState";
+import SkeletonLoader from "../components/SkeletonLoader";
+import PremiumPageHeader from "../components/PremiumPageHeader";
 import { useTheme } from "../theme/ThemeContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
@@ -29,19 +29,18 @@ import {
 
 const TYPES = [
   { key: "court", label: "Courts" },
-
   { key: "judge", label: "Judges" },
-
   { key: "stage", label: "Stages" },
-
   { key: "caseType", label: "Case Types" },
-
   { key: "description", label: "Proceedings" },
 ];
 
 export default function MasterListScreen({ onBack }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const [selectedType, setSelectedType] = useState("court");
@@ -200,14 +199,15 @@ export default function MasterListScreen({ onBack }) {
 
   const getPlaceholder = () => {
     if (selectedType === "court") return "e.g. Senior Civil Judge";
-
     if (selectedType === "judge") return "e.g. Malik Azmat Ullah Awan";
-
     if (selectedType === "stage") return "e.g. Final Arguments";
-
     if (selectedType === "caseType") return "e.g. Suit for Recovery";
-
     return "Enter proceeding";
+  };
+
+  const getTypeLabel = () => {
+    const found = TYPES.find((t) => t.key === selectedType);
+    return found?.label || selectedType;
   };
 
   return (
@@ -218,8 +218,49 @@ export default function MasterListScreen({ onBack }) {
         translucent
       />
 
-      {/* PREMIUM MINIMAL HEADER */}
-      <PremiumPageHeader title="Configurations" />
+      {/* PREMIUM HEADER - Enhanced with complete configuration */}
+      <PremiumPageHeader
+        title="Configurations"
+        subtitle={`${getTypeLabel()} Registry`}
+        footer={`${items.length} ${selectedType}${items.length !== 1 ? "s" : ""} configured`}
+        onBack={() => (onBack ? onBack() : navigation.goBack())}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
+      />
+
+      {/* TYPE TABS - Moved to body */}
+      <View style={styles.tabContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabTrack}
+        >
+          {TYPES.map((type) => (
+            <TouchableOpacity
+              accessibilityRole="button"
+              key={type.key}
+              style={[
+                styles.tabItem,
+                selectedType === type.key && styles.tabActive,
+              ]}
+              onPress={() => setSelectedType(type.key)}
+            >
+              <Text
+                style={[
+                  styles.tabLabel,
+                  selectedType === type.key && styles.tabLabelActive,
+                ]}
+              >
+                {type.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -230,7 +271,11 @@ export default function MasterListScreen({ onBack }) {
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{selectedType} Registry</Text>
-          <TouchableOpacity accessibilityRole="button" style={styles.addBtn} onPress={openAddModal}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            style={styles.addBtn}
+            onPress={openAddModal}
+          >
             <Text style={styles.addBtnText}>+ Add New</Text>
           </TouchableOpacity>
         </View>
@@ -256,13 +301,15 @@ export default function MasterListScreen({ onBack }) {
             <View key={item.id} style={styles.itemCard}>
               <Text style={styles.itemValueText}>{item.value}</Text>
               <View style={styles.cardActions}>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   style={styles.editAction}
                   onPress={() => openEditModal(item)}
                 >
                   <Text style={styles.editActionText}>Modify</Text>
                 </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   style={styles.deleteAction}
                   onPress={() => handleDelete(item)}
                 >
@@ -297,7 +344,8 @@ export default function MasterListScreen({ onBack }) {
                       ? "Update Configuration"
                       : `Add ${selectedType}`}
                   </Text>
-                  <TouchableOpacity accessibilityRole="button"
+                  <TouchableOpacity
+                    accessibilityRole="button"
                     onPress={closeModal}
                     style={styles.closeBtn}
                   >
@@ -317,7 +365,8 @@ export default function MasterListScreen({ onBack }) {
                   />
                 </View>
 
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   style={[styles.saveBtn, saving && { opacity: 0.7 }]}
                   onPress={handleSave}
                   disabled={saving}
@@ -335,230 +384,184 @@ export default function MasterListScreen({ onBack }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: colors.border },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: { flex: 1, backgroundColor: colors.border },
 
-  // Header & Tab System
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 25,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    zIndex: 10,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  glassBackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  backIcon: {
-    fontSize: 28,
-    color: colors.primary,
-    fontWeight: "300",
-    marginTop: -4,
-  },
-  titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
-  jurisdictionPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-  jurisdictionText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
+    // Tab System
+    tabContainer: { paddingHorizontal: 20, paddingTop: 16 },
+    tabTrack: {
+      flexDirection: "row",
+      backgroundColor: colors.border,
+      borderRadius: 18,
+      padding: 6,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 4,
+    },
+    tabItem: {
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      alignItems: "center",
+      borderRadius: 14,
+    },
+    tabActive: {
+      backgroundColor: colors.surface,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      elevation: 2,
+    },
+    tabLabel: { fontSize: 12, fontWeight: "700", color: colors.placeholder },
+    tabLabelActive: { color: colors.primary },
 
-  tabContainer: { paddingHorizontal: 20, marginTop: 25 },
-  tabTrack: {
-    flexDirection: "row",
-    backgroundColor: colors.border,
-    borderRadius: 18,
-    padding: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tabItem: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderRadius: 14,
-  },
-  tabActive: {
-    backgroundColor: colors.surface,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  tabLabel: { fontSize: 12, fontWeight: "700", color: colors.placeholder },
-  tabLabelActive: { color: colors.primary },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 20 },
+    sectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    sectionTitle: {
+      fontSize: 12,
+      fontWeight: "800",
+      color: colors.secondaryText,
+      textTransform: "uppercase",
+      letterSpacing: 1.2,
+    },
+    addBtn: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 12,
+    },
+    addBtnText: { color: colors.surface, fontSize: 12, fontWeight: "900" },
 
-  scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: colors.secondaryText,
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-  },
-  addBtn: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  addBtnText: { color: colors.surface, fontSize: 12, fontWeight: "900" },
+    // List Cards
+    itemCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 20,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.02,
+      shadowRadius: 10,
+    },
+    itemValueText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.text,
+      lineHeight: 22,
+    },
+    cardActions: {
+      flexDirection: "row",
+      borderTopWidth: 1,
+      borderTopColor: colors.background,
+      marginTop: 15,
+      paddingTop: 12,
+      gap: 15,
+    },
+    editAction: { paddingVertical: 4 },
+    editActionText: { fontSize: 13, fontWeight: "800", color: colors.primary },
+    deleteAction: { paddingVertical: 4 },
+    deleteActionText: { fontSize: 13, fontWeight: "800", color: colors.danger },
 
-  // List Cards
-  itemCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.02,
-    shadowRadius: 10,
-  },
-  itemValueText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    lineHeight: 22,
-  },
-  cardActions: {
-    flexDirection: "row",
-    borderTopWidth: 1,
-    borderTopColor: colors.background,
-    marginTop: 15,
-    paddingTop: 12,
-    gap: 15,
-  },
-  editAction: { paddingVertical: 4 },
-  editActionText: { fontSize: 13, fontWeight: "800", color: colors.primary },
-  deleteAction: { paddingVertical: 4 },
-  deleteActionText: { fontSize: 13, fontWeight: "800", color: colors.danger },
+    // Empty & Loader
+    emptyBox: { alignItems: "center", marginTop: 80, paddingHorizontal: 40 },
+    emptyIconCircle: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    emptyEmoji: { fontSize: 32 },
+    emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
+    emptySub: {
+      fontSize: 14,
+      color: colors.placeholder,
+      marginTop: 8,
+      textAlign: "center",
+      lineHeight: 22,
+    },
+    loaderWrap: { paddingVertical: 80, alignItems: "center" },
+    loaderText: { marginTop: 15, color: colors.primary, fontWeight: "700" },
 
-  // Empty & Loader
-  emptyBox: { alignItems: "center", marginTop: 80, paddingHorizontal: 40 },
-  emptyIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  emptyEmoji: { fontSize: 32 },
-  emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
-  emptySub: {
-    fontSize: 14,
-    color: colors.placeholder,
-    marginTop: 8,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  loaderWrap: { paddingVertical: 80, alignItems: "center" },
-  loaderText: { marginTop: 15, color: colors.primary, fontWeight: "700" },
-
-  // Modal (Bottom Sheet Style)
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(15, 23, 42, 0.7)",
-    justifyContent: "flex-end",
-  },
-  modalCard: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 35,
-    borderTopRightRadius: 35,
-    paddingHorizontal: 25,
-    paddingTop: 15,
-  },
-  modalHandle: {
-    width: 40,
-    height: 4,
-    backgroundColor: colors.border,
-    borderRadius: 2,
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 25,
-  },
-  modalTitle: { fontSize: 20, fontWeight: "900", color: colors.text },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeX: { fontSize: 12, color: colors.placeholder, fontWeight: "900" },
-  inputGroup: { marginBottom: 30 },
-  inputLabel: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: colors.secondaryText,
-    textTransform: "uppercase",
-    marginBottom: 10,
-    letterSpacing: 1,
-  },
-  modalInput: {
-    backgroundColor: colors.background,
-    borderRadius: 18,
-    padding: 18,
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.text,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  multilineInput: { minHeight: 120, textAlignVertical: "top" },
-  saveBtn: {
-    backgroundColor: colors.primary,
-    paddingVertical: 20,
-    borderRadius: 22,
-    alignItems: "center",
-    shadowColor: colors.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
-    elevation: 5,
-  },
-  saveBtnText: {
-    color: colors.surface,
-    fontWeight: "900",
-    fontSize: 15,
-    letterSpacing: 1.5,
-  },
-});
+    // Modal (Bottom Sheet Style)
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(15, 23, 42, 0.7)",
+      justifyContent: "flex-end",
+    },
+    modalCard: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 35,
+      borderTopRightRadius: 35,
+      paddingHorizontal: 25,
+      paddingTop: 15,
+    },
+    modalHandle: {
+      width: 40,
+      height: 4,
+      backgroundColor: colors.border,
+      borderRadius: 2,
+      alignSelf: "center",
+      marginBottom: 20,
+    },
+    modalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 25,
+    },
+    modalTitle: { fontSize: 20, fontWeight: "900", color: colors.text },
+    closeBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    closeX: { fontSize: 12, color: colors.placeholder, fontWeight: "900" },
+    inputGroup: { marginBottom: 30 },
+    inputLabel: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: colors.secondaryText,
+      textTransform: "uppercase",
+      marginBottom: 10,
+      letterSpacing: 1,
+    },
+    modalInput: {
+      backgroundColor: colors.background,
+      borderRadius: 18,
+      padding: 18,
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.text,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    multilineInput: { minHeight: 120, textAlignVertical: "top" },
+    saveBtn: {
+      backgroundColor: colors.primary,
+      paddingVertical: 20,
+      borderRadius: 22,
+      alignItems: "center",
+      shadowColor: colors.primary,
+      shadowOpacity: 0.3,
+      shadowRadius: 15,
+      elevation: 5,
+    },
+    saveBtnText: {
+      color: colors.surface,
+      fontWeight: "900",
+      fontSize: 15,
+      letterSpacing: 1.5,
+    },
+  });

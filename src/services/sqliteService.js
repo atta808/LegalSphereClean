@@ -4,7 +4,7 @@ export const db = SQLite.openDatabaseSync("legal_app.db");
 // =============================
 // 🔧 DB VERSIONING / MIGRATION
 // =============================
-const CURRENT_DB_VERSION = 33; // Incremented for new indexes and schema changes
+const CURRENT_DB_VERSION = 36; // Incremented for new indexes and schema changes
 
 const getDBVersion = () => {
   try {
@@ -238,6 +238,7 @@ remarks TEXT,
   remoteId TEXT,
   caseId INTEGER,
   caseName TEXT,
+  judge TEXT,
   court TEXT,
   amount REAL,
   purpose TEXT,
@@ -246,7 +247,6 @@ remarks TEXT,
   paid INTEGER DEFAULT 0,
   paidTo TEXT,
   paidDate TEXT,
-
   syncStatus TEXT DEFAULT 'pending',
   updatedAt INTEGER
 );
@@ -302,6 +302,15 @@ CREATE TABLE IF NOT EXISTS document_vault (
   updatedAt INTEGER
 );
 `);
+    // =============================
+    // 🔥 ADD ocr_metadata COLUMN (LegalSphere AI v4)
+    // =============================
+    try {
+      db.execSync("ALTER TABLE document_vault ADD COLUMN ocr_metadata TEXT");
+    } catch (_e) {
+      // ignore if column already exists
+    }
+
     db.execSync(`
  CREATE TABLE IF NOT EXISTS quick_links (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -618,6 +627,9 @@ CREATE TABLE IF NOT EXISTS document_vault (
     try {
       db.execSync("ALTER TABLE cases ADD COLUMN procedureFamily TEXT");
     } catch {}
+    try {
+      db.execSync("ALTER TABLE processFees ADD COLUMN judge TEXT");
+    } catch {}
     // =============================
     // 🚀 RUN MIGRATIONS
     // =============================
@@ -763,7 +775,6 @@ export const getAllClients = () =>
   db.getAllSync(
     "SELECT * FROM clients WHERE isArchived=0 AND isDeleted=0 ORDER BY id DESC LIMIT 100",
   );
-
 
 // =============================
 // 🗂 CLIENT ARCHIVE SYSTEM
@@ -1305,9 +1316,25 @@ export const getTimelineByCaseId = (caseId) => {
   }
 };
 export const getCaseHearings = (caseId) =>
-  db.getAllSync("SELECT * FROM hearings WHERE caseId=? AND isDeleted=0", [
-    caseId,
-  ]);
+  db.getAllSync(
+    `SELECT *
+     FROM hearings
+     WHERE caseId=? AND isDeleted=0
+     ORDER BY hearingDate DESC`,
+    [caseId],
+  );
+
+// ==========================================
+// AI CHATROOM COMPATIBILITY HELPERS
+// ==========================================
+
+// Compatibility alias for AI v4
+export const getHearingsByCaseId = (caseId) =>
+  getCaseHearings(caseId);
+
+// Compatibility alias for AI v4
+export const getCaseNotesByCaseId = (caseId) =>
+  getCaseNotes(caseId);
 
 export const deleteHearing = (id) => {
   const now = Date.now();
@@ -1584,11 +1611,12 @@ export const insertProcessFee = (data) => {
   const now = Date.now();
 
   db.runSync(
-    `INSERT INTO processFees 
-     (caseName, court, amount, purpose, date, note, paid, syncStatus, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
+    `INSERT INTO processFees
+     (caseName, judge, court, amount, purpose, date, note, paid, syncStatus, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
     [
       data.caseName,
+      data.judge || "",
       data.court,
       data.amount,
       data.purpose || "",
@@ -1605,16 +1633,24 @@ export const updateProcessFee = (id, data) => {
 
   db.runSync(
     `UPDATE processFees SET
-     caseName=?, court=?, amount=?, purpose=?, date=?, note=?,
-     syncStatus='pending', updatedAt=?
+     caseName=?,
+     judge=?,
+     court=?,
+     amount=?,
+     purpose=?,
+     date=?,
+     note=?,
+     syncStatus='pending',
+     updatedAt=?
      WHERE id=?`,
     [
       data.caseName,
+      data.judge || "",
       data.court,
       data.amount,
-      data.purpose,
-      data.date,
-      data.note,
+      data.purpose || "",
+      toISO(data.date),
+      data.note || "",
       now,
       id,
     ],
@@ -1824,6 +1860,10 @@ VALUES (
     return false;
   }
 };
+
+// =============================
+// 📄 DOCUMENT VAULT (UPDATED with ocr_metadata)
+// =============================
 export const insertDocument = (data) => {
   try {
     const now = Date.now();
@@ -1852,13 +1892,15 @@ export const insertDocument = (data) => {
         aiSummary,
         aiTags,
 
+        ocr_metadata,
+
         createdAt,
         updatedAt,
         syncStatus
       )
 
       VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending'
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending'
       )`,
 
       [
@@ -1884,6 +1926,8 @@ export const insertDocument = (data) => {
         data.aiSummary || "",
         data.aiTags || "",
 
+        data.ocr_metadata || null,
+
         now,
         now,
       ],
@@ -1895,6 +1939,20 @@ export const insertDocument = (data) => {
     return false;
   }
 };
+
+export const getDocumentById = (id) => {
+  try {
+    return db.getFirstSync(
+      `SELECT * FROM document_vault
+       WHERE id=? AND isDeleted=0`,
+      [id],
+    );
+  } catch (e) {
+    console.log("❌ getDocumentById error:", e);
+    return null;
+  }
+};
+
 export const getDocumentsByCaseId = (caseId) => {
   try {
     return db.getAllSync(
@@ -1909,6 +1967,7 @@ export const getDocumentsByCaseId = (caseId) => {
     return [];
   }
 };
+
 export const getAllDocuments = () => {
   try {
     return db.getAllSync(
@@ -1921,6 +1980,7 @@ export const getAllDocuments = () => {
     return [];
   }
 };
+
 export const updateDocument = (id, data) => {
   try {
     db.runSync(
@@ -1931,6 +1991,7 @@ export const updateDocument = (id, data) => {
          category=?,
          aiSummary=?,
          aiTags=?,
+         ocr_metadata=?,
          updatedAt=?,
          syncStatus='pending'
        WHERE id=?`,
@@ -1941,6 +2002,7 @@ export const updateDocument = (id, data) => {
         data.category,
         data.aiSummary || "",
         data.aiTags || "",
+        data.ocr_metadata || null,
         Date.now(),
         id,
       ],
@@ -1952,6 +2014,7 @@ export const updateDocument = (id, data) => {
     return false;
   }
 };
+
 export const deleteDocument = (id) => {
   try {
     db.runSync(
@@ -1970,6 +2033,116 @@ export const deleteDocument = (id) => {
     return false;
   }
 };
+
+// =============================
+// 📊 STATISTICS HELPERS (for AI)
+// =============================
+
+export const getTotalFeeBalance = () => {
+  try {
+    const result = db.getFirstSync(
+      "SELECT SUM(feeBalance) as total FROM cases WHERE isDeleted=0",
+    );
+    return result?.total || 0;
+  } catch (e) {
+    console.log("❌ getTotalFeeBalance error:", e);
+    return 0;
+  }
+};
+
+export const getRecentActivity = (limit = 5) => {
+  try {
+    return db.getAllSync(
+      `SELECT 'timeline' as type, hearingDate as date, description as activity, caseId
+       FROM timeline WHERE isDeleted=0
+       UNION ALL
+       SELECT 'note' as type, createdAt as date, text as activity, caseId
+       FROM case_notes WHERE isDeleted=0
+       ORDER BY date DESC
+       LIMIT ?`,
+      [limit],
+    );
+  } catch (e) {
+    console.log("❌ getRecentActivity error:", e);
+    return [];
+  }
+};
+
+export const getHearingsCount = (caseId) => {
+  try {
+    const result = db.getFirstSync(
+      "SELECT COUNT(*) as count FROM hearings WHERE caseId=? AND isDeleted=0",
+      [caseId],
+    );
+    return result?.count || 0;
+  } catch (e) {
+    console.log("❌ getHearingsCount error:", e);
+    return 0;
+  }
+};
+
+export const getNotesCount = (caseId) => {
+  try {
+    const result = db.getFirstSync(
+      "SELECT COUNT(*) as count FROM case_notes WHERE caseId=? AND isDeleted=0",
+      [caseId],
+    );
+    return result?.count || 0;
+  } catch (e) {
+    console.log("❌ getNotesCount error:", e);
+    return 0;
+  }
+};
+
+export const getDocumentsCount = (caseId) => {
+  try {
+    const result = db.getFirstSync(
+      "SELECT COUNT(*) as count FROM document_vault WHERE caseId=? AND isDeleted=0",
+      [caseId],
+    );
+    return result?.count || 0;
+  } catch (e) {
+    console.log("❌ getDocumentsCount error:", e);
+    return 0;
+  }
+};
+
+export const getCitationsCount = (caseId) => {
+  try {
+    const result = db.getFirstSync(
+      "SELECT COUNT(*) as count FROM citations WHERE caseId=? AND isDeleted=0",
+      [caseId],
+    );
+    return result?.count || 0;
+  } catch (e) {
+    console.log("❌ getCitationsCount error:", e);
+    return 0;
+  }
+};
+
+export const getCasesByStatus = (status) => {
+  try {
+    return db.getAllSync("SELECT * FROM cases WHERE status=? AND isDeleted=0", [
+      status,
+    ]);
+  } catch (e) {
+    console.log("❌ getCasesByStatus error:", e);
+    return [];
+  }
+};
+
+export const getHearingsByDate = (date) => {
+  try {
+    return db.getAllSync(
+      "SELECT * FROM hearings WHERE hearingDate=? AND isDeleted=0",
+      [date],
+    );
+  } catch (e) {
+    console.log("❌ getHearingsByDate error:", e);
+    return [];
+  }
+};
+
 // 🧹 CLEAR ALL LOCAL DATA
 export const clearAllLocalData = () => {
   db.runSync("DELETE FROM cases");

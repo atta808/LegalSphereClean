@@ -1,101 +1,88 @@
 /**
  * @file DocumentAnalyzer.js
- * @description Coordinates the structured analysis of documents for Document Vault AI.
- * No UI code. Outputs a structured JavaScript object.
+ * @description Document Vault OCR, analysis, and structured-result workflow.
  */
 
-import { OCRPipeline } from './OCRPipeline';
-import { LanguagePipeline } from './language/LanguagePipeline';
-import { PromptManager } from '../core/PromptManager';
-import { ProviderRegistry } from '../core/ProviderRegistry';
+import { OCRPipeline } from "./OCRPipeline";
+import { LanguagePipeline } from "./language/LanguagePipeline";
+import { PromptManager } from "../core/PromptManager";
+import { ProviderRegistry } from "../core/ProviderRegistry";
+import { AIError } from "../core/models/AIError";
+import { countUrduChars } from "../../../utils/unicodeHelpers";
 
-/**
- * Document Analyzer
- */
 export class DocumentAnalyzer {
-    /**
-     * Performs a complete automated analysis of a document.
-     *
-     * @param {Object} fileParams - The file to analyze.
-     * @param {Object} [documentContext={}] - Optional metadata context.
-     * @returns {Promise<Object>} The structured analysis object.
-     */
-    static async analyze(fileParams, documentContext = {}) {
-        try {
-            // 1. OCR Extraction
-            const rawText = await OCRPipeline.execute(fileParams);
+  static async analyze(attachment, documentContext = {}, options = {}) {
+    const { language = "auto" } = options;
+    try {
+      const { text: rawText, metadata: ocrMetadata } =
+        await OCRPipeline.execute(attachment, { language });
+      if (!rawText?.trim()) throw this._noTextError("OCR returned no text.");
 
-            if (!rawText || !rawText.trim()) {
-                 // Return empty state directly for MarkdownFormatter to render
-                 return {
-                     executiveSummary: "No readable text was detected.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis.",
-                     documentType: "Unreadable",
-                     parties: [],
-                     importantDates: [],
-                     legalIssues: [],
-                     risks: [],
-                     recommendations: ["Upload a clearer image or PDF for analysis."],
-                     confidence: "Low"
-                 };
-            }
+      const { normalizedText } = LanguagePipeline.process(rawText);
+      if (!normalizedText?.trim()) {
+        throw this._noTextError("OCR text was empty after normalization.");
+      }
 
-            // 2. Process Text through Language Pipeline
-            const { normalizedText } = LanguagePipeline.process(rawText);
+      const prompt = PromptManager.buildDocumentVault(
+        normalizedText,
+        documentContext,
+      );
+      const llm = ProviderRegistry.getLLMProvider();
+      const rawResponse = await llm.execute(prompt, { temperature: 0.1 });
+      const parsed = this._parseJsonResponse(rawResponse);
 
-            if (!normalizedText || !normalizedText.trim()) {
-                return {
-                     executiveSummary: "No readable text was detected after processing.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis.",
-                     documentType: "Unreadable",
-                     parties: [],
-                     importantDates: [],
-                     legalIssues: [],
-                     risks: [],
-                     recommendations: ["Upload a clearer image or PDF for analysis."],
-                     confidence: "Low"
-                 };
-            }
-
-            // 3. Prompt Building
-            const prompt = PromptManager.buildDocumentVault(normalizedText, documentContext);
-
-            // 4. Execution (force temperature 0 for strictly structured output) via Registry
-            const llm = ProviderRegistry.getLLMProvider();
-            const rawResponse = await llm.execute(prompt, { temperature: 0.1 });
-
-            // 5. Parse JSON (Removing potential markdown wrappers)
-            return this._parseJsonResponse(rawResponse);
-        } catch (error) {
-             if (__DEV__) {
-                 console.error('DocumentAnalyzer Error:', error.message);
-             }
-             throw new Error(`Document analysis failed: ${error.message}`);
-        }
+      return {
+        ...parsed,
+        metadata: {
+          ...ocrMetadata,
+          promptLength: prompt.length,
+          responseLength: rawResponse.length,
+          responseUrduCount: countUrduChars(rawResponse),
+        },
+      };
+    } catch (error) {
+      if (error instanceof AIError || error.code?.startsWith("OCR_"))
+        throw error;
+      throw new AIError({
+        code: "DOCUMENT_ANALYZER_ERROR",
+        userMessage: "Document analysis failed. Please try again.",
+        technicalMessage: error.message,
+        source: "DocumentAnalyzer",
+      });
     }
+  }
 
-    /**
-     * Safely parses the AI response expecting JSON.
-     * Strips Markdown formatting if the AI ignores instructions.
-     */
-    static _parseJsonResponse(response) {
-        try {
-            // Strip code block markers
-            let cleaned = response.replace(/```json/gi, '').replace(/```/g, '').trim();
+  static _noTextError(technicalMessage) {
+    return new AIError({
+      code: "OCR_NO_TEXT",
+      userMessage:
+        "No readable text was detected. Please upload a clearer PDF or image.",
+      technicalMessage,
+      source: "DocumentAnalyzer",
+    });
+  }
 
-            // Find first { and last } to avoid leading/trailing text
-            const startIndex = cleaned.indexOf('{');
-            const endIndex = cleaned.lastIndexOf('}');
-
-            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-                cleaned = cleaned.substring(startIndex, endIndex + 1);
-            }
-
-            const parsed = JSON.parse(cleaned);
-            return parsed;
-        } catch (error) {
-             if (__DEV__) {
-                 console.error('DocumentAnalyzer parsing error:', error.message, '\nRaw Response:', response);
-             }
-             throw new Error('Failed to parse AI response into structured data.');
-        }
+  static _parseJsonResponse(response) {
+    try {
+      let cleaned = response
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
+      const startIndex = cleaned.indexOf("{");
+      const endIndex = cleaned.lastIndexOf("}");
+      if (startIndex === -1 || endIndex <= startIndex) {
+        throw new Error("No JSON object found in response");
+      }
+      cleaned = cleaned.substring(startIndex, endIndex + 1);
+      return JSON.parse(cleaned);
+    } catch (error) {
+      throw new AIError({
+        code: "JSON_PARSE_FAILED",
+        userMessage:
+          "The document analysis could not be structured. Please try again.",
+        technicalMessage: error.message,
+        source: "DocumentAnalyzer",
+      });
     }
+  }
 }

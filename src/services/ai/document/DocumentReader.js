@@ -1,64 +1,50 @@
 /**
  * @file DocumentReader.js
- * @description Coordinates the reading of documents (OCR + Language Detection).
- * Used primarily by Lex AI and ChatRoom when a user attaches a document to a chat.
+ * @description Shared document-reading workflow for Lex AI and AI ChatRoom.
  */
 
-import { OCRPipeline } from './OCRPipeline';
-import { LanguagePipeline } from './language/LanguagePipeline';
+import { OCRPipeline } from "./OCRPipeline";
+import { LanguagePipeline } from "./language/LanguagePipeline";
+import { AIError } from "../core/models/AIError";
+import { countUrduChars } from "../../../utils/unicodeHelpers";
 
-/**
- * Document Reader
- */
 export class DocumentReader {
-    /**
-     * Reads a document, extracts its text, and normalizes it.
-     *
-     * @param {Object} fileParams - The file to process (must contain uri, type, base64 if image).
-     * @returns {Promise<Object>} Object containing the extracted text and detected language.
-     */
-    static async read(fileParams) {
-        if (!fileParams) return null;
+  static async read(attachment, options = {}) {
+    const { language = "auto" } = options;
+    const { text: rawText, metadata: ocrMetadata } = await OCRPipeline.execute(
+      attachment,
+      { language },
+    );
 
-        try {
-            // 1. Execute OCR Pipeline
-            const rawText = await OCRPipeline.execute(fileParams);
-
-            if (!rawText || !rawText.trim()) {
-                 return {
-                     language: 'unknown',
-                     text: "No readable text was detected.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis."
-                 };
-            }
-
-            // 2. Process Text through Language Pipeline
-            const { language, normalizedText } = LanguagePipeline.process(rawText);
-
-            if (!normalizedText || !normalizedText.trim()) {
-                 return {
-                     language: 'unknown',
-                     text: "No readable text was detected after processing.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis."
-                 };
-            }
-
-            return {
-                language,
-                text: normalizedText
-            };
-        } catch (error) {
-            if (__DEV__) {
-                console.error('DocumentReader Error:', error.message);
-            }
-
-            // Handle OCR Failures gracefully without throwing to LLM processing errors if possible
-            if (error.code && error.code.startsWith('OCR_')) {
-                 return {
-                     language: 'unknown',
-                     text: "No readable text was detected.\n\nPossible reasons\n\n• Low quality scan\n• Handwritten document\n• Protected PDF\n• Empty document\n\nPlease upload a clearer copy for better analysis."
-                 };
-            }
-
-            throw new Error(`Failed to read document: ${error.message}`);
-        }
+    if (!rawText?.trim()) {
+      throw this._noTextError("OCR returned no text.");
     }
+
+    const { language: detectedLanguage, normalizedText } =
+      LanguagePipeline.process(rawText);
+    if (!normalizedText?.trim()) {
+      throw this._noTextError("OCR text was empty after normalization.");
+    }
+
+    return {
+      language: detectedLanguage,
+      text: normalizedText,
+      metadata: {
+        ...ocrMetadata,
+        detectedLanguage,
+        normalizedLength: normalizedText.length,
+        normalizedUrduCount: countUrduChars(normalizedText),
+      },
+    };
+  }
+
+  static _noTextError(technicalMessage) {
+    return new AIError({
+      code: "OCR_NO_TEXT",
+      userMessage:
+        "No readable text was detected. Please upload a clearer PDF or image.",
+      technicalMessage,
+      source: "DocumentReader",
+    });
+  }
 }

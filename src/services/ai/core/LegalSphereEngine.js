@@ -8,6 +8,8 @@ import { AIRouter } from './AIRouter';
 import { ResponseFormatter } from './ResponseFormatter';
 import { LexAIRequest, CaseAIRequest, DocumentVaultRequest } from './models/Requests';
 import { AIEvents } from './AIEvents';
+import { FileIngestionService } from '../document/FileIngestionService';
+import { AIError } from './models/AIError';
 
 /**
  * LegalSphere AI Engine
@@ -23,6 +25,7 @@ export class LegalSphereEngine {
      */
     static async processLexAI(request) {
         try {
+            this._validateChatRequest(request, 'Lex AI');
             const rawResponse = await AIRouter.routeLexAI(request);
             return ResponseFormatter.formatChatResponse(rawResponse);
         } catch (error) {
@@ -41,6 +44,7 @@ export class LegalSphereEngine {
      */
     static async processAIChatRoom(request) {
         try {
+            this._validateChatRequest(request, 'AI ChatRoom', true);
             const rawResponse = await AIRouter.routeCaseAI(request);
             return ResponseFormatter.formatChatResponse(rawResponse);
         } catch (error) {
@@ -59,6 +63,7 @@ export class LegalSphereEngine {
      */
     static async processDocumentVault(request) {
         try {
+            this._validateDocumentRequest(request);
             const structuredData = await AIRouter.routeDocumentVault(request);
 
             return ResponseFormatter.formatDocumentVaultResponse(structuredData);
@@ -67,5 +72,38 @@ export class LegalSphereEngine {
             AIEvents.emitError(error);
             throw error; // Let the UI handle document errors directly (e.g. showing an alert)
         }
+    }
+
+    static _validateChatRequest(request, productName, requiresCaseId = false) {
+        if (!request || typeof request !== 'object') {
+            throw this._validationError('AI_REQUEST_INVALID', `${productName} request must be an object.`);
+        }
+        if (typeof request.query !== 'string' || !request.query.trim()) {
+            throw this._validationError('AI_QUERY_MISSING', `${productName} request requires a non-empty query.`);
+        }
+        if (requiresCaseId && (request.caseId === null || request.caseId === undefined || !String(request.caseId).trim())) {
+            throw this._validationError('CASE_ID_MISSING', 'AI ChatRoom requires a valid caseId.');
+        }
+        if (request.attachment) {
+            FileIngestionService.validate(request.attachment);
+        }
+    }
+
+    static _validateDocumentRequest(request) {
+        if (!request || typeof request !== 'object' || !request.attachment) {
+            throw this._validationError('ATTACHMENT_MISSING', 'Document Vault requires an attachment.');
+        }
+        FileIngestionService.validate(request.attachment);
+    }
+
+    static _validationError(code, technicalMessage) {
+        return new AIError({
+            code,
+            userMessage: code === 'CASE_ID_MISSING'
+                ? 'Open AI ChatRoom from a case before starting a conversation.'
+                : 'The AI request is incomplete. Please try again.',
+            technicalMessage,
+            source: 'LegalSphereEngine',
+        });
     }
 }

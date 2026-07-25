@@ -1,8 +1,8 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
-import SkeletonLoader from '../components/SkeletonLoader';
-import PremiumPageHeader from '../components/PremiumPageHeader';
-import PremiumTouchable from '../components/PremiumTouchable';
+import EmptyState from "../components/EmptyState";
+import SkeletonLoader from "../components/SkeletonLoader";
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
@@ -27,15 +27,19 @@ import {
   getProfile,
   updateCaseStatus,
 } from "../services/sqliteService";
-import { updateCaseNotifications, cancelCaseNotifications } from "../services/reminderScheduler";
+import {
+  updateCaseNotifications,
+  cancelCaseNotifications,
+} from "../services/reminderScheduler";
 import { exportCauseListPdf } from "../utils/causeListPdf";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { isPast, isToday, toDisplay } from "../utils/date";
-import HearingClassificationService from '../services/hearing/HearingClassificationService';
+import HearingClassificationService from "../services/hearing/HearingClassificationService";
 
 // --- PREMIUM GLOSSY COMPONENT ---
 const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => (
-  <PremiumTouchable accessibilityRole="button"
+  <PremiumTouchable
+    accessibilityRole="button"
     style={styles.premiumExportBtn}
     activeOpacity={0.7}
     onPress={(e) => {
@@ -50,7 +54,10 @@ const PremiumExportButton = ({ item, openExportOptions, styles, colors }) => (
 
 export default function DiaryScreen({ profile }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
@@ -80,9 +87,10 @@ export default function DiaryScreen({ profile }) {
   const loadCases = useCallback(async () => {
     try {
       setLoading(true);
-      const allCases = await getAllCases(); // ✅ Logic Fixed
+      const allCases = await getAllCases();
 
-      const { today, overdue, upcoming, pipeline } = HearingClassificationService.classifyHearings(allCases);
+      const { today, tomorrow, overdue, upcoming, pipeline } =
+        HearingClassificationService.classifyHearings(allCases);
 
       const sortByDate = (a, b) => {
         if (!a.nextHearingISO) return 1;
@@ -90,8 +98,11 @@ export default function DiaryScreen({ profile }) {
         return a.nextHearingISO.localeCompare(b.nextHearingISO);
       };
 
-      const pendingList = [...overdue, ...upcoming.filter(c => !c.nextHearingISO)];
-      const upcomingList = upcoming.filter(c => c.nextHearingISO);
+      const pendingList = [
+        ...overdue,
+        ...upcoming.filter((c) => !c.nextHearingISO),
+      ];
+      const upcomingList = upcoming.filter((c) => c.nextHearingISO);
 
       pendingList.sort(sortByDate);
       today.sort(sortByDate);
@@ -99,7 +110,7 @@ export default function DiaryScreen({ profile }) {
       pipeline.sort(sortByDate);
 
       setPendingCases(pendingList);
-      setCases([...today, ...upcomingList]);
+      setCases([...today, ...tomorrow, ...upcomingList]);
       setPipelineCases(pipeline);
     } catch (_) {
       Alert.alert("Error", "Failed to load diary cases.");
@@ -145,6 +156,11 @@ export default function DiaryScreen({ profile }) {
     setExportModalVisible(true);
   };
 
+  const totalActive = cases.length;
+  const totalPending = pendingCases.length;
+  const totalPipeline = pipelineCases.length;
+  const totalCases = totalActive + totalPending + totalPipeline;
+
   const filteredCases = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return { active: cases, pipeline: pipelineCases };
@@ -168,22 +184,37 @@ export default function DiaryScreen({ profile }) {
         translucent
       />
 
-            {/* HEADER SECTION */}
+      {/* HEADER SECTION - Fixed with back button enabled */}
       <PremiumPageHeader
         title="Chamber Diary"
-        subtitle={`${profile?.name || "Advocate"} • Practice Workflow`}
-        rightComponent={
-          <PremiumTouchable accessibilityRole="button"
-            style={styles.glassButton}
-            onPress={handleFullDiaryPDF}
-          >
-            <FileText color={colors.primary} size={24} />
-          </PremiumTouchable>
-        }
+        subtitle={`${currentProfile?.name || "Advocate"} • Practice Workflow`}
+        footer={`${totalActive} Active • ${totalPending} Pending • ${totalPipeline} Pipeline`}
+        onBack={() => navigation.goBack()}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
+        actions={[
+          {
+            icon: "document-text-outline",
+            onPress: handleFullDiaryPDF,
+            accessibilityLabel: "Export full diary as PDF",
+            accessibilityHint: "Generate PDF report of all diary cases",
+            variant: "outline",
+          },
+        ]}
       />
 
       {/* SEARCH BAR (moved out of header) */}
-      <View style={{ backgroundColor: colors.surface, paddingHorizontal: 16, paddingBottom: 16 }}>
+      <View
+        style={{
+          backgroundColor: colors.surface,
+          paddingHorizontal: 16,
+          paddingBottom: 16,
+        }}
+      >
         <View style={styles.searchWrapper}>
           <LegalInput
             label="Diary Search"
@@ -212,14 +243,17 @@ export default function DiaryScreen({ profile }) {
                   <Text style={[styles.sectionTitle, { color: colors.danger }]}>
                     Pending Updates
                   </Text>
-                  <View style={[styles.badge, { backgroundColor: colors.danger }]}>
+                  <View
+                    style={[styles.badge, { backgroundColor: colors.danger }]}
+                  >
                     <Text style={[styles.badgeText, { color: colors.danger }]}>
                       {pendingCases.length}
                     </Text>
                   </View>
                 </View>
                 {pendingCases.map((item) => (
-                  <PremiumTouchable accessibilityRole="button"
+                  <PremiumTouchable
+                    accessibilityRole="button"
                     key={item.id}
                     style={[styles.caseCard, styles.pendingBorder]}
                     onPress={() =>
@@ -254,7 +288,8 @@ export default function DiaryScreen({ profile }) {
                   >
                     <Text style={styles.caseTitleText}>{item.title}</Text>
                     <Text style={styles.caseCourtText}>🏛 {item.court}</Text>
-                    <PremiumTouchable accessibilityRole="button"
+                    <PremiumTouchable
+                      accessibilityRole="button"
                       style={styles.activateBtn}
                       onPress={async () => {
                         try {
@@ -287,7 +322,8 @@ export default function DiaryScreen({ profile }) {
               </View>
 
               {filteredCases.active.map((item) => (
-                <PremiumTouchable accessibilityRole="button"
+                <PremiumTouchable
+                  accessibilityRole="button"
                   key={item.id}
                   style={[styles.caseCard, styles.activeBorder]}
                   onPress={() =>
@@ -310,13 +346,19 @@ export default function DiaryScreen({ profile }) {
                         </Text>
                       </View>
                     </View>
-                    <PremiumExportButton styles={styles} colors={colors}
+                    <PremiumExportButton
+                      styles={styles}
+                      colors={colors}
                       item={item}
                       openExportOptions={openExportOptions}
                     />
                   </View>
 
                   <Text style={styles.caseCourtText}>🏛 {item.court}</Text>
+
+                  {item.judge ? (
+                    <Text style={styles.caseJudgeText}>👨‍⚖️ {item.judge}</Text>
+                  ) : null}
 
                   <View style={styles.hearingModule}>
                     <View
@@ -341,7 +383,8 @@ export default function DiaryScreen({ profile }) {
                   </View>
 
                   <View style={styles.cardFooter}>
-                    <PremiumTouchable accessibilityRole="button"
+                    <PremiumTouchable
+                      accessibilityRole="button"
                       onPress={() => handleArchive(item.id, item.title)}
                     >
                       <Text style={styles.archiveLink}>Move to Archive</Text>
@@ -361,7 +404,8 @@ export default function DiaryScreen({ profile }) {
           <View style={styles.exportModalCard}>
             <Text style={styles.modalTitle}>Export Case</Text>
 
-            <PremiumTouchable accessibilityRole="button"
+            <PremiumTouchable
+              accessibilityRole="button"
               style={styles.exportOption}
               onPress={() => {
                 exportCauseListPdf([selectedCase], selectedCase.title);
@@ -372,7 +416,8 @@ export default function DiaryScreen({ profile }) {
               <Text style={styles.exportText}>Export as PDF</Text>
             </PremiumTouchable>
 
-            <PremiumTouchable accessibilityRole="button"
+            <PremiumTouchable
+              accessibilityRole="button"
               style={styles.exportOption}
               onPress={async () => {
                 const text = `Title: ${selectedCase?.title}\nCourt: ${selectedCase?.court}\nNext Hearing: ${toDisplay(selectedCase?.nextHearingISO, locale)}\nBalance: ${formatMoney(selectedCase?.feeBalance, currency, locale)}`;
@@ -385,7 +430,8 @@ export default function DiaryScreen({ profile }) {
               <Text style={styles.exportText}>Copy Full Details</Text>
             </PremiumTouchable>
 
-            <PremiumTouchable accessibilityRole="button"
+            <PremiumTouchable
+              accessibilityRole="button"
               style={styles.exportOption}
               onPress={async () => {
                 await Clipboard.setStringAsync(
@@ -399,7 +445,8 @@ export default function DiaryScreen({ profile }) {
               <Text style={styles.exportText}>Copy Case No</Text>
             </PremiumTouchable>
 
-            <PremiumTouchable accessibilityRole="button"
+            <PremiumTouchable
+              accessibilityRole="button"
               style={styles.cancelBtn}
               onPress={() => setExportModalVisible(false)}
             >
@@ -412,205 +459,215 @@ export default function DiaryScreen({ profile }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: colors.border },
-  backIcon: { color: resolvedTheme === 'dark' ? colors.primary : colors.surface, fontSize: 28, marginTop: -4 },
-  titleCenter: { flex: 1, alignItems: "center" },
-  jurisdictionPill: {
-    backgroundColor: colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-  jurisdictionText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: colors.secondaryText,
-    textTransform: "uppercase",
-  },
-  searchWrapper: { paddingHorizontal: 20, marginTop: 20 },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
-  sectionContainer: { marginBottom: 30 },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: colors.secondaryText,
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-  },
-  badge: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    marginLeft: 10,
-  },
-  badgeText: { fontSize: 10, fontWeight: "800", color: colors.surface },
-  caseCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === "light"
-      ? {
-          shadowColor: colors.shadow,
-          shadowOpacity: 0.04,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 2,
-        }
-      : {
-          shadowOpacity: 0,
-          elevation: 0,
-        }),
-  },
-  activeBorder: { borderLeftColor: colors.primary },
-  pendingBorder: { borderLeftColor: colors.danger },
-  pipelineBorder: { borderLeftColor: colors.border },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  caseTitleText: { fontSize: 17, fontWeight: "800", color: colors.text, flex: 1 },
-  caseCourtText: { fontSize: 13, color: colors.secondaryText, marginBottom: 10 },
-  hearingModule: {
-    backgroundColor: colors.background,
-    padding: 12,
-    borderRadius: 16,
-    marginBottom: 10,
-  },
-  hLabel: { fontSize: 9, fontWeight: "900", color: colors.placeholder },
-  hDate: { fontSize: 15, fontWeight: "800", color: colors.primary },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: 12,
-    marginTop: 5,
-  },
-  archiveLink: { color: colors.placeholder, fontSize: 12, fontWeight: "600" },
-  tapHint: { color: colors.primary, fontSize: 12, fontWeight: "800" },
-  overdueBadge: {
-    backgroundColor: colors.danger,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    marginLeft: 10,
-  },
-  overdueText: { color: colors.danger, fontSize: 9, fontWeight: "900" },
-  activateBtn: {
-    backgroundColor: colors.surface,
-    paddingVertical: 8,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  activateBtnText: { color: colors.surface, fontSize: 11, fontWeight: "900" },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(15, 23, 42, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  exportModalCard: {
-    width: "85%",
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderRadius: 30,
-    padding: 25,
-    ...(resolvedTheme === 'light' ? {
-      elevation: 20,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.2,
-      shadowRadius: 20,
-    } : {
-      elevation: 0,
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: { flex: 1, backgroundColor: colors.border },
+    searchWrapper: { paddingHorizontal: 20, marginTop: 20 },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
+    sectionContainer: { marginBottom: 30 },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 15,
+    },
+    sectionTitle: {
+      fontSize: 12,
+      fontWeight: "800",
+      color: colors.secondaryText,
+      textTransform: "uppercase",
+      letterSpacing: 1.2,
+    },
+    badge: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      marginLeft: 10,
+    },
+    badgeText: { fontSize: 10, fontWeight: "800", color: colors.surface },
+    caseCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 20,
+      marginBottom: 16,
+      borderLeftWidth: 6,
       borderWidth: 1,
-    }),
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "900",
-    color: colors.primary,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  exportOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  exportText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.text,
-    marginLeft: 15,
-  },
-  cancelBtn: { marginTop: 20, paddingVertical: 12 },
-  cancelText: {
-    color: colors.danger,
-    textAlign: "center",
-    fontWeight: "900",
-    fontSize: 14,
-  },
-  premiumExportBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: colors.primaryLight,
-    borderWidth: 1,
-    borderColor:
-      resolvedTheme === "dark" ? colors.border : "transparent",
-  },
-  premiumExportText: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: "700",
-    marginLeft: 6,
-    letterSpacing: 0.5,
-  },
-  glossHighlight: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "40%",
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
-  },
-  priorityBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    backgroundColor: colors.border,
-    marginTop: 4,
-  },
-  priorityUrgent: { backgroundColor: colors.danger },
-  priorityText: { fontSize: 9, fontWeight: "900", color: colors.secondaryText },
-  loaderWrap: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 100,
-  },
-  loaderText: { marginTop: 15, color: colors.secondaryText, fontWeight: "700" },
-  glassButton: { padding: 5 },
-});
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOpacity: 0.04,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 2,
+          }
+        : {
+            shadowOpacity: 0,
+            elevation: 0,
+          }),
+    },
+    activeBorder: { borderLeftColor: colors.primary },
+    pendingBorder: { borderLeftColor: colors.danger },
+    pipelineBorder: { borderLeftColor: colors.border },
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 6,
+    },
+    caseTitleText: {
+      fontSize: 17,
+      fontWeight: "800",
+      color: colors.text,
+      flex: 1,
+    },
+    caseCourtText: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      marginBottom: 4,
+    },
+
+    caseJudgeText: {
+      fontSize: 13,
+      color: colors.text,
+      fontWeight: "600",
+      marginBottom: 10,
+    },
+    hearingModule: {
+      backgroundColor: colors.background,
+      padding: 12,
+      borderRadius: 16,
+      marginBottom: 10,
+    },
+    hLabel: { fontSize: 9, fontWeight: "900", color: colors.placeholder },
+    hDate: { fontSize: 15, fontWeight: "800", color: colors.primary },
+    cardFooter: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: 12,
+      marginTop: 5,
+    },
+    archiveLink: { color: colors.placeholder, fontSize: 12, fontWeight: "600" },
+    tapHint: { color: colors.primary, fontSize: 12, fontWeight: "800" },
+    overdueBadge: {
+      backgroundColor: colors.danger,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 6,
+      marginLeft: 10,
+    },
+    overdueText: { color: colors.danger, fontSize: 9, fontWeight: "900" },
+    activateBtn: {
+      backgroundColor: colors.surface,
+      paddingVertical: 8,
+      borderRadius: 10,
+      alignItems: "center",
+      marginTop: 10,
+    },
+    activateBtnText: { color: colors.surface, fontSize: 11, fontWeight: "900" },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(15, 23, 42, 0.6)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    exportModalCard: {
+      width: "85%",
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: 30,
+      padding: 25,
+      ...(resolvedTheme === "light"
+        ? {
+            elevation: 20,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.2,
+            shadowRadius: 20,
+          }
+        : {
+            elevation: 0,
+            borderWidth: 1,
+          }),
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "900",
+      color: colors.primary,
+      marginBottom: 20,
+      textAlign: "center",
+    },
+    exportOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 18,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    exportText: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: colors.text,
+      marginLeft: 15,
+    },
+    cancelBtn: { marginTop: 20, paddingVertical: 12 },
+    cancelText: {
+      color: colors.danger,
+      textAlign: "center",
+      fontWeight: "900",
+      fontSize: 14,
+    },
+    premiumExportBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      borderRadius: 12,
+      overflow: "hidden",
+      backgroundColor: colors.primaryLight,
+      borderWidth: 1,
+      borderColor: resolvedTheme === "dark" ? colors.border : "transparent",
+    },
+    premiumExportText: {
+      color: colors.primary,
+      fontSize: 11,
+      fontWeight: "700",
+      marginLeft: 6,
+      letterSpacing: 0.5,
+    },
+    glossHighlight: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      height: "40%",
+      backgroundColor: "rgba(255, 255, 255, 0.12)",
+    },
+    priorityBadge: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 6,
+      backgroundColor: colors.border,
+      marginTop: 4,
+    },
+    priorityUrgent: { backgroundColor: colors.danger },
+    priorityText: {
+      fontSize: 9,
+      fontWeight: "900",
+      color: colors.secondaryText,
+    },
+    loaderWrap: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 100,
+    },
+    loaderText: {
+      marginTop: 15,
+      color: colors.secondaryText,
+      fontWeight: "700",
+    },
+  });

@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import {
   Animated,
   StyleSheet,
@@ -12,8 +12,11 @@ import { useTheme } from "../theme/ThemeContext";
 export default function BottomBar({ currentScreen, setCurrentScreen }) {
   const { colors, resolvedTheme } = useTheme();
 
-  const styles = useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
-  // ✨ FIX: Explicitly setting the exact active and inactive icon names
+  const styles = useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
+
   const tabs = [
     {
       label: "Home",
@@ -42,8 +45,7 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
     },
   ];
 
-  // 🔥 ACTION BUTTON ANIMATION
-  const scaleAnim = React.useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePress = () => {
     Animated.sequence([
@@ -80,7 +82,7 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
                   { transform: [{ scale: scaleAnim }] },
                 ]}
               >
-                <Ionicons name="add" size={28} color={resolvedTheme === 'dark' ? '#FFFFFF' : '#FFFFFF'} />
+                <Ionicons name="add" size={28} color="#FFFFFF" />
               </Animated.View>
             </TouchableOpacity>
           );
@@ -97,7 +99,6 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
           >
             <View style={[styles.iconBox, active && styles.activeIconBox]}>
               <Ionicons
-                // ✨ FIX: Now it cleanly switches between the exact names we defined
                 name={active ? tab.activeIcon : tab.inactiveIcon}
                 size={22}
                 color={active ? colors.primary : colors.placeholder}
@@ -111,93 +112,83 @@ export default function BottomBar({ currentScreen, setCurrentScreen }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  // ☁️ THE DOCK
-  dockContainer: {
-    position: "absolute",
-    bottom: 30,
-    left: 24,
-    right: 24,
-    height: 68,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    paddingHorizontal: 12,
-
-    borderWidth: 1,
-    borderColor: colors.border,
-
-    // Soft, wide diffusion shadow
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOpacity: 0.04,
-      shadowOffset: { width: 0, height: 2 },
-      shadowRadius: 20,
-      elevation: 2
-    } : {
-      elevation: 0
-    }),
-  },
-
-  // 🟦 STANDARD TABS
-  tab: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  activeTabPadding: {
-    flex: 1.5,
-  },
-
-  iconBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-  },
-
-  activeIconBox: {
-    backgroundColor: colors.primaryLight,
-  },
-
-  // 📝 DYNAMIC LABEL
-  activeLabel: {
-    marginLeft: 6,
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: "700",
-  },
-
-  // 🔥 THE NEW INLINE ADD BUTTON
-  actionTabWrapper: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  actionButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
-
-    justifyContent: "center",
-    alignItems: "center",
-
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      elevation: 6
-    } : {
-      elevation: 0,
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    dockContainer: {
+      position: "absolute",
+      bottom: 30,
+      left: 24,
+      right: 24,
+      height: 68,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      paddingHorizontal: 12,
       borderWidth: 1,
-      borderColor: colors.border
-    }),
-  },
-});
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOpacity: 0.04,
+            shadowOffset: { width: 0, height: 2 },
+            shadowRadius: 20,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    tab: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    activeTabPadding: {
+      flex: 1.5,
+    },
+    iconBox: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: 16,
+    },
+    activeIconBox: {
+      backgroundColor: colors.primaryLight,
+    },
+    activeLabel: {
+      marginLeft: 6,
+      fontSize: 12,
+      color: colors.primary,
+      fontWeight: "700",
+    },
+    actionTabWrapper: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    actionButton: {
+      width: 48,
+      height: 48,
+      borderRadius: 16,
+      backgroundColor: colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.primary,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {
+            elevation: 0,
+            borderWidth: 1,
+            borderColor: colors.border,
+          }),
+    },
+  });

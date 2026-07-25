@@ -1,4 +1,4 @@
-import { isToday, isTomorrow, isPast } from '../../utils/date';
+import { isToday, isTomorrow, isPast, toISO } from '../../utils/date';
 
 /**
  * HearingClassificationService
@@ -38,20 +38,24 @@ class HearingClassificationService {
             } else if (c.status === 'active') {
                 allActive.push(c);
 
-                if (c.nextHearingISO) {
-                    if (isToday(c.nextHearingISO)) {
+                // FALLBACK: Use nextHearingDate if nextHearingISO is missing
+                let hearingIso = c.nextHearingISO;
+                if (!hearingIso && c.nextHearingDate) {
+                    hearingIso = toISO(c.nextHearingDate);
+                }
+
+                if (hearingIso) {
+                    if (isToday(hearingIso)) {
                         today.push(c);
-                    } else if (isTomorrow(c.nextHearingISO)) {
+                    } else if (isTomorrow(hearingIso)) {
                         tomorrow.push(c);
-                    } else if (isPast(c.nextHearingISO)) {
+                    } else if (isPast(hearingIso)) {
                         overdue.push(c);
                     } else {
                         upcoming.push(c);
                     }
                 } else {
-                    // Active case with no hearing date yet goes to upcoming or pipeline depending on your business rules,
-                    // but commonly treated as upcoming or just left in allActive. Let's put in upcoming for now, or ignore.
-                    // If no hearing date, it cannot be today, tomorrow, or overdue. We'll add it to upcoming.
+                    // Active case with no hearing date at all.
                     upcoming.push(c);
                 }
             }

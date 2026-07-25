@@ -32,6 +32,7 @@ export class DocumentRouter {
             AIEvents.emitAnalysisCompleted();
             return result;
         } catch (error) {
+            if (error instanceof AIError || error.code?.startsWith('OCR_')) throw error;
             throw new AIError({
                 code: 'DOCUMENT_ROUTER_ERROR',
                 userMessage: 'Document Vault AI encountered an error analyzing your document.',

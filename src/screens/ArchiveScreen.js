@@ -1,7 +1,7 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
-import SkeletonLoader from '../components/SkeletonLoader';
-import PremiumPageHeader from '../components/PremiumPageHeader';
+import EmptyState from "../components/EmptyState";
+import SkeletonLoader from "../components/SkeletonLoader";
+import PremiumPageHeader from "../components/PremiumPageHeader";
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -23,13 +23,19 @@ import {
   updateCaseStatus,
   getProfile,
 } from "../services/sqliteService";
-import { updateCaseNotifications, cancelCaseNotifications } from "../services/reminderScheduler";
+import {
+  updateCaseNotifications,
+  cancelCaseNotifications,
+} from "../services/reminderScheduler";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { toDisplay } from "../utils/date";
 
 export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const insets = useSafeAreaInsets();
   const currency = getCurrency(currentProfile);
@@ -37,6 +43,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const navigation = useNavigation();
+
   const loadArchivedCases = useCallback(() => {
     try {
       setLoading(true);
@@ -49,6 +56,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
       setLoading(false);
     }
   }, []);
+
   useFocusEffect(
     useCallback(() => {
       const load = async () => {
@@ -58,6 +66,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
       load();
     }, []),
   );
+
   useEffect(() => {
     loadArchivedCases();
   }, [loadArchivedCases]);
@@ -126,8 +135,22 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
         translucent
       />
 
-      {/* HEADER: GLASS STYLE */}
-      <PremiumPageHeader title="Archive Vault" subtitle="Historical Records" />
+      {/* HEADER - Migrated to PremiumPageHeader V5.1 */}
+      <PremiumPageHeader
+        title="Archive Vault"
+        subtitle="Historical Records"
+        showBackButton={true}
+        onBack={() => {
+          if (onBack) {
+            onBack();
+          } else if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.navigate("Dashboard");
+          }
+        }}
+        headerVariant="default"
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -154,7 +177,7 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
           </View>
         ) : (
           filteredCases.map((item) => (
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               key={item.id}
               style={styles.caseCard}
               activeOpacity={0.9}
@@ -196,13 +219,13 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
               </View>
 
               <View style={styles.actionRow}>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
                   style={styles.restoreBtn}
                   onPress={() => handleRestore(item.id, item.title)}
                 >
                   <Text style={styles.restoreBtnText}>Restore Case</Text>
                 </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
                   style={styles.deleteBtn}
                   onPress={() => handleDeleteCase(item.id, item.title)}
                 >
@@ -217,184 +240,143 @@ export default function ArchiveScreen({ profile, onBack, onOpenCaseDetail }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: colors.border },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: { flex: 1, backgroundColor: colors.border },
 
-  // Header & Search
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 25,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    zIndex: 100,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-  },
-  glassBackButton: {
-    width: 44,
-    height: 44,
-    backgroundColor: colors.background,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backIcon: {
-    color: colors.primary,
-    fontSize: 28,
-    fontWeight: "300",
-    marginTop: -4,
-  },
-  titleCenter: { flex: 1, alignItems: "center" },
-  headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
-  jurisdictionPill: {
-    backgroundColor: colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-  jurisdictionText: {
-    color: colors.secondaryText,
-    fontSize: 10,
-    fontWeight: "700",
-    textTransform: "uppercase",
-  },
+    searchWrapper: { paddingHorizontal: 20, marginTop: 20 },
 
-  searchWrapper: { paddingHorizontal: 20, marginTop: 20 },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 20 },
 
-  scrollContent: { paddingHorizontal: 20, paddingTop: 20 },
+    // Empty State
+    emptyBox: { alignItems: "center", marginTop: 80, paddingHorizontal: 40 },
+    emptyIconCircle: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    emptyEmoji: { fontSize: 40 },
+    emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
+    emptySub: {
+      fontSize: 14,
+      color: colors.placeholder,
+      marginTop: 8,
+      textAlign: "center",
+      lineHeight: 22,
+    },
 
-  // Empty State
-  emptyBox: { alignItems: "center", marginTop: 80, paddingHorizontal: 40 },
-  emptyIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  emptyEmoji: { fontSize: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.text },
-  emptySub: {
-    fontSize: 14,
-    color: colors.placeholder,
-    marginTop: 8,
-    textAlign: "center",
-    lineHeight: 22,
-  },
+    // Case Cards
+    caseCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 20,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.03,
+      shadowRadius: 10,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+    },
+    caseTitle: {
+      fontSize: 17,
+      fontWeight: "800",
+      color: colors.text,
+      marginBottom: 2,
+    },
+    caseCourt: { fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
+    statusPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.border,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 20,
+    },
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.placeholder,
+      marginRight: 6,
+    },
+    statusText: {
+      fontSize: 10,
+      fontWeight: "800",
+      color: colors.secondaryText,
+    },
 
-  // Case Cards
-  caseCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 10,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  caseTitle: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: colors.text,
-    marginBottom: 2,
-  },
-  caseCourt: { fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
-  statusPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.border,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.placeholder,
-    marginRight: 6,
-  },
-  statusText: { fontSize: 10, fontWeight: "800", color: colors.secondaryText },
+    divider: { height: 1, backgroundColor: colors.border, marginVertical: 15 },
 
-  divider: { height: 1, backgroundColor: colors.border, marginVertical: 15 },
+    metaGrid: { flexDirection: "row", justifyContent: "space-between" },
+    metaItem: { flex: 1 },
+    metaLabel: {
+      fontSize: 9,
+      fontWeight: "800",
+      color: colors.placeholder,
+      letterSpacing: 0.5,
+    },
+    metaValue: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.text,
+      marginTop: 3,
+    },
 
-  metaGrid: { flexDirection: "row", justifyContent: "space-between" },
-  metaItem: { flex: 1 },
-  metaLabel: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.placeholder,
-    letterSpacing: 0.5,
-  },
-  metaValue: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.text,
-    marginTop: 3,
-  },
+    balanceContainer: {
+      backgroundColor: colors.background,
+      padding: 15,
+      borderRadius: 16,
+      marginTop: 15,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    balanceLabel: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.secondaryText,
+    },
+    balanceValue: { fontSize: 15, fontWeight: "800", color: colors.primary },
 
-  balanceContainer: {
-    backgroundColor: colors.background,
-    padding: 15,
-    borderRadius: 16,
-    marginTop: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  balanceLabel: { fontSize: 12, fontWeight: "600", color: colors.secondaryText },
-  balanceValue: { fontSize: 15, fontWeight: "800", color: colors.primary },
+    actionRow: { flexDirection: "row", marginTop: 20, gap: 10 },
+    restoreBtn: {
+      flex: 2,
+      backgroundColor: colors.primary,
+      paddingVertical: 14,
+      borderRadius: 14,
+      alignItems: "center",
+      shadowColor: colors.primary,
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      elevation: 4,
+    },
+    restoreBtnText: { color: colors.surface, fontWeight: "800", fontSize: 13 },
+    deleteBtn: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      paddingVertical: 14,
+      borderRadius: 14,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.danger,
+    },
+    deleteBtnText: { color: colors.danger, fontWeight: "800", fontSize: 13 },
 
-  actionRow: { flexDirection: "row", marginTop: 20, gap: 10 },
-  restoreBtn: {
-    flex: 2,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: "center",
-    shadowColor: colors.primary,
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  restoreBtnText: { color: colors.surface, fontWeight: "800", fontSize: 13 },
-  deleteBtn: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.danger,
-  },
-  deleteBtnText: { color: colors.danger, fontWeight: "800", fontSize: 13 },
-
-  loaderWrap: { paddingVertical: 80, alignItems: "center" },
-  loaderText: {
-    marginTop: 15,
-    color: colors.primary,
-    fontWeight: "700",
-    fontSize: 13,
-  },
-});
+    loaderWrap: { paddingVertical: 80, alignItems: "center" },
+    loaderText: {
+      marginTop: 15,
+      color: colors.primary,
+      fontWeight: "700",
+      fontSize: 13,
+    },
+  });

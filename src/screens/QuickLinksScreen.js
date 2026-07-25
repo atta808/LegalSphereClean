@@ -199,14 +199,28 @@ export default function QuickLinksScreen({ onBack }) {
     loadLinks();
   };
 
+  // Calculate stats
+  const totalLinks = links.length;
+  const favoriteLinks = links.filter(l => l.isFavorite).length;
+  const pinnedLinks = links.filter(l => l.isPinned).length;
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent />
 
-      {/* HEADER */}
-      <PremiumPageHeader title="Quick Links" subtitle="
-                Legal Resources & Tools
-              " />
+      {/* HEADER - Enhanced with complete configuration */}
+      <PremiumPageHeader
+        title="Quick Links"
+        subtitle={`${totalLinks} Legal Resources`}
+        footer={`⭐ ${favoriteLinks} favorites • 📌 ${pinnedLinks} pinned • ${selectedFilter !== 'all' ? `Filter: ${selectedFilter}` : 'All categories'}`}
+        onBack={() => (onBack ? onBack() : navigation.goBack())}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
+      />
 
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 }]}>
         {/* SEARCH */}
@@ -218,7 +232,7 @@ export default function QuickLinksScreen({ onBack }) {
         />
 
         {/* FILTER */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
           {["all", ...CATEGORIES].map((f) => (
             <TouchableOpacity accessibilityRole="button"
               key={f}
@@ -234,7 +248,7 @@ export default function QuickLinksScreen({ onBack }) {
                   selectedFilter === f && styles.filterTextActive,
                 ]}
               >
-                {f.toUpperCase()}
+                {f === "all" ? "ALL" : f.toUpperCase()}
               </Text>
             </TouchableOpacity>
           ))}
@@ -257,14 +271,14 @@ export default function QuickLinksScreen({ onBack }) {
             keyboardType="url"
           />
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
             {CATEGORIES.map((c) => (
               <TouchableOpacity accessibilityRole="button"
                 key={c}
                 style={[styles.catBtn, category === c && styles.catActive]}
                 onPress={() => setCategory(c)}
               >
-                <Text style={styles.catText}>
+                <Text style={[styles.catText, category === c && styles.catTextActive]}>
                   {categoryIcons[c]} {c}
                 </Text>
               </TouchableOpacity>
@@ -329,73 +343,20 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     backgroundColor: colors.background,
   },
 
-  // ================= HEADER =================
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 5,
-  },
-
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-
-  glassBackButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  backIcon: {
-    fontSize: 28,
-    color: colors.primary,
-    fontWeight: "300",
-    marginTop: -4,
-  },
-
-  titleCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
-
-  headerTitleText: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: colors.primary,
-  },
-
-  jurisdictionPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-
-  jurisdictionText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
   content: {
     padding: 18,
     paddingBottom: 120,
   },
 
+  filterScroll: {
+    marginTop: 12,
+    marginBottom: 4,
+  },
+
+  catScroll: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
 
   // ================= FILTER =================
   filterBtn: {
@@ -453,7 +414,7 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     color: colors.text,
   },
 
-  catActiveText: {
+  catTextActive: {
     color: colors.surface,
   },
 

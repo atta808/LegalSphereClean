@@ -1,31 +1,46 @@
 /**
  * @file TextCleaner.js
- * @description Removes raw OCR artifacts and control characters.
+ * @description Cleans raw OCR text by removing control characters, extra spaces, and other artifacts.
+ * Unicode-safe: preserves Arabic/Urdu script.
+ * Now includes dev logging to warn if Urdu characters are lost.
  */
 
+import { countUrduChars } from "../../../../utils/unicodeHelpers";
+
 export class TextCleaner {
-    /**
-     * Cleans OCR garbage and zero-width characters.
-     */
-    static clean(text) {
-        if (!text) return '';
+  /**
+   * Cleans the input text by:
+   * - Removing control characters (except newlines and tabs)
+   * - Collapsing multiple spaces, newlines, tabs
+   * - Stripping leading/trailing whitespace
+   *
+   * @param {string} text - The raw text to clean.
+   * @returns {string} The cleaned text.
+   */
+  static clean(text) {
+    if (!text || typeof text !== "string") return "";
 
-        // 1. Remove Zero-width characters
-        let cleaned = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+    const originalUrduCount = countUrduChars(text);
 
-        // 2. Remove multiple blank lines (3 or more down to 2)
-        cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+    // Remove control characters except newline (0x0A) and tab (0x09)
+    let cleaned = text.replace(/[\x00-\x08\x0B-\x1F\x7F]/g, "");
 
-        // 3. Remove repeated punctuation (e.g. ..... or ,,,,,)
-        cleaned = cleaned.replace(/\.{4,}/g, '...'); // keep ellipses
-        cleaned = cleaned.replace(/,{2,}/g, ',');
+    // Replace multiple spaces, tabs, and newlines with single space
+    cleaned = cleaned.replace(/[ \t]+/g, " ");
+    cleaned = cleaned.replace(/\n{3,}/g, "\n\n"); // collapse multiple newlines to max 2
 
-        // 4. Normalize spaces (multiple spaces to single)
-        cleaned = cleaned.replace(/[ \t]{2,}/g, ' ');
+    // Trim leading/trailing whitespace
+    cleaned = cleaned.trim();
 
-        // 5. Clean up weird page separators common in OCR
-        cleaned = cleaned.replace(/---+\s*page\s*\d+\s*---+/gi, '\n\n[PAGE BREAK]\n\n');
-
-        return cleaned.trim();
+    if (__DEV__) {
+      const newUrduCount = countUrduChars(cleaned);
+      if (newUrduCount < originalUrduCount * 0.9 && originalUrduCount > 0) {
+        console.warn(
+          `TextCleaner: Urdu characters dropped from ${originalUrduCount} to ${newUrduCount} (significant drop)`,
+        );
+      }
     }
+
+    return cleaned;
+  }
 }

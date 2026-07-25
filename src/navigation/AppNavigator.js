@@ -1,14 +1,22 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { DefaultTheme, DarkTheme, NavigationContainer } from "@react-navigation/native";
+import {
+  DefaultTheme,
+  DarkTheme,
+  NavigationContainer,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BottomBar from "../components/BottomBar"; // ✅ ADD THIS
+import { useNavigationContainerRef } from "@react-navigation/native";
+import React from "react";
+import BottomBar from "../components/BottomBar";
 import LoginScreen from "../screens/LoginScreen";
+
 // 🟦 TAB SCREENS
 import ClientsScreen from "../screens/ClientsScreen";
 import DashboardScreen from "../screens/DashboardScreen";
 import DiaryScreen from "../screens/DiaryScreen";
 import QuickLinksScreen from "../screens/QuickLinksScreen";
 import BrowserHomeScreen from "../screens/BrowserHomeScreen";
+
 // 🟪 STACK SCREENS
 import AddCaseScreen from "../screens/AddCaseScreen";
 import AddClientScreen from "../screens/AddClientScreen";
@@ -32,6 +40,7 @@ import AIChatRoomScreen from "../screens/AIChatRoomScreen";
 import LexAiScreen from "../screens/LexAiScreen";
 import NotificationCenterScreen from "../screens/NotificationCenterScreen";
 import { useTheme } from "../theme/ThemeContext";
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -39,6 +48,14 @@ const Tab = createBottomTabNavigator();
 // 🟦 MAIN TABS
 // =======================
 function MainTabs({ profile, onLogout }) {
+  const screenMap = {
+    dashboard: "Dashboard",
+    diary: "Diary",
+    clients: "Clients",
+    browser: "Browser",
+    calendar: "Calendar",
+  };
+
   return (
     <Tab.Navigator
       tabBar={(props) => (
@@ -47,9 +64,10 @@ function MainTabs({ profile, onLogout }) {
             props.state.index
           ].toLowerCase()}
           setCurrentScreen={(screen) => {
-            props.navigation.navigate(
-              screen.charAt(0).toUpperCase() + screen.slice(1),
-            );
+            const targetScreen =
+              screenMap[screen] ||
+              screen.charAt(0).toUpperCase() + screen.slice(1);
+            props.navigation.navigate(targetScreen);
           }}
         />
       )}
@@ -66,9 +84,11 @@ function MainTabs({ profile, onLogout }) {
       <Tab.Screen name="Diary">
         {(props) => <DiaryScreen {...props} profile={profile} />}
       </Tab.Screen>
+
       <Tab.Screen name="Clients">
         {(props) => <ClientsScreen {...props} profile={profile} />}
       </Tab.Screen>
+
       <Tab.Screen name="Browser" component={BrowserHomeScreen} />
 
       <Tab.Screen name="Calendar">
@@ -83,11 +103,10 @@ function MainTabs({ profile, onLogout }) {
 // =======================
 // 🧭 ROOT NAVIGATOR
 // =======================
-import React, { forwardRef } from 'react';
-
-const AppNavigator = forwardRef(({ user, profile, onLogout }, ref) => {
+const AppNavigator = ({ user, profile, onLogout }) => {
   const { colors, resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
+  const navigationRef = useNavigationContainerRef();
+  const isDark = resolvedTheme === "dark";
 
   const baseTheme = isDark ? DarkTheme : DefaultTheme;
 
@@ -106,7 +125,7 @@ const AppNavigator = forwardRef(({ user, profile, onLogout }, ref) => {
   };
 
   return (
-    <NavigationContainer theme={navigationTheme} ref={ref}>
+    <NavigationContainer theme={navigationTheme} ref={navigationRef}>
       {user ? (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {/* MAIN */}
@@ -141,14 +160,16 @@ const AppNavigator = forwardRef(({ user, profile, onLogout }, ref) => {
           />
           <Stack.Screen name="AIChatRoom" component={AIChatRoomScreen} />
           <Stack.Screen name="LexAi" component={LexAiScreen} />
-          <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} />
+          <Stack.Screen
+            name="NotificationCenter"
+            component={NotificationCenterScreen}
+          />
         </Stack.Navigator>
       ) : (
-        // 🔥 THIS IS THE KEY PART
         <LoginScreen />
       )}
     </NavigationContainer>
   );
-});
+};
 
 export default AppNavigator;

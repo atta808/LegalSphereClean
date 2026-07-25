@@ -1,4 +1,6 @@
 import React from "react";
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
 import EmptyState from "../components/EmptyState";
 import PremiumCard from "../components/PremiumCard";
 import { useTheme } from "../theme/ThemeContext";
@@ -72,6 +74,7 @@ export default function DashboardScreen({ profile, onLogout }) {
   const locale = currentProfile?.locale || "en-PK";
   const currency = getCurrency(currentProfile);
   const navigation = useNavigation();
+
   const loadStats = useCallback(async () => {
     try {
       const allCases = await getAllCases();
@@ -133,7 +136,7 @@ export default function DashboardScreen({ profile, onLogout }) {
           const freshData = await getProfile();
           if (freshData) {
             setCurrentProfile(freshData);
-            setImageKey(Date.now()); // ✅ refresh only when profile updates
+            setImageKey(Date.now());
           }
         } catch (e) {
           console.log("Profile reload error:", e);
@@ -142,7 +145,7 @@ export default function DashboardScreen({ profile, onLogout }) {
 
       loadProfile();
 
-      return () => {}; // ensures refresh cycle
+      return () => {};
     }, [loadStats]),
   );
 
@@ -207,57 +210,41 @@ export default function DashboardScreen({ profile, onLogout }) {
         barStyle="light-content"
         backgroundColor={colors.primaryDark}
       />
-
-            {/* HEADER */}
+      {/* HEADER - Migrated to PremiumPageHeader V5.1 */}
       <PremiumPageHeader
+        headerVariant="dashboard"
         title="LegalSphere Diary"
-        subtitle={currentProfile?.name || "Advocate"}
         showBackButton={false}
-        rightComponent={
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <PremiumTouchable
-              accessibilityRole="button"
-              style={styles.glassButton}
-              onPress={() => navigation.navigate("NotificationCenter")}
-            >
-              <Ionicons
-                name="notifications-outline"
-                size={22}
-                color={colors.primary}
-              />
-              {unreadNotificationsCount > 0 && (
-                <View style={styles.badgeContainer}>
-                  <Text style={styles.badgeText}>
-                    {unreadNotificationsCount > 9
-                      ? "9+"
-                      : unreadNotificationsCount}
-                  </Text>
-                </View>
-              )}
-            </PremiumTouchable>
-            <PremiumTouchable
-              accessibilityRole="button"
-              style={styles.glassButton}
-              onPress={handleTodayPDF}
-            >
-              <Text style={styles.iconText}>📄</Text>
-            </PremiumTouchable>
-            <PremiumTouchable
-              accessibilityRole="button"
-              style={styles.glassButton}
-              onPress={() => navigation.navigate("LexAi")}
-            >
-              <Text style={styles.iconText}>⚡</Text>
-            </PremiumTouchable>
-          </View>
+        showAvatar={true}
+        avatarSource={currentProfile?.image || null}
+        profileName={currentProfile?.name || "Advocate"}
+        profileSubtitle={currentProfile?.jurisdiction || "High Court"}
+        jurisdiction={
+          currentProfile?.country ? `📍 ${currentProfile.country}` : null
         }
+        actions={[
+          {
+            icon: "notifications-outline",
+            onPress: () => navigation.navigate("NotificationCenter"),
+            badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : 0,
+            badgeColor: colors.danger,
+            accessibilityLabel: "Notifications",
+            accessibilityHint: "View your notifications",
+          },
+          {
+            icon: "document-text-outline",
+            onPress: handleTodayPDF,
+            accessibilityLabel: "Export PDF",
+            accessibilityHint: "Export today's cause list as PDF",
+          },
+          {
+            icon: "flash-outline",
+            onPress: () => navigation.navigate("LexAi"),
+            accessibilityLabel: "Lex AI",
+            accessibilityHint: "Open Lex AI assistant",
+          },
+        ]}
       />
-      <View style={styles.jurisdictionContainer}>
-          <Text style={styles.jurisdictionText}>
-            📍 {currentProfile?.jurisdiction || "High Court"} •{" "}
-            {currentProfile?.country || "Pakistan"}
-          </Text>
-        </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
@@ -588,45 +575,6 @@ export default function DashboardScreen({ profile, onLogout }) {
           </View>
         )}
 
-        {/* LAWYER PROFILE CARD */}
-        <View style={styles.profileCard}>
-          <TouchableOpacity
-            accessibilityRole="button"
-            style={styles.profileLeft}
-            onPress={() => navigation.navigate("LawyerProfile")}
-          >
-            {currentProfile?.image ? (
-              <Image
-                source={{ uri: currentProfile.image + "?t=" + imageKey }}
-                style={styles.profileImage}
-              />
-            ) : (
-              <View style={styles.profileAvatar}>
-                <Text style={styles.profileAvatarText}>
-                  {currentProfile?.name?.charAt(0) || "A"}
-                </Text>
-              </View>
-            )}
-            <View>
-              <Text style={styles.profileName}>
-                {currentProfile?.name || "Advocate"}
-              </Text>
-              <Text style={styles.profileSub}>
-                {currentProfile?.jurisdiction || "High Court"}
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            accessibilityRole="button"
-            style={styles.shareBtn}
-            onPress={handleShareProfile}
-          >
-            <Text style={{ color: colors.surface, fontWeight: "700" }}>
-              Share
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         {/* ACTION GRID */}
         <Text style={styles.sectionHeading}>Practice Management</Text>
         <View style={styles.actionGrid}>
@@ -652,26 +600,6 @@ export default function DashboardScreen({ profile, onLogout }) {
 const createStyles = (colors, resolvedTheme) =>
   StyleSheet.create({
     mainWrapper: { flex: 1, backgroundColor: colors.background },
-    premiumHeader: {
-      backgroundColor:
-        resolvedTheme === "dark" ? colors.surface : colors.primary,
-      paddingHorizontal: 20,
-      paddingBottom: 50,
-      borderBottomLeftRadius: 35,
-      borderBottomRightRadius: 35,
-      ...(resolvedTheme === "dark"
-        ? {
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderTopWidth: 0,
-          }
-        : {}),
-    },
-    headerRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
     badgeContainer: {
       position: "absolute",
       top: -5,
@@ -689,53 +617,6 @@ const createStyles = (colors, resolvedTheme) =>
       color: "#FFF",
       fontSize: 10,
       fontWeight: "bold",
-    },
-    profileSection: { flexDirection: "row", alignItems: "center", gap: 12 },
-    avatarGlow: {
-      width: 48,
-      height: 48,
-      borderRadius: 16,
-      backgroundColor:
-        resolvedTheme === "dark"
-          ? colors.primaryLight
-          : "rgba(255,255,255,0.2)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    avatarText: {
-      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
-      fontSize: 20,
-      fontWeight: "800",
-    },
-    welcomeLabel: {
-      color:
-        resolvedTheme === "dark"
-          ? colors.secondaryText
-          : "rgba(255,255,255,0.8)",
-      fontSize: 11,
-    },
-    lawyerName: {
-      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
-      fontSize: 17,
-      fontWeight: "700",
-    },
-    glassLogout: {
-      backgroundColor:
-        resolvedTheme === "dark" ? colors.card : "rgba(255,255,255,0.15)",
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 12,
-      ...(resolvedTheme === "dark"
-        ? {
-            borderWidth: 1,
-            borderColor: colors.border,
-          }
-        : {}),
-    },
-    logoutText: {
-      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
-      fontSize: 12,
-      fontWeight: "600",
     },
     jurisdictionContainer: {
       marginTop: 15,
@@ -760,12 +641,30 @@ const createStyles = (colors, resolvedTheme) =>
       paddingBottom: 120,
     },
     notificationsPreviewContainer: {
-      marginTop: -20,
+      marginTop: 0,
       marginBottom: 20,
       zIndex: 10,
     },
+    sectionHeaderRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 10,
+    },
+    sectionTitle: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.secondaryText,
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+    },
+    seeAllText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.primary,
+    },
     notificationsList: {
-      marginTop: 10,
+      marginTop: 0,
     },
     notificationMiniCard: {
       flexDirection: "row",
@@ -804,7 +703,7 @@ const createStyles = (colors, resolvedTheme) =>
       borderRadius: 24,
       padding: 20,
       justifyContent: "space-between",
-      marginTop: -35,
+      marginTop: 16,
       marginBottom: 20,
       borderWidth: 1,
       borderColor: colors.border,
@@ -1018,12 +917,6 @@ const createStyles = (colors, resolvedTheme) =>
       alignItems: "center",
     },
     alertTitle: { fontWeight: "700", fontSize: 15 },
-    alertItem: {
-      marginTop: 12,
-      paddingLeft: 12,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.border,
-    },
     caseName: { fontSize: 15, fontWeight: "700", color: colors.text },
     caseCourt: {
       fontSize: 13,
@@ -1082,64 +975,6 @@ const createStyles = (colors, resolvedTheme) =>
       flex: 1,
     },
 
-    glassButton: {
-      backgroundColor: "rgba(255,255,255,0.15)",
-      width: 38,
-      height: 38,
-      borderRadius: 12,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    iconText: { fontSize: 18, color: colors.surface },
-    profileCard: {
-      backgroundColor: colors.surface,
-      borderRadius: 16,
-      padding: 16,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 15,
-      borderWidth: 1,
-      borderColor: colors.border,
-      ...(resolvedTheme === "light"
-        ? {
-            elevation: 2,
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.04,
-            shadowRadius: 6,
-          }
-        : {
-            elevation: 0,
-          }),
-    },
-    profileLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
-    profileImage: { width: 54, height: 54, borderRadius: 27 },
-    profileAvatar: {
-      width: 54,
-      height: 54,
-      borderRadius: 27,
-      backgroundColor: colors.primaryLight,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    profileAvatarText: {
-      color: colors.primary,
-      fontWeight: "700",
-      fontSize: 20,
-    },
-    profileName: { fontSize: 17, fontWeight: "700", color: colors.text },
-    profileSub: {
-      fontSize: 13,
-      color: colors.secondaryText,
-      fontWeight: "500",
-    },
-    shareBtn: {
-      backgroundColor: colors.primary,
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: 12,
-    },
     domainBadge: {
       alignSelf: "flex-start",
       paddingHorizontal: 10,

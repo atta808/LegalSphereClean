@@ -1,6 +1,6 @@
 import React from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
-import PremiumTouchable from '../components/PremiumTouchable';
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
 import EmptyState from "../components/EmptyState";
 import SkeletonLoader from "../components/SkeletonLoader";
 import PremiumCard from "../components/PremiumCard";
@@ -91,45 +91,34 @@ export default function ClientsScreen({ profile }) {
     <View style={styles.mainContainer}>
       <StatusBar barStyle="dark-content" translucent />
 
-      {/* PREMIUM HEADER WITH BACK BUTTON */}
+      {/* PREMIUM HEADER - Migrated to PremiumPageHeader with actions */}
       <PremiumPageHeader
+        headerVariant="default"
         title="Client Directory"
         subtitle={`${clients.length} Total Verified Clients`}
-        rightComponent={
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            {/* 🔥 ARCHIVE BUTTON */}
-            <PremiumTouchable
-              accessibilityRole="button"
-              style={styles.archiveBtn}
-              onPress={() => navigation.navigate("ClientArchive")}
-            >
-              <Ionicons
-                name="archive-outline"
-                size={20}
-                color={colors.primary}
-              />
-            </PremiumTouchable>
-
-            {/* ADD BUTTON */}
-            <PremiumTouchable
-              accessibilityRole="button"
-              style={styles.addBtn}
-              onPress={() => navigation.navigate("AddClient")}
-            >
-              <Ionicons
-                name="add"
-                size={24}
-                color={
-                  resolvedTheme === "dark" ? colors.surface : colors.primary
-                }
-              />
-            </PremiumTouchable>
-          </View>
-        }
+        showBackButton={true}
+        onBack={() => navigation.goBack()}
+        actions={[
+          {
+            icon: "archive-outline",
+            onPress: () => navigation.navigate("Archive"),
+            accessibilityLabel: "Archive",
+          },
+          {
+            icon: "add",
+            onPress: () => navigation.navigate("AddClient"),
+            accessibilityLabel: "Add Client",
+          },
+        ]}
       />
-
-      <View style={{ backgroundColor: colors.surface, paddingHorizontal: 16, paddingBottom: 16 }}>
-      {/* INTEGRATED SEARCH */}
+      <View
+        style={{
+          backgroundColor: colors.surface,
+          paddingHorizontal: 16,
+          paddingBottom: 16,
+        }}
+      >
+        {/* INTEGRATED SEARCH */}
         <LegalInput
           label="Client Search"
           value={search}
@@ -265,83 +254,6 @@ export default function ClientsScreen({ profile }) {
 const createStyles = (colors, resolvedTheme) =>
   StyleSheet.create({
     mainContainer: { flex: 1, backgroundColor: colors.background },
-    header: {
-      backgroundColor:
-        resolvedTheme === "dark" ? colors.surface : colors.primary,
-      paddingHorizontal: 20,
-      paddingBottom: 20,
-      borderBottomLeftRadius: 32,
-      borderBottomRightRadius: 32,
-      ...(resolvedTheme === "dark"
-        ? {
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderTopWidth: 0,
-          }
-        : {
-            shadowColor: colors.shadow,
-            shadowOpacity: 0.03,
-            shadowRadius: 15,
-            elevation: 2,
-          }),
-    },
-    headerRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-
-    // ✅ PRECISE BACK BUTTON STYLING
-    glassBackButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 14,
-      backgroundColor:
-        resolvedTheme === "dark" ? colors.card : "rgba(255,255,255,0.15)",
-      borderWidth: 1,
-      borderColor:
-        resolvedTheme === "dark" ? colors.border : "rgba(255,255,255,0.1)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    backIcon: {
-      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
-      fontSize: 28,
-      fontWeight: "300",
-      marginTop: -4,
-    },
-
-    titleContainer: { flex: 1, alignItems: "center" },
-    title: {
-      fontSize: 20,
-      fontWeight: "700",
-      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
-    },
-    subTitle: {
-      fontSize: 10,
-      color:
-        resolvedTheme === "dark" ? colors.placeholder : "rgba(255,255,255,0.7)",
-      fontWeight: "700",
-      textTransform: "uppercase",
-      marginTop: 2,
-    },
-
-    addBtn: {
-      width: 44,
-      height: 44,
-      borderRadius: 14,
-      backgroundColor:
-        resolvedTheme === "dark" ? colors.primary : colors.surface,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    addText: {
-      color: resolvedTheme === "dark" ? colors.surface : colors.primary,
-      fontSize: 22,
-      fontWeight: "bold",
-    },
-
     scrollContent: { padding: 20, paddingBottom: 100 },
     card: {
       backgroundColor: colors.surface,
@@ -411,31 +323,4 @@ const createStyles = (colors, resolvedTheme) =>
 
     center: { alignItems: "center", marginTop: 100 },
     emptyTitle: { fontWeight: "600", color: colors.placeholder },
-    archiveBtn: {
-      width: 44,
-      height: 44,
-      borderRadius: 14,
-      backgroundColor: resolvedTheme === "dark" ? colors.card : colors.surface,
-      justifyContent: "center",
-      alignItems: "center",
-
-      borderWidth: 1,
-      borderColor: resolvedTheme === "dark" ? colors.border : colors.surface,
-
-      ...(resolvedTheme === "light"
-        ? {
-            shadowColor: colors.shadow,
-            shadowOpacity: 0.15,
-            shadowRadius: 10,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 6,
-          }
-        : {
-            elevation: 0,
-          }),
-    },
-
-    archiveBtnIcon: {
-      fontSize: 18,
-    },
   });

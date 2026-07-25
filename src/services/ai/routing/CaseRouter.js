@@ -49,6 +49,7 @@ export class CaseRouter {
 
             return response;
         } catch (error) {
+            if (error instanceof AIError || error.code?.startsWith('OCR_')) throw error;
             const llm = ProviderRegistry.getLLMProvider();
             ProviderRegistry.reportFailure(llm);
 

@@ -23,9 +23,9 @@ export class DocumentContext {
             contextType: 'DocumentMetadata',
             timestamp: toISO(new Date()),
             fileName: fileParams.name || 'Unknown',
-            fileType: fileParams.type || 'Unknown',
+            fileType: fileParams.mimeType || 'Unknown',
             fileSize: fileParams.size || 'Unknown',
-            sourceUri: fileParams.uri || 'Unknown' // Useful for debugging or logging
+            hasLocalFile: Boolean(fileParams.uri)
         };
     }
 }

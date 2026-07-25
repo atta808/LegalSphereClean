@@ -1,5 +1,5 @@
 import React from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumPageHeader from "../components/PremiumPageHeader";
 import { useTheme } from "../theme/ThemeContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
@@ -49,7 +49,10 @@ import { updateCaseNotifications } from "../services/reminderScheduler";
 
 export default function UpdateCaseHearingScreen({ profile }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const locale = currentProfile?.locale || "en-PK";
   const navigation = useNavigation();
@@ -324,6 +327,9 @@ export default function UpdateCaseHearingScreen({ profile }) {
     }
   };
 
+  // Calculate total hearings count (from timeline or case data)
+  const hearingCount = caseData?.hearings?.length || 0;
+
   return (
     <View style={styles.mainWrapper}>
       <StatusBar
@@ -332,12 +338,18 @@ export default function UpdateCaseHearingScreen({ profile }) {
         translucent
       />
 
-      {/* PREMIUM WHITE HEADER */}
-
-            {/* PREMIUM WHITE HEADER */}
+      {/* PREMIUM HEADER - Enhanced with complete configuration */}
       <PremiumPageHeader
         title={isEditMode ? "Update Hearing" : "Record Proceedings"}
-        subtitle="Court Hearing Ledger"
+        subtitle={caseData?.title || "Court Hearing Ledger"}
+        footer={`Case #${caseId || "Unknown"} • ${hearingCount} hearing${hearingCount !== 1 ? "s" : ""} on record`}
+        onBack={() => navigation.goBack()}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
       />
 
       <ScrollView
@@ -355,7 +367,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
 
         <View style={styles.card}>
           <View style={styles.statusRow}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={[
                 styles.statusBtn,
                 caseStatus === "active" && styles.btnActive,
@@ -372,7 +385,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={[
                 styles.statusBtn,
                 caseStatus === "disposed" && styles.btnDisposed,
@@ -396,7 +410,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
         </View>
 
         <View style={styles.card}>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.pickerContainer}
             activeOpacity={0.85}
             onPress={() => setCmsPickerVisible(true)}
@@ -445,7 +460,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
               : "Next Adjourned Date"}
           </Text>
 
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.dateSelector}
             onPress={() => setShowDatePicker(true)}
           >
@@ -483,7 +499,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Hearing Stage</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setStagePickerVisible(true)}
@@ -510,7 +527,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Proceeding</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setDescriptionPickerVisible(true)}
@@ -523,7 +541,9 @@ export default function UpdateCaseHearingScreen({ profile }) {
               >
                 <Text
                   style={{
-                    color: hearingDescription ? colors.text : colors.placeholder,
+                    color: hearingDescription
+                      ? colors.text
+                      : colors.placeholder,
                     fontSize: 15,
                     fontWeight: "600",
                   }}
@@ -537,7 +557,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Adjudicating Court</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setCourtPickerVisible(true)}
@@ -565,7 +586,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
           <View style={styles.inputGroup}>
             <Text style={styles.fieldLabel}>Judge</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.pickerContainer}
               activeOpacity={0.85}
               onPress={() => setJudgePickerVisible(true)}
@@ -609,7 +631,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
         </View>
 
         <View style={{ marginTop: 10 }}>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={[
               styles.mainSaveBtn,
               (!hearingStage || !hearingCourt || !selectedDate) && {
@@ -624,7 +647,8 @@ export default function UpdateCaseHearingScreen({ profile }) {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.discardBtn}
             onPress={() => navigation.goBack()}
           >
@@ -811,260 +835,212 @@ export default function UpdateCaseHearingScreen({ profile }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainWrapper: { flex: 1, backgroundColor: colors.border },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainWrapper: { flex: 1, backgroundColor: colors.border },
 
-  // Header
+    scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
 
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    zIndex: 10,
-  },
+    // Section Structure
 
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
+    sectionHeader: { marginBottom: 12, paddingLeft: 5 },
 
-  glassBackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: resolvedTheme === 'dark' ? colors.card : "rgba(255,255,255,0.15)",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: resolvedTheme === 'dark' ? colors.border : "rgba(255,255,255,0.1)",
-  },
+    sectionTitle: {
+      fontSize: 11,
+      fontWeight: "700",
+      color: colors.secondaryText,
+      textTransform: "uppercase",
+      letterSpacing: 1.2,
+    },
 
-  backIcon: {
-    fontSize: 28,
-    color: resolvedTheme === 'dark' ? colors.primary : colors.surface,
-    fontWeight: "300",
-    marginTop: -4,
-  },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 20,
+      elevation: 0,
+      borderWidth: 1,
+      borderColor: colors.border,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.02,
+      shadowRadius: 8,
+    },
 
-  titleCenter: { flex: 1, alignItems: "center" },
+    fieldLabel: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.primary,
+      marginBottom: 12,
+      opacity: 0.6,
+    },
 
-  headerTitleText: { fontSize: 18, fontWeight: "700", color: resolvedTheme === 'dark' ? colors.primary : colors.surface },
+    // Status Toggle
 
-  jurisdictionPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
+    statusRow: { flexDirection: "row", gap: 10 },
 
-  jurisdictionText: {
-    fontSize: 9,
-    fontWeight: "700",
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
+    statusBtn: {
+      flex: 1,
+      paddingVertical: 15,
+      borderRadius: 16,
+      alignItems: "center",
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
+    btnActive: {
+      backgroundColor: "rgba(26, 115, 232, 0.1)",
+      borderColor: colors.primary,
+    },
 
-  // Section Structure
+    btnDisposed: {
+      backgroundColor: "rgba(220, 38, 38, 0.1)",
+      borderColor: colors.danger,
+    },
 
-  sectionHeader: { marginBottom: 12, paddingLeft: 5 },
+    statusBtnText: {
+      color: colors.secondaryText,
+      fontWeight: "700",
+      fontSize: 13,
+    },
 
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: colors.secondaryText,
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-  },
+    textWhite: { color: colors.surface },
 
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    elevation: 0,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.02,
-    shadowRadius: 8,
-  },
+    // Inputs & Selectors
 
-  fieldLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.primary,
-    marginBottom: 12,
-    opacity: 0.6,
-  },
+    dateSelector: {
+      backgroundColor: colors.background,
+      borderRadius: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      minHeight: 48,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  // Status Toggle
+    dateRow: { flexDirection: "row", alignItems: "center" },
 
-  statusRow: { flexDirection: "row", gap: 10 },
+    calendarEmoji: { fontSize: 18, marginRight: 10 },
 
-  statusBtn: {
-    flex: 1,
-    paddingVertical: 15,
-    borderRadius: 16,
-    alignItems: "center",
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    dateValue: { fontSize: 15, fontWeight: "600", color: colors.text },
 
-  btnActive: {
-    backgroundColor: "rgba(26, 115, 232, 0.1)",
-    borderColor: colors.primary,
-  },
+    inputGroup: { marginBottom: 18 },
 
-  btnDisposed: {
-    backgroundColor: "rgba(220, 38, 38, 0.1)",
-    borderColor: colors.danger,
-  },
+    pickerContainer: {
+      backgroundColor: colors.background,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: "hidden",
+    },
 
-  statusBtnText: { color: colors.secondaryText, fontWeight: "700", fontSize: 13 },
+    premiumMultiline: {
+      backgroundColor: colors.background,
+      borderRadius: 18,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      minHeight: 48,
+      fontSize: 15,
+      color: colors.text,
+      minHeight: 120,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  textWhite: { color: colors.surface },
+    // Final Actions
 
-  // Inputs & Selectors
+    mainSaveBtn: {
+      backgroundColor: colors.primary,
+      borderRadius: 16,
+      paddingVertical: 18,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      marginBottom: 40,
+      shadowColor: colors.primary,
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 4,
+    },
 
-  dateSelector: {
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    minHeight: 48,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    saveBtnText: {
+      color: colors.surface,
+      fontWeight: "700",
+      fontSize: 16,
+      marginLeft: 8,
+    },
 
-  dateRow: { flexDirection: "row", alignItems: "center" },
+    discardBtn: {
+      marginTop: 15,
+      paddingVertical: 14,
+      alignItems: "center",
+      backgroundColor: colors.border,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  calendarEmoji: { fontSize: 18, marginRight: 10 },
+    discardBtnText: {
+      color: colors.placeholder,
+      fontSize: 14,
+      fontWeight: "700",
+    },
 
-  dateValue: { fontSize: 15, fontWeight: "600", color: colors.text },
+    premiumInput: {
+      backgroundColor: colors.background,
+      borderRadius: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      minHeight: 48,
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.text,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  inputGroup: { marginBottom: 18 },
-
-  pickerContainer: {
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: "hidden",
-  },
-
-  premiumMultiline: {
-    backgroundColor: colors.background,
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    minHeight: 48,
-    fontSize: 15,
-    color: colors.text,
-    minHeight: 120,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  // Final Actions
-
-  mainSaveBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    paddingVertical: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    marginBottom: 40,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-
-  saveBtnText: {
-    color: colors.surface,
-    fontWeight: "700",
-    fontSize: 16,
-    marginLeft: 8,
-  },
-
-  discardBtn: {
-    marginTop: 15,
-    paddingVertical: 14,
-    alignItems: "center",
-    backgroundColor: colors.border,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  discardBtnText: { color: colors.placeholder, fontSize: 14, fontWeight: "700" },
-
-  premiumInput: {
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    minHeight: 48,
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.text,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  fabContainer: {
-    position: "absolute",
-    right: 24,
-    bottom: 110,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.text,
-        shadowOffset: {
-          width: 0,
-          height: 10,
+    fabContainer: {
+      position: "absolute",
+      right: 24,
+      bottom: 110,
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.text,
+          shadowOffset: {
+            width: 0,
+            height: 10,
+          },
+          shadowOpacity: 0.35,
+          shadowRadius: 12,
         },
-        shadowOpacity: 0.35,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 12,
-      },
-    }),
-  },
+        android: {
+          elevation: 12,
+        },
+      }),
+    },
 
-  aiFab: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
-  },
+    aiFab: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      justifyContent: "center",
+      alignItems: "center",
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.15)",
+    },
 
-  innerBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 30,
-    borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.1)",
-    margin: 1,
-  },
+    innerBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 30,
+      borderWidth: 1.5,
+      borderColor: "rgba(255,255,255,0.1)",
+      margin: 1,
+    },
 
-  fabPressed: {
-    transform: [{ scale: 0.95 }],
-    opacity: 0.9,
-  },
-});
+    fabPressed: {
+      transform: [{ scale: 0.95 }],
+      opacity: 0.9,
+    },
+  });

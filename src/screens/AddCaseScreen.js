@@ -1,5 +1,6 @@
 import React from "react";
-import PremiumButton from '../components/PremiumButton';
+import PremiumButton from "../components/PremiumButton";
+import PremiumPageHeader from "../components/PremiumPageHeader";
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,14 +26,17 @@ import {
   insertCase,
   getProfile,
   ensureMasterItemExists,
-  getCaseById,
 } from "../services/sqliteService";
 import { scheduleCaseNotifications } from "../services/reminderScheduler";
 import { formatMoney, getCurrency, getLocale } from "../utils/currency";
 import { normalizeDateInput, toDatePickerDate, toISO } from "../utils/date";
+
 export default function AddCaseScreen({ route, profile }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const [court, setCourt] = useState("");
   const [courtPickerVisible, setCourtPickerVisible] = useState(false);
   const [judgePickerVisible, setJudgePickerVisible] = useState(false);
@@ -55,6 +59,7 @@ export default function AddCaseScreen({ route, profile }) {
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const [cmsPickerVisible, setCmsPickerVisible] = useState(false);
   const [selectedCMS, setSelectedCMS] = useState(null);
+
   useEffect(() => {
     const loadProfile = async () => {
       const fresh = await getProfile();
@@ -66,16 +71,15 @@ export default function AddCaseScreen({ route, profile }) {
 
     loadProfile();
   }, []);
-  // 🔹 Load clients
 
   useEffect(() => {
     if (route?.params?.newClientId) {
       setSelectedClient(String(route.params.newClientId));
 
-      // 🔥 CLEAR PARAM AFTER USE (IMPORTANT)
       navigation.setParams({ newClientId: null });
     }
   }, [route?.params?.newClientId, navigation]);
+
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       const data = getAllClients();
@@ -84,11 +88,12 @@ export default function AddCaseScreen({ route, profile }) {
 
     return unsubscribe;
   }, [navigation]);
+
   useEffect(() => {
     const data = getAllClients();
     setClients(data);
   }, [route?.params?.refresh]);
-  // 🔹 Auto-fill selected client (FINAL FIX)
+
   useEffect(() => {
     const selected = clients.find(
       (c) => String(c.id) === String(selectedClient),
@@ -99,8 +104,10 @@ export default function AddCaseScreen({ route, profile }) {
       setClientMobile(selected.mobile || "");
       setClientEmail(selected.email || "");
     }
-  }, [selectedClient, clients]); // ✅ FIXED
+  }, [selectedClient, clients]);
+
   const passedClient = route?.params?.client;
+
   useEffect(() => {
     if (passedClient) {
       setSelectedClient(String(passedClient.id));
@@ -109,6 +116,7 @@ export default function AddCaseScreen({ route, profile }) {
       setClientEmail(passedClient.email || "");
     }
   }, [passedClient]);
+
   const [clientName, setClientName] = useState("");
   const [clientMobile, setClientMobile] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -165,19 +173,23 @@ export default function AddCaseScreen({ route, profile }) {
     const paid = parseCurrency(feePaid);
     return decided - paid;
   }, [feeDecided, feePaid]);
+
   useEffect(() => {
     if (availableCMS.length > 0 && !selectedCMS) {
       setSelectedCMS(availableCMS[0]);
     }
   }, [availableCMS]);
+
   const validateDate = (value) => {
     const regex = /^(0[1-9]|[12][0-9]|3[01])[\/-](0[1-9]|1[0-2])[\/-]\d{4}$/;
 
     return regex.test(value);
   };
+
   const normalizeDate = (dateString) => {
     return normalizeDateInput(dateString);
   };
+
   const resetForm = () => {
     setCourt("");
     setTitle("");
@@ -197,7 +209,7 @@ export default function AddCaseScreen({ route, profile }) {
     setFeeDecided("");
     setFeePaid("");
 
-    setSelectedClient(null); // ✅ ADD THIS
+    setSelectedClient(null);
 
     setClientName("");
     setClientMobile("");
@@ -210,6 +222,7 @@ export default function AddCaseScreen({ route, profile }) {
     setLitigationDomain("civil");
     setPriority("normal");
   };
+
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
 
@@ -218,6 +231,7 @@ export default function AddCaseScreen({ route, profile }) {
       setNextHearingDate(normalizeDateInput(selectedDate));
     }
   };
+
   const handleSave = async () => {
     if (!court || !title || !nextHearingDate || !stage) {
       Alert.alert(
@@ -303,17 +317,12 @@ export default function AddCaseScreen({ route, profile }) {
         cmsRawData: aiRawMetadata ? JSON.stringify(aiRawMetadata) : null,
       };
 
-      // ✅ ALWAYS save locally
       await insertCase(caseData);
 
-      // ✅ Fetch the saved case (to get its new SQLite ID)
-      // Since insertCase doesn't return the ID, and relies on auto-increment, we can fetch the latest inserted case for this client/title
-      // However, it's safer to fetch the last inserted row. Assuming we can't reliably get the ID from insertCase directly in this exact flow,
-      // we can do a lookup or adjust sqliteService to return lastInsertRowId if possible.
-      // Since we shouldn't change existing DB logic drastically, let's fetch the most recent case:
-      // A robust way without changing insertCase:
       const { db } = require("../services/sqliteService");
-      const latestCase = db.getFirstSync("SELECT * FROM cases ORDER BY id DESC LIMIT 1");
+      const latestCase = db.getFirstSync(
+        "SELECT * FROM cases ORDER BY id DESC LIMIT 1",
+      );
       if (latestCase) {
         await scheduleCaseNotifications(latestCase);
       }
@@ -336,14 +345,14 @@ export default function AddCaseScreen({ route, profile }) {
       setTimeout(() => {}, 100);
     }
   };
+
   useEffect(() => {
     if (route?.params?.newCourt) {
       setCourt(route.params.newCourt);
-      // 🔥 VERY IMPORTANT
       navigation.setParams({ newCourt: null });
     }
   }, [route?.params?.newCourt, navigation]);
-  // ✅ STAGE AUTO SELECT
+
   useEffect(() => {
     if (route?.params?.newJudge) {
       setJudge(route.params.newJudge);
@@ -353,6 +362,7 @@ export default function AddCaseScreen({ route, profile }) {
       });
     }
   }, [route?.params?.newJudge, navigation]);
+
   useEffect(() => {
     if (route?.params?.newStage) {
       setStage(route.params.newStage);
@@ -360,13 +370,13 @@ export default function AddCaseScreen({ route, profile }) {
     }
   }, [route?.params?.newStage, navigation]);
 
-  // ✅ DESCRIPTION AUTO SELECT
   useEffect(() => {
     if (route?.params?.newDescription) {
       setDescription(route.params.newDescription);
       navigation.setParams({ newDescription: null });
     }
   }, [route?.params?.newDescription, navigation]);
+
   useEffect(() => {
     if (route?.params?.newCaseType) {
       setCaseType(route.params.newCaseType);
@@ -376,11 +386,11 @@ export default function AddCaseScreen({ route, profile }) {
       });
     }
   }, [route?.params?.newCaseType, navigation]);
+
   useEffect(() => {
     const aiCaseData = route?.params?.aiCaseData;
 
     if (!aiCaseData) return;
-    // 🤖 Auto Populate Master Lists
 
     ensureMasterItemExists("court", aiCaseData.court);
 
@@ -391,7 +401,6 @@ export default function AddCaseScreen({ route, profile }) {
     ensureMasterItemExists("caseType", aiCaseData.caseType);
 
     ensureMasterItemExists("description", aiCaseData.description);
-    // Refresh Pickers
 
     setCourts(getMasterItems("court") || []);
 
@@ -436,7 +445,7 @@ export default function AddCaseScreen({ route, profile }) {
       aiCaseData: null,
     });
   }, [route?.params?.aiCaseData]);
-  // reload descriptions
+
   useEffect(() => {
     try {
       setCourts(getMasterItems("court") || []);
@@ -452,6 +461,7 @@ export default function AddCaseScreen({ route, profile }) {
       console.log("❌ Master load error:", e);
     }
   }, []);
+
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       setCourts(getMasterItems("court") || []);
@@ -467,6 +477,7 @@ export default function AddCaseScreen({ route, profile }) {
 
     return unsubscribe;
   }, [navigation]);
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -478,10 +489,13 @@ export default function AddCaseScreen({ route, profile }) {
       <KeyboardAvoidingView
         style={styles.keyboardWrap}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-            >
+      >
+        {/* HEADER - Migrated to PremiumPageHeader V5.1 */}
         <PremiumPageHeader
           title="Add Case"
           subtitle="Create a new legal matter"
+          showBackButton={true}
+          headerVariant="default"
         />
 
         <ScrollView
@@ -489,7 +503,7 @@ export default function AddCaseScreen({ route, profile }) {
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.sectionHeader}>Client Information</Text>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
             style={styles.input}
             activeOpacity={0.85}
             onPress={() => setClientPickerVisible(true)}
@@ -515,7 +529,7 @@ export default function AddCaseScreen({ route, profile }) {
                 Import case information directly from court CMS systems.
               </Text>
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 style={styles.aiButton}
                 onPress={() => {
                   if (!selectedCMS?.url) {
@@ -534,7 +548,7 @@ export default function AddCaseScreen({ route, profile }) {
               </TouchableOpacity>
             </View>
             <Text style={styles.inputLabel}>CMS System</Text>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setCmsPickerVisible(true)}
@@ -570,7 +584,7 @@ export default function AddCaseScreen({ route, profile }) {
               </>
             ) : null}
             <Text style={styles.inputLabel}>Litigation Domain</Text>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setDomainPickerVisible(true)}
@@ -586,9 +600,9 @@ export default function AddCaseScreen({ route, profile }) {
               </Text>
             </TouchableOpacity>
             <Text style={styles.sectionHeader}>Case Information</Text>
-          <Text style={styles.inputLabel}>Court</Text>
+            <Text style={styles.inputLabel}>Court</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setCourtPickerVisible(true)}
@@ -604,7 +618,7 @@ export default function AddCaseScreen({ route, profile }) {
             </TouchableOpacity>
             <Text style={styles.inputLabel}>Judge</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setJudgePickerVisible(true)}
@@ -694,7 +708,7 @@ export default function AddCaseScreen({ route, profile }) {
               multiline
             />
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               onPress={() => setShowDatePicker(true)}
             >
@@ -706,7 +720,7 @@ export default function AddCaseScreen({ route, profile }) {
                 {nextHearingDate || "Select Next Hearing Date"}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setStagePickerVisible(true)}
@@ -722,7 +736,7 @@ export default function AddCaseScreen({ route, profile }) {
             </TouchableOpacity>
             <Text style={styles.inputLabel}>Proceeding</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setDescriptionPickerVisible(true)}
@@ -736,7 +750,7 @@ export default function AddCaseScreen({ route, profile }) {
                 {description || "Select Proceeding"}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={styles.input}
               activeOpacity={0.85}
               onPress={() => setCaseTypePickerVisible(true)}
@@ -757,7 +771,7 @@ export default function AddCaseScreen({ route, profile }) {
             <Text style={styles.sectionTitle}>Case Priority</Text>
 
             <View style={styles.statusRow}>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 style={[
                   styles.statusButton,
                   priority === "normal" && styles.statusButtonActive,
@@ -767,7 +781,7 @@ export default function AddCaseScreen({ route, profile }) {
                 <Text style={styles.statusButtonText}>Normal</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 style={[
                   styles.statusButton,
                   priority === "important" && styles.statusButtonActive,
@@ -777,7 +791,7 @@ export default function AddCaseScreen({ route, profile }) {
                 <Text style={styles.statusButtonText}>Important</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 style={[
                   styles.statusButton,
                   priority === "urgent" && styles.statusButtonActive,
@@ -817,9 +831,8 @@ export default function AddCaseScreen({ route, profile }) {
             <Text style={styles.sectionTitle}>Case Controls</Text>
             <View style={styles.rowBetween}></View>
             <Text style={styles.statusLabel}>Status</Text>
-            {/* ERROR WAS HERE: Changed <div> to <View> */}
             <View style={styles.statusRow}>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 style={[
                   styles.statusButton,
                   status === "active" && styles.statusButtonActive,
@@ -835,7 +848,7 @@ export default function AddCaseScreen({ route, profile }) {
                   Active
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 style={[
                   styles.statusButton,
                   status === "pipeline" && styles.statusButtonActive,
@@ -854,7 +867,12 @@ export default function AddCaseScreen({ route, profile }) {
             </View>
           </View>
 
-          <PremiumButton title="Save Case" onPress={handleSave} loading={saving} style={{ marginTop: 24, marginBottom: 40 }} />
+          <PremiumButton
+            title="Save Case"
+            onPress={handleSave}
+            loading={saving}
+            style={{ marginTop: 24, marginBottom: 40 }}
+          />
           {showDatePicker && (
             <DateTimePicker
               value={dateObject}
@@ -1043,217 +1061,177 @@ export default function AddCaseScreen({ route, profile }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  keyboardWrap: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 16,
-  },
-  header: {
-    backgroundColor: colors.primary,
-    borderRadius: 18,
-    paddingVertical: 18, // 🔥 was 18 → smaller header height
-    paddingHorizontal: 0, // 🔥 was 18 → smaller header height
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
-    paddingTop: 50,
-    marginBottom: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  backIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 16, // ⭐ ADD THIS
-    marginTop: 4, // ⭐ THIS FIX
-  },
-
-  headerTextWrap: {
-    flex: 1,
-    alignItems: "center",
-  },
-
-  headerTitle: {
-    color: colors.surface,
-    fontSize: 18, // 🔥 was 22
-    fontWeight: "800",
-  },
-
-  headerSub: {
-    color: colors.surface,
-    marginTop: 2,
-    fontSize: 12, // 🔥 was 13
-    opacity: 0.9,
-  },
-  card: {
-    marginHorizontal: 16, // ← add this
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 14,
-  },
-  sectionHeader: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.primary,
-    marginTop: 24,
-    marginBottom: 16,
-  },
-  inputLabel: {
-    fontSize: 13,
-    color: colors.secondaryText,
-    marginBottom: 6,
-    marginLeft: 4,
-    fontWeight: "600",
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 4, // 👈 FIXED (was 12)
-    marginBottom: 12,
-    color: colors.text,
-  },
-  multilineInput: {
-    minHeight: 96,
-  },
-  balanceCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 14,
-  },
-  balanceLabel: {
-    color: colors.secondaryText,
-    fontSize: 13,
-    marginBottom: 6,
-  },
-  balanceValue: {
-    color: colors.primary,
-    fontSize: 20,
-    fontWeight: "800",
-  },
-  rowBetween: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 14,
-  },
-  rowLabel: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  statusLabel: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 10,
-  },
-  statusRow: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  statusButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingVertical: 13,
-    alignItems: "center",
-    backgroundColor: colors.surface,
-  },
-  statusButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  statusButtonText: {
-    color: colors.text,
-    fontWeight: "700",
-  },
-  statusButtonTextActive: {
-    color: colors.surface,
-  },
-  saveButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 16,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  saveButtonDisabled: {
-    opacity: 0.7,
-  },
-  saveButtonText: {
-    color: colors.surface,
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  aiCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  aiTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-
-  aiText: {
-    marginTop: 4,
-    color: colors.secondaryText,
-    marginBottom: 12,
-  },
-
-  aiButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 16,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 4,
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
+    keyboardWrap: {
+      flex: 1,
+    },
+    content: {
+      paddingHorizontal: 16,
+    },
+    card: {
+      marginHorizontal: 16,
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 16,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 14,
+    },
+    sectionHeader: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.primary,
+      marginTop: 24,
+      marginBottom: 16,
+    },
+    inputLabel: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      marginBottom: 6,
+      marginLeft: 4,
+      fontWeight: "600",
+    },
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 4,
+      marginBottom: 12,
+      color: colors.text,
+    },
+    multilineInput: {
+      minHeight: 96,
+    },
+    balanceCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 14,
+    },
+    balanceLabel: {
+      color: colors.secondaryText,
+      fontSize: 13,
+      marginBottom: 6,
+    },
+    balanceValue: {
+      color: colors.primary,
+      fontSize: 20,
+      fontWeight: "800",
+    },
+    rowBetween: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 14,
+    },
+    rowLabel: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    statusLabel: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "600",
+      marginBottom: 10,
+    },
+    statusRow: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    statusButton: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      paddingVertical: 13,
+      alignItems: "center",
+      backgroundColor: colors.surface,
+    },
+    statusButtonActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    statusButtonText: {
+      color: colors.text,
+      fontWeight: "700",
+    },
+    statusButtonTextActive: {
+      color: colors.surface,
+    },
+    saveButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 14,
+      paddingVertical: 16,
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    saveButtonDisabled: {
+      opacity: 0.7,
+    },
+    saveButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "800",
+    },
+    aiCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-    elevation: 5,
-  },
+    aiTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.primary,
+    },
 
-  aiButtonText: {
-    color: colors.surface,
-    fontSize: 16,
-    fontWeight: "800",
-    marginLeft: 8,
-  },
-});
+    aiText: {
+      marginTop: 4,
+      color: colors.secondaryText,
+      marginBottom: 12,
+    },
+
+    aiButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 14,
+      paddingVertical: 16,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+
+      shadowColor: colors.primary,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+
+      elevation: 5,
+    },
+
+    aiButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "800",
+      marginLeft: 8,
+    },
+  });

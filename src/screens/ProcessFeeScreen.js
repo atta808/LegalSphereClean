@@ -1,6 +1,6 @@
 import React from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
-import PremiumTouchable from '../components/PremiumTouchable';
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -33,9 +33,13 @@ import { formatMoney, getCurrency } from "../utils/currency";
 
 export default function ProcessFeeScreen({ profile, onBack }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const [caseName, setCaseName] = useState("");
   const [casePickerVisible, setCasePickerVisible] = useState(false);
+  const [judgeName, setJudgeName] = useState("");
   const [courtName, setCourtName] = useState("");
   const [amount, setAmount] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -63,7 +67,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
     try {
       setLoading(true);
 
-      const list = await getAllProcessFees(); // ✅ now valid
+      const list = await getAllProcessFees();
 
       setFees(list || []);
     } catch (e) {
@@ -78,7 +82,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         const fresh = await getProfile();
         if (fresh) setCurrentProfile(fresh);
 
-        await loadFees(); // ✅ reload data also
+        await loadFees();
       };
 
       init();
@@ -94,7 +98,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         const data = await getAllCases();
 
         setCases(data || []);
-        setCasesReady(true); // ✅ IMPORTANT
+        setCasesReady(true);
       } catch (e) {
         console.log("❌ Load Cases Error:", e);
       } finally {
@@ -109,6 +113,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
 
     if (selected) {
       setCaseName(selected.title || "");
+      setJudgeName(selected.judge || "");
       setCourtName(selected.court || "");
     }
   }, [selectedCaseId, cases]);
@@ -126,6 +131,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
       const payload = {
         caseId: selectedCaseId,
         caseName,
+        judge: judgeName,
         court: courtName,
         amount: Number(amount),
         purpose: purpose || "",
@@ -142,9 +148,11 @@ export default function ProcessFeeScreen({ profile, onBack }) {
       // RESET
       setSelectedCaseId(null);
       setCaseName("");
+      setJudgeName("");
       setCourtName("");
       setAmount("");
       setPurpose("");
+      setDateObject(new Date());
       setNote("");
       setEditingId(null);
 
@@ -182,6 +190,9 @@ export default function ProcessFeeScreen({ profile, onBack }) {
   };
 
   const total = fees.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+  const unpaidTotal = fees
+    .filter((f) => !f.paid)
+    .reduce((sum, i) => sum + Number(i.amount || 0), 0);
 
   return (
     <View style={styles.container}>
@@ -194,15 +205,24 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         </View>
       ) : null}
 
-            {/* HEADER */}
+      {/* HEADER - Enhanced with complete configuration */}
       <PremiumPageHeader
         title="Process Fee"
-        subtitle="Manage Case Expenses"
+        subtitle={`${fees.length} expense${fees.length !== 1 ? "s" : ""} recorded`}
+        footer={`Total: ${formatMoney(total, currency, locale)} • Unpaid: ${formatMoney(unpaidTotal, currency, locale)}`}
+        onBack={() => (onBack ? onBack() : navigation.goBack())}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
       />
 
-      <ScrollView contentContainerStyle={{ padding: 20 , paddingBottom: 120 }}>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }}>
         {/* CASE PICKER */}
-        <PremiumTouchable accessibilityRole="button"
+        <PremiumTouchable
+          accessibilityRole="button"
           style={styles.input}
           activeOpacity={0.85}
           onPress={() => setCasePickerVisible(true)}
@@ -217,10 +237,20 @@ export default function ProcessFeeScreen({ profile, onBack }) {
               ?.title || "Select Case"}
           </Text>
         </PremiumTouchable>
-
-        {/* AUTO COURT DISPLAY */}
+        {/* AUTO JUDGE DISPLAY */}
         <View style={styles.input}>
-          <Text style={{ color: courtName ? colors.shadow : colors.placeholder }}>
+          <Text
+            style={{
+              color: judgeName ? colors.shadow : colors.placeholder,
+            }}
+          >
+            {judgeName || "Judge will auto-fill"}
+          </Text>
+        </View>
+        <View style={styles.input}>
+          <Text
+            style={{ color: courtName ? colors.shadow : colors.placeholder }}
+          >
             {courtName || "Court will auto-fill"}
           </Text>
         </View>
@@ -234,11 +264,14 @@ export default function ProcessFeeScreen({ profile, onBack }) {
         />
 
         {/* DATE */}
-        <PremiumTouchable accessibilityRole="button"
+        <PremiumTouchable
+          accessibilityRole="button"
           style={styles.input}
           onPress={() => setShowDatePicker(true)}
         >
-          <Text style={{ color: dateObject ? colors.shadow : colors.placeholder }}>
+          <Text
+            style={{ color: dateObject ? colors.shadow : colors.placeholder }}
+          >
             {dateObject ? toDisplay(dateObject, locale) : "Select Date"}
           </Text>
         </PremiumTouchable>
@@ -272,7 +305,11 @@ export default function ProcessFeeScreen({ profile, onBack }) {
           multiline
         />
 
-        <PremiumTouchable accessibilityRole="button" style={styles.saveBtn} onPress={handleSave}>
+        <PremiumTouchable
+          accessibilityRole="button"
+          style={styles.saveBtn}
+          onPress={handleSave}
+        >
           <Text style={styles.saveText}>{editingId ? "UPDATE" : "SAVE"}</Text>
         </PremiumTouchable>
 
@@ -289,6 +326,7 @@ export default function ProcessFeeScreen({ profile, onBack }) {
               </Text>
 
               <Text>{`📁 ${item.caseName || "-"}`}</Text>
+              <Text>{`👨‍⚖️ ${item.judge || "-"}`}</Text>
               <Text>{`🏛 ${item.court || "-"}`}</Text>
               <Text>{`📅 ${toDisplay(item.date, locale)}`}</Text>
               <Text>{`📌 ${item.purpose || "-"}`}</Text>
@@ -312,15 +350,17 @@ export default function ProcessFeeScreen({ profile, onBack }) {
               ) : null}
 
               <View style={styles.row}>
-                <PremiumTouchable accessibilityRole="button"
+                <PremiumTouchable
+                  accessibilityRole="button"
                   style={styles.btn}
                   onPress={() => {
                     setSelectedCaseId(item.caseId || null);
                     setCaseName(item.caseName || "");
+                    setJudgeName(item.judge || "");
                     setCourtName(item.court || "");
                     setAmount(String(item.amount || ""));
                     setPurpose(item.purpose || "");
-                      setDateObject(toDatePickerDate(item.date));
+                    setDateObject(toDatePickerDate(item.date));
                     setNote(item.note || "");
                     setEditingId(item.id);
                   }}
@@ -329,7 +369,8 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                 </PremiumTouchable>
 
                 {!item.paid ? (
-                  <PremiumTouchable accessibilityRole="button"
+                  <PremiumTouchable
+                    accessibilityRole="button"
                     style={styles.paidBtn}
                     onPress={() => {
                       setSelectedFeeId(item.id);
@@ -340,7 +381,8 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                   </PremiumTouchable>
                 ) : null}
 
-                <PremiumTouchable accessibilityRole="button"
+                <PremiumTouchable
+                  accessibilityRole="button"
                   style={styles.deleteBtn}
                   onPress={() => {
                     if (item?.id) {
@@ -372,7 +414,8 @@ export default function ProcessFeeScreen({ profile, onBack }) {
             />
 
             <View style={styles.row}>
-              <PremiumTouchable accessibilityRole="button"
+              <PremiumTouchable
+                accessibilityRole="button"
                 style={styles.cancelBtn}
                 onPress={() => {
                   setShowPaidModal(false);
@@ -382,7 +425,11 @@ export default function ProcessFeeScreen({ profile, onBack }) {
                 <Text>Cancel</Text>
               </PremiumTouchable>
 
-              <PremiumTouchable accessibilityRole="button" style={styles.confirmBtn} onPress={confirmPaid}>
+              <PremiumTouchable
+                accessibilityRole="button"
+                style={styles.confirmBtn}
+                onPress={confirmPaid}
+              >
                 <Text style={{ color: colors.surface }}>Confirm</Text>
               </PremiumTouchable>
             </View>
@@ -406,110 +453,93 @@ export default function ProcessFeeScreen({ profile, onBack }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.border },
-  header: {
-    backgroundColor: colors.surface,
-    paddingTop: 50,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  subTitle: { fontSize: 11, color: colors.secondaryText, marginTop: 2 },
-  backBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backIcon: { fontSize: 24, color: colors.primary },
-  title: { fontSize: 18, fontWeight: "800" },
-  input: {
-    backgroundColor: colors.surface,
-    padding: 14,
-    borderRadius: 14,
-    marginBottom: 12,
-    color: colors.shadow,
-  },
-  saveBtn: {
-    backgroundColor: colors.primary,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  saveText: { color: colors.surface, fontWeight: "800" },
-  total: { marginTop: 20, fontWeight: "800", color: colors.shadow },
-  card: {
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 20,
-    marginTop: 14,
-  },
-  amount: { color: colors.danger, fontWeight: "900", fontSize: 16 },
-  row: { flexDirection: "row", marginTop: 10 },
-  btn: {
-    flex: 1,
-    backgroundColor: colors.border,
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    marginRight: 5,
-  },
-  paidBtn: {
-    flex: 1,
-    backgroundColor: colors.success,
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    marginHorizontal: 5,
-  },
-  deleteBtn: {
-    flex: 1,
-    backgroundColor: colors.danger,
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    marginLeft: 5,
-  },
-  loader: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 999,
-  },
-  modal: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalBox: {
-    backgroundColor: colors.surface,
-    padding: 20,
-    borderRadius: 20,
-    width: "85%",
-  },
-  cancelBtn: {
-    flex: 1,
-    backgroundColor: colors.border,
-    padding: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginRight: 5,
-  },
-  confirmBtn: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    padding: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginLeft: 5,
-  },
-});
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.border },
+    input: {
+      backgroundColor: colors.surface,
+      padding: 14,
+      borderRadius: 14,
+      marginBottom: 12,
+      color: colors.shadow,
+    },
+    saveBtn: {
+      backgroundColor: colors.primary,
+      padding: 16,
+      borderRadius: 16,
+      alignItems: "center",
+    },
+    saveText: { color: colors.surface, fontWeight: "800" },
+    total: { marginTop: 20, fontWeight: "800", color: colors.shadow },
+    card: {
+      backgroundColor: colors.surface,
+      padding: 16,
+      borderRadius: 20,
+      marginTop: 14,
+    },
+    amount: { color: colors.danger, fontWeight: "900", fontSize: 16 },
+    row: { flexDirection: "row", marginTop: 10 },
+    btn: {
+      flex: 1,
+      backgroundColor: colors.border,
+      padding: 10,
+      borderRadius: 10,
+      alignItems: "center",
+      marginRight: 5,
+    },
+    paidBtn: {
+      flex: 1,
+      backgroundColor: colors.success,
+      padding: 10,
+      borderRadius: 10,
+      alignItems: "center",
+      marginHorizontal: 5,
+    },
+    deleteBtn: {
+      flex: 1,
+      backgroundColor: colors.danger,
+      padding: 10,
+      borderRadius: 10,
+      alignItems: "center",
+      marginLeft: 5,
+    },
+    loader: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: "rgba(255, 255, 255, 0.7)",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 999,
+    },
+    modal: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalBox: {
+      backgroundColor: colors.surface,
+      padding: 20,
+      borderRadius: 20,
+      width: "85%",
+    },
+    cancelBtn: {
+      flex: 1,
+      backgroundColor: colors.border,
+      padding: 12,
+      borderRadius: 10,
+      alignItems: "center",
+      marginRight: 5,
+    },
+    confirmBtn: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      padding: 12,
+      borderRadius: 10,
+      alignItems: "center",
+      marginLeft: 5,
+    },
+  });

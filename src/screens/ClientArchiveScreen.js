@@ -41,10 +41,16 @@ export default function ClientArchiveScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-            {/* 🔹 HEADER */}
+      {/* 🔹 HEADER - Migrated to PremiumPageHeader */}
       <PremiumPageHeader
         title="Archived Clients"
         subtitle="Restore deleted clients"
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
       />
 
       {/* 🔹 CONTENT */}
@@ -126,49 +132,6 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.border,
-  },
-
-  // 🔹 HEADER
-  header: {
-    backgroundColor: colors.surface,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 5,
-  },
-
-  backBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  backIcon: {
-    fontSize: 26,
-    color: colors.primary,
-    fontWeight: "300",
-  },
-
-  title: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: colors.primary,
-  },
-
-  subTitle: {
-    fontSize: 11,
-    color: colors.placeholder,
-    marginTop: 2,
-    fontWeight: "600",
   },
 
   // 🧾 CARD

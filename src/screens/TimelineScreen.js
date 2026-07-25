@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
-import { useTheme } from '../theme/ThemeContext';
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import { useTheme } from "../theme/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
@@ -14,7 +15,10 @@ import { toDisplay } from "../utils/date";
 
 export default function TimelineScreen({ route, navigation }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const { caseId } = route.params;
   const insets = useSafeAreaInsets();
 
@@ -39,9 +43,7 @@ export default function TimelineScreen({ route, navigation }) {
 
       {/* Content */}
       <View style={styles.card}>
-        <Text style={styles.date}>
-          {toDisplay(item.hearingDate)}
-        </Text>
+        <Text style={styles.date}>{toDisplay(item.hearingDate)}</Text>
 
         <Text style={styles.label}>Stage</Text>
         <Text style={styles.value}>{item.stage || "-"}</Text>
@@ -65,9 +67,18 @@ export default function TimelineScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-            {/* HEADER */}
+      {/* HEADER - Enhanced with complete configuration */}
       <PremiumPageHeader
         title="Timeline"
+        subtitle={`Case #${caseId || "Unknown"}`}
+        footer={`${timeline.length} hearing${timeline.length !== 1 ? "s" : ""} recorded`}
+        onBack={() => navigation.goBack()}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
       />
 
       {/* LIST */}
@@ -84,86 +95,68 @@ export default function TimelineScreen({ route, navigation }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  },
+    row: {
+      flexDirection: "row",
+      marginBottom: 20,
+    },
 
-  back: {
-    fontSize: 28,
-    color: colors.primary,
-  },
+    timelineLeft: {
+      alignItems: "center",
+      marginRight: 10,
+    },
 
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.primary,
-  },
+    dot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: colors.primary,
+    },
 
-  row: {
-    flexDirection: "row",
-    marginBottom: 20,
-  },
+    line: {
+      width: 2,
+      flex: 1,
+      backgroundColor: colors.surface,
+      marginTop: 2,
+    },
 
-  timelineLeft: {
-    alignItems: "center",
-    marginRight: 10,
-  },
+    card: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: 14,
+      padding: 14,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
+    },
 
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.primary,
-  },
+    date: {
+      fontWeight: "700",
+      marginBottom: 6,
+      color: colors.primary,
+    },
 
-  line: {
-    width: 2,
-    flex: 1,
-    backgroundColor: colors.surface,
-    marginTop: 2,
-  },
+    label: {
+      fontSize: 11,
+      color: colors.secondaryText,
+      marginTop: 6,
+    },
 
-  card: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 14,
-    padding: 14,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
+    value: {
+      fontSize: 14,
+      color: colors.text,
+    },
 
-  date: {
-    fontWeight: "700",
-    marginBottom: 6,
-    color: colors.primary,
-  },
-
-  label: {
-    fontSize: 11,
-    color: colors.secondaryText,
-    marginTop: 6,
-  },
-
-  value: {
-    fontSize: 14,
-    color: colors.text,
-  },
-
-  empty: {
-    textAlign: "center",
-    marginTop: 40,
-    color: colors.secondaryText,
-  },
-});
+    empty: {
+      textAlign: "center",
+      marginTop: 40,
+      color: colors.secondaryText,
+    },
+  });

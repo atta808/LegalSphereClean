@@ -2,6 +2,7 @@ import React from "react";
 import EmptyState from "../components/EmptyState";
 import SkeletonLoader from "../components/SkeletonLoader";
 import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -152,7 +153,19 @@ export default function FeeManagerScreen({ profile, onBack }) {
         translucent
       />
 
-      <PremiumPageHeader title="Fee Manager" />
+      {/* PREMIUM HEADER - Enhanced with complete configuration */}
+      <PremiumPageHeader
+        title="Fee Manager"
+        subtitle={`${cases.length} Active Cases`}
+        footer={`Outstanding: ${formatMoney(totalOutstanding, currency, locale)} • Received: ${formatMoney(totalReceived, currency, locale)}`}
+        onBack={() => (onBack ? onBack() : navigation.goBack())}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -163,6 +176,12 @@ export default function FeeManagerScreen({ profile, onBack }) {
       >
         {loading ? (
           <SkeletonLoader variant="list" count={4} />
+        ) : cases.length === 0 ? (
+          <EmptyState
+            icon={<Text style={{ fontSize: 48 }}>💰</Text>}
+            title="No Fee Records"
+            description="Fees will appear here once you add cases with fee information."
+          />
         ) : (
           cases.map((item) => (
             <View key={item.id} style={styles.caseCard}>
@@ -259,97 +278,6 @@ export default function FeeManagerScreen({ profile, onBack }) {
 const createStyles = (colors, resolvedTheme) =>
   StyleSheet.create({
     mainContainer: { flex: 1, backgroundColor: colors.border },
-
-    // Header
-    premiumHeader: {
-      backgroundColor: colors.surface,
-      paddingBottom: 25,
-      borderBottomLeftRadius: 35,
-      borderBottomRightRadius: 35,
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.05,
-      shadowRadius: 20,
-      zIndex: 10,
-    },
-    headerRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: 20,
-    },
-    glassBackButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 14,
-      backgroundColor: colors.border,
-      justifyContent: "center",
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    backIcon: {
-      color: colors.primary,
-      fontSize: 28,
-      fontWeight: "300",
-      marginTop: -4,
-    },
-    titleCenter: { flex: 1, alignItems: "center" },
-    headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
-    jurisdictionPill: {
-      backgroundColor: colors.surface,
-      paddingHorizontal: 12,
-      paddingVertical: 3,
-      borderRadius: 10,
-      marginTop: 4,
-    },
-    jurisdictionText: {
-      fontSize: 9,
-      fontWeight: "800",
-      color: colors.primary,
-      textTransform: "uppercase",
-    },
-
-    // Summary Grid
-    summaryGrid: {
-      flexDirection: "row",
-      gap: 12,
-      paddingHorizontal: 20,
-      marginTop: 25,
-    },
-    summaryCard: {
-      flex: 1,
-      backgroundColor: colors.surface,
-      padding: 18,
-      borderRadius: 24,
-      borderWidth: 1,
-      borderColor: colors.border,
-      shadowColor: colors.shadow,
-      shadowOpacity: 0.02,
-      shadowRadius: 10,
-    },
-    outstandingBg: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-    },
-    summaryLabel: {
-      fontSize: 9,
-      fontWeight: "800",
-      color: colors.placeholder,
-      letterSpacing: 0.5,
-    },
-    summaryLabelLight: {
-      fontSize: 9,
-      fontWeight: "800",
-      color: "rgba(255,255,255,0.6)",
-      letterSpacing: 0.5,
-    },
-    summaryValue: { fontSize: 20, fontWeight: "900", marginTop: 4 },
-    summaryValueLight: {
-      fontSize: 20,
-      fontWeight: "900",
-      color: colors.surface,
-      marginTop: 4,
-    },
 
     scrollContent: { paddingHorizontal: 20, paddingTop: 25 },
 

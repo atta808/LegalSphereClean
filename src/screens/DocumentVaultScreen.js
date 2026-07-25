@@ -1,6 +1,6 @@
 import React from "react";
-import EmptyState from '../components/EmptyState';
-import SkeletonLoader from '../components/SkeletonLoader';
+import EmptyState from "../components/EmptyState";
+import SkeletonLoader from "../components/SkeletonLoader";
 import { useTheme } from "../theme/ThemeContext";
 // screens/DocumentVaultScreen.js
 import {
@@ -31,7 +31,11 @@ import {
   Image,
   Share,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import {
   insertDocument,
   getDocumentsByCaseId,
@@ -47,6 +51,7 @@ import * as Sharing from "expo-sharing";
 import Markdown from "react-native-markdown-display";
 import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
 import { DocumentVaultRequest } from "../services/ai/core/models/Requests";
+import { FileIngestionService } from "../services/ai/document/FileIngestionService";
 
 const generateId = () =>
   Date.now().toString() + Math.random().toString(36).substring(2, 9);
@@ -106,6 +111,7 @@ export default function DocumentVaultScreen() {
   const [aiInsightsVisible, setAiInsightsVisible] = useState(false);
   const [aiInsights, setAiInsights] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
+
   const copyAIResponse = async () => {
     if (!aiInsights?.userFacing) return;
 
@@ -157,6 +163,7 @@ export default function DocumentVaultScreen() {
       Alert.alert("Error", "Failed to save note.");
     }
   };
+
   // Load documents from AsyncStorage
   const loadDocuments = useCallback(() => {
     try {
@@ -183,6 +190,7 @@ export default function DocumentVaultScreen() {
       loadDocuments();
     }, [loadDocuments]),
   );
+
   // Document upload handlers
   const handlePickDocument = async () => {
     try {
@@ -195,9 +203,8 @@ export default function DocumentVaultScreen() {
       if (result.canceled) return;
 
       const asset = result.assets[0];
-      const originalName = asset.name;
-      const uri = asset.uri;
-      const mimeType = asset.mimeType;
+      const attachment = FileIngestionService.fromPickerAsset(asset);
+      const { name: originalName, uri, mimeType, size } = attachment;
 
       // Determine destination path
       const fileExt = getFileExtension(originalName);
@@ -226,7 +233,7 @@ export default function DocumentVaultScreen() {
         uri: destUri,
         originalUri: uri,
         mimeType,
-        fileSize: asset.size,
+        fileSize: size,
         fileExt,
         fileCategory: getFileCategory(originalName),
         uploadDate: toISO(new Date()),
@@ -265,7 +272,13 @@ export default function DocumentVaultScreen() {
 
       const asset = result.assets[0];
       const originalName = asset.fileName || `photo_${Date.now()}.jpg`;
-      const uri = asset.uri;
+      const attachment = FileIngestionService.fromPickerAsset({
+        ...asset,
+        name: originalName,
+        mimeType: asset.mimeType || "image/jpeg",
+        size: asset.fileSize,
+      });
+      const { uri } = attachment;
 
       const fileExt = "jpg";
       const fileName = `${generateId()}.${fileExt}`;
@@ -286,8 +299,8 @@ export default function DocumentVaultScreen() {
         category: "uncategorized",
         uri: destUri,
         originalUri: uri,
-        mimeType: "image/jpeg",
-        fileSize: asset.fileSize,
+        mimeType: attachment.mimeType,
+        fileSize: attachment.size,
         fileExt,
         fileCategory: "image",
         uploadDate: toISO(new Date()),
@@ -444,12 +457,7 @@ Case: ${doc.caseTitle || "—"}
 
       // Create structured request object for LegalSphereEngine
       const request = new DocumentVaultRequest({
-        attachment: {
-          uri: doc.uri,
-          name: doc.name,
-          type: doc.mimeType,
-          size: doc.fileSize,
-        },
+        attachment: FileIngestionService.fromDocumentRecord(doc),
       });
 
       const response = await LegalSphereEngine.processDocumentVault(request);
@@ -501,43 +509,47 @@ Case: ${doc.caseTitle || "—"}
   }
 
   return (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer} edges={["top", "left", "right"]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
 
-      {/* Premium Header */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity accessibilityRole="button"
+      {/* COMPACT AI HEADER */}
+      <View style={styles.compactHeader}>
+        <View style={styles.compactHeaderLeft}>
+          <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={styles.glassBackButton}
+            style={styles.compactHeaderIconBtn}
           >
-            <Text style={styles.backIcon}>‹</Text>
+            <Ionicons name="arrow-back" size={20} color={colors.text} />
           </TouchableOpacity>
-          <View style={styles.titleCenter}>
-            <Text style={styles.headerTitleText}>Document Vault</Text>
-            {caseTitle && <Text style={styles.caseContext}>{caseTitle}</Text>}
+          <View style={styles.compactHeaderTitleContainer}>
+            <Text style={styles.compactHeaderTitle}>Document Vault</Text>
+            <View style={styles.compactHeaderSubtitleRow}>
+              <View style={styles.statusDot} />
+              <Text style={styles.compactHeaderSubtitle}>
+                AI Document Intelligence
+              </Text>
+            </View>
           </View>
-          <TouchableOpacity accessibilityRole="button"
-            style={styles.aiCopyButton}
-            onPress={async () => {
-              const docsInfo = documents
-                .map((doc) => `- ${doc.name} (${getFileTypeLabel(doc.name)})`)
-                .join("\n");
-              const text = `Case: ${caseTitle || "All Documents"}\n\nDocuments:\n${docsInfo}`;
-              await Clipboard.setStringAsync(text);
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
-              Alert.alert("Copied", "Document list copied to clipboard.");
-            }}
-          >
-            <Text style={styles.aiCopyIcon}>✦</Text>
-          </TouchableOpacity>
         </View>
+        {/* Right Action */}
+        <TouchableOpacity
+          style={styles.compactHeaderIconBtn}
+          onPress={async () => {
+            const docsInfo = documents
+              .map((doc) => `- ${doc.name} (${getFileTypeLabel(doc.name)})`)
+              .join("\n");
+            const text = `Case: ${caseTitle || "All Documents"}\n\nDocuments:\n${docsInfo}`;
+            await Clipboard.setStringAsync(text);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            Alert.alert("Copied", "Document list copied to clipboard.");
+          }}
+        >
+          <Ionicons name="copy-outline" size={18} color={colors.text} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -549,14 +561,16 @@ Case: ${doc.caseTitle || "—"}
       >
         {/* Action Buttons */}
         <View style={styles.actionContainer}>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.actionButton}
             onPress={handlePickDocument}
           >
             <Text style={styles.actionIcon}>📄</Text>
             <Text style={styles.actionLabel}>Pick File</Text>
           </TouchableOpacity>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.actionButton}
             onPress={handleTakePhoto}
           >
@@ -576,7 +590,10 @@ Case: ${doc.caseTitle || "—"}
             onChangeText={setSearchQuery}
           />
           {searchQuery !== "" && (
-            <TouchableOpacity accessibilityRole="button" onPress={() => setSearchQuery("")}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              onPress={() => setSearchQuery("")}
+            >
               <Text style={styles.clearIcon}>✕</Text>
             </TouchableOpacity>
           )}
@@ -589,7 +606,8 @@ Case: ${doc.caseTitle || "—"}
           style={styles.categoryScroll}
         >
           {categories.map((cat) => (
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               key={cat.id}
               style={[
                 styles.categoryChip,
@@ -629,7 +647,8 @@ Case: ${doc.caseTitle || "—"}
         ) : (
           filteredDocuments.map((doc) => (
             <View key={doc.id} style={styles.documentCard}>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.documentContent}
                 onPress={() => handleOpenDocument(doc)}
                 activeOpacity={0.7}
@@ -667,31 +686,36 @@ Case: ${doc.caseTitle || "—"}
                 </View>
               </TouchableOpacity>
               <View style={styles.documentActions}>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   onPress={() => handleEditDocument(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>✏️</Text>
                 </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   onPress={() => handleShareDocument(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>📤</Text>
                 </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   onPress={() => handleAiInsights(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>✨</Text>
                 </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   onPress={() => handleDeleteDocument(doc)}
                   style={styles.actionIconBtn}
                 >
                   <Text style={styles.actionIconSmall}>🗑️</Text>
                 </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   onPress={() => handleCopyDocumentInfo(doc)}
                   style={styles.actionIconBtn}
                 >
@@ -707,7 +731,8 @@ Case: ${doc.caseTitle || "—"}
       <Modal visible={previewVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.previewContainer}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.closePreviewBtn}
               onPress={() => setPreviewVisible(false)}
             >
@@ -747,7 +772,8 @@ Case: ${doc.caseTitle || "—"}
             />
             <View style={styles.modalCategoryRow}>
               {categories.slice(1).map((cat) => (
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   key={cat.id}
                   style={[
                     styles.modalCategoryChip,
@@ -768,13 +794,15 @@ Case: ${doc.caseTitle || "—"}
               ))}
             </View>
             <View style={styles.modalActionRow}>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.modalCancel}
                 onPress={() => setEditModalVisible(false)}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.modalSave}
                 onPress={handleSaveEdit}
               >
@@ -828,39 +856,66 @@ Case: ${doc.caseTitle || "—"}
                 )}
               </ScrollView>
             )}
-            <View style={styles.modalActionRow}>
-              <TouchableOpacity accessibilityRole="button"
+
+            {/* --- REFINED AI ACTION BAR --- */}
+            <View style={styles.aiActionRow}>
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.aiSecondaryButton}
-                onPress={copyAIResponse}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  copyAIResponse();
+                }}
+                activeOpacity={0.7}
               >
-                <Text style={styles.aiSecondaryText}>📋 Copy</Text>
+                <Ionicons name="copy-outline" size={18} color={colors.text} />
+                <Text style={styles.aiSecondaryText}>Copy</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.aiSecondaryButton}
-                onPress={saveAIToNotes}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  saveAIToNotes();
+                }}
+                activeOpacity={0.7}
               >
-                <Text style={styles.aiSecondaryText}>📝 Save</Text>
+                <Ionicons name="book-outline" size={18} color={colors.text} />
+                <Text style={styles.aiSecondaryText}>Save</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.aiSecondaryButton}
-                onPress={shareAIResponse}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  shareAIResponse();
+                }}
+                activeOpacity={0.7}
               >
-                <Text style={styles.aiSecondaryText}>📤 Share</Text>
+                <Ionicons name="share-outline" size={18} color={colors.text} />
+                <Text style={styles.aiSecondaryText}>Share</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.aiPrimaryButton}
-                onPress={() => setAiInsightsVisible(false)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setAiInsightsVisible(false);
+                }}
+                activeOpacity={0.8}
               >
+                <Ionicons name="checkmark" size={18} color="#FFFFFF" />
                 <Text style={styles.aiPrimaryText}>Close</Text>
               </TouchableOpacity>
             </View>
+            {/* ----------------------------- */}
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -874,54 +929,58 @@ const createStyles = (colors, resolvedTheme) =>
       backgroundColor: colors.surface,
     },
 
-    // Header
-    premiumHeader: {
-      backgroundColor: colors.surface,
-      paddingBottom: 16,
-      borderBottomLeftRadius: 28,
-      borderBottomRightRadius: 28,
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.04,
-      shadowRadius: 12,
+    // Compact Standardized AI Header
+    compactHeader: {
+      flexDirection: "row",
+      height: 56,
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      backgroundColor:
+        resolvedTheme === "dark" ? colors.surface : colors.background,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
       zIndex: 10,
     },
-    headerRow: {
+    compactHeaderLeft: {
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 20,
+      gap: 12,
     },
-    glassBackButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
-      backgroundColor: colors.border,
-      justifyContent: "center",
+    compactHeaderIconBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
       alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.border,
     },
-    backIcon: {
-      fontSize: 28,
-      color: colors.primary,
-      fontWeight: "300",
-      marginTop: -4,
+    compactHeaderTitleContainer: {
+      justifyContent: "center",
     },
-    titleCenter: { flex: 1, alignItems: "center" },
-    headerTitleText: { fontSize: 18, fontWeight: "800", color: colors.primary },
-    caseContext: {
-      fontSize: 11,
-      color: colors.secondaryText,
+    compactHeaderTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.text,
+      letterSpacing: -0.3,
+    },
+    compactHeaderSubtitleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
       marginTop: 2,
+    },
+    statusDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.success,
+    },
+    compactHeaderSubtitle: {
+      fontSize: 12,
+      color: colors.secondaryText,
       fontWeight: "500",
     },
-    aiCopyButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
-      backgroundColor: colors.surface,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    aiCopyIcon: { fontSize: 18, color: colors.primary, fontWeight: "900" },
 
     scrollContent: { paddingHorizontal: 20, paddingTop: 24 },
 
@@ -1175,7 +1234,7 @@ const createStyles = (colors, resolvedTheme) =>
     },
     modalSaveText: { color: colors.surface, fontWeight: "800" },
 
-    // AI Insights
+   
     aiSectionTitle: {
       fontSize: 14,
       fontWeight: "800",
@@ -1184,48 +1243,53 @@ const createStyles = (colors, resolvedTheme) =>
       marginBottom: 8,
     },
     aiText: { fontSize: 14, color: colors.secondaryText, lineHeight: 20 },
-    aiKeywordsRow: {
+
+   
+    aiActionRow: {
       flexDirection: "row",
-      flexWrap: "wrap",
       gap: 8,
-      marginBottom: 8,
-    },
-    aiKeywordChip: {
-      backgroundColor: colors.surface,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 16,
-    },
-    aiKeywordText: { fontSize: 12, fontWeight: "600", color: colors.primary },
-    aiPrimaryButton: {
-      flex: 1.4,
-      backgroundColor: colors.primary,
-      height: 56,
-      borderRadius: 18,
-      justifyContent: "center",
+      marginTop: 24,
+      paddingTop: 16,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
       alignItems: "center",
+      justifyContent: "space-between",
     },
-
-    aiPrimaryText: {
-      color: colors.surface,
-      fontSize: 16,
-      fontWeight: "800",
-    },
-
     aiSecondaryButton: {
       flex: 1,
-      backgroundColor: colors.border,
-      height: 56,
-      borderRadius: 18,
+      height: 52,
+      backgroundColor:
+        resolvedTheme === "dark" ? "rgba(255,255,255,0.05)" : "#F8FAFC",
+      borderRadius: 14,
       justifyContent: "center",
       alignItems: "center",
       borderWidth: 1,
       borderColor: colors.border,
     },
-
     aiSecondaryText: {
-      color: colors.secondaryText,
-      fontSize: 14,
+      color: colors.text,
+      fontSize: 11,
+      fontWeight: "600",
+      marginTop: 4,
+    },
+    aiPrimaryButton: {
+      flex: 1.4,
+      height: 52,
+      backgroundColor: colors.primary,
+      borderRadius: 14,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 6,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    aiPrimaryText: {
+      color: "#FFFFFF",
+      fontSize: 15,
       fontWeight: "700",
     },
   });

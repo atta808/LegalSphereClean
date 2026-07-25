@@ -1,5 +1,5 @@
 import React from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumPageHeader from "../components/PremiumPageHeader";
 import { useTheme } from "../theme/ThemeContext";
 import LegalInput from "../components/LegalInput";
 import LegalPicker from "../components/LegalPicker";
@@ -25,7 +25,10 @@ import { getWhatsAppLink } from "../utils/phone";
 
 export default function AddClientScreen({ onBack, onSaved }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -35,6 +38,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
   const [email, setEmail] = useState("");
   const [country, setCountry] = useState("PK");
   const [countryPickerVisible, setCountryPickerVisible] = useState(false);
+
   useEffect(() => {
     const loadDefaultCountry = async () => {
       try {
@@ -49,7 +53,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         }
 
         setCountry(finalCountry);
-        setIsReady(true); // ✅ CRITICAL
+        setIsReady(true);
       } catch (e) {
         console.log("Load country error", e);
         setIsReady(true);
@@ -58,7 +62,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
 
     loadDefaultCountry();
   }, []);
-  // 🔹 IMPORT FROM CONTACTS
+
   const handlePickContact = async () => {
     try {
       const { status } = await Contacts.requestPermissionsAsync();
@@ -72,30 +76,24 @@ export default function AddClientScreen({ onBack, onSaved }) {
 
       if (!contact) return;
 
-      // ✅ NAME
       setName(contact.name || "");
 
-      // ✅ MOBILE
       if (contact.phoneNumbers?.length > 0) {
         let phone = contact.phoneNumbers[0].number || "";
 
-        // remove spaces/symbols
         phone = phone.replace(/[^\d]/g, "");
 
-        // remove country code if duplicated
         const code = (phoneCodeMap[country] || "+1").replace("+", "");
 
         if (phone.startsWith(code)) {
           phone = phone.slice(code.length);
         }
 
-        // remove leading zeros
         phone = phone.replace(/^0+/, "");
 
         setMobile(phone);
       }
 
-      // ✅ EMAIL
       if (contact.emails?.length > 0) {
         setEmail(contact.emails[0].email || "");
       }
@@ -105,7 +103,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
       Alert.alert("Error", "Failed to import contact.");
     }
   };
-  // 🔹 SAVE CLIENT
+
   const handleSaveOnly = () => {
     if (!name.trim() || !mobile.trim()) {
       Alert.alert("Missing Fields", "Name and mobile number are required.");
@@ -115,17 +113,15 @@ export default function AddClientScreen({ onBack, onSaved }) {
     try {
       const code = phoneCodeMap[country] || "+1";
 
-      // clean input (remove spaces etc.)
       let clean = mobile.replace(/[^\d]/g, "");
 
-      // remove leading zero (PK, IN etc.)
       clean = clean.replace(/^0+/, "");
 
       const fullNumber = code + clean;
 
       const newId = insertClient({
         name: name.trim(),
-        mobile: fullNumber, // ✅ FIXED
+        mobile: fullNumber,
         email: email.trim(),
         country: country,
       });
@@ -146,7 +142,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
       Alert.alert("Error", e.message);
     }
   };
-  // 🔹 WHATSAPP
+
   const handleWhatsApp = () => {
     if (!mobile) return;
 
@@ -164,34 +160,28 @@ export default function AddClientScreen({ onBack, onSaved }) {
     <View style={styles.mainContainer}>
       <StatusBar barStyle="dark-content" translucent />
 
-      {/* HEADER */}
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity accessibilityRole="button"
-          onPress={() => {
-            if (onBack) {
-              onBack();
-            } else {
-              navigation.goBack();
-            }
-          }}
-          style={styles.backBtn}
-        >
-          <Ionicons name="chevron-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
+      {/* HEADER - Migrated to PremiumPageHeader V5.1 */}
+      <PremiumPageHeader
+        title="Add Client"
+        subtitle="Client Registration"
+        showBackButton={true}
+        onBack={() => {
+          if (onBack) {
+            onBack();
+          } else {
+            navigation.goBack();
+          }
+        }}
+        headerVariant="default"
+      />
 
-        <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={styles.title}>Add Client</Text>
-          <Text style={styles.subtitle}>Client Registration</Text>
-        </View>
-
-        <View style={{ width: 40 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 120 }]}>
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: 120 }]}
+      >
         <View style={styles.card}>
           <View style={styles.labelRow}>
             <Text style={styles.sectionTitle}>Personal Information</Text>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               onPress={handlePickContact}
               activeOpacity={0.7}
               style={{
@@ -226,14 +216,17 @@ export default function AddClientScreen({ onBack, onSaved }) {
           {/* COUNTRY */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Country</Text>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               style={[styles.input, !isReady && { opacity: 0.5 }]}
               activeOpacity={0.85}
               disabled={!isReady}
               onPress={() => setCountryPickerVisible(true)}
             >
               <Text
-                style={{ color: country ? colors.text : colors.secondaryText, fontSize: 15 }}
+                style={{
+                  color: country ? colors.text : colors.secondaryText,
+                  fontSize: 15,
+                }}
               >
                 {countries.find((c) => c.code === country)?.name ||
                   "Select Country"}
@@ -295,7 +288,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Communication</Text>
           <View style={styles.quickActions}>
-            <TouchableOpacity accessibilityRole="button" style={styles.waBtn} onPress={handleWhatsApp}>
+            <TouchableOpacity style={styles.waBtn} onPress={handleWhatsApp}>
               <Ionicons
                 name="logo-whatsapp"
                 size={18}
@@ -308,7 +301,7 @@ export default function AddClientScreen({ onBack, onSaved }) {
         </View>
 
         {/* SAVE */}
-        <TouchableOpacity accessibilityRole="button" style={styles.saveBtn} onPress={handleSaveOnly}>
+        <TouchableOpacity style={styles.saveBtn} onPress={handleSaveOnly}>
           <Ionicons
             name="save"
             size={18}
@@ -336,145 +329,109 @@ export default function AddClientScreen({ onBack, onSaved }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    backgroundColor: colors.border,
-  },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: {
+      flex: 1,
+      backgroundColor: colors.border,
+    },
 
-  header: {
-    backgroundColor: colors.surface,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
+    container: {
+      padding: 20,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 16,
+    },
 
-  backBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    inputGroup: {
+      marginBottom: 18,
+    },
+    labelRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8,
+    },
 
-  backText: {
-    fontSize: 26,
-    color: colors.primary,
-  },
+    contactImportText: {
+      fontSize: 11,
+      fontWeight: "700",
+      color: colors.primary,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.secondaryText,
+      marginBottom: 8,
+    },
 
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.primary,
-  },
+    input: {
+      backgroundColor: colors.background,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      minHeight: 48,
+      fontSize: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      justifyContent: "center",
+    },
 
-  subtitle: {
-    fontSize: 10,
-    color: colors.secondaryText,
-    marginTop: 2,
-    fontWeight: "500",
-  },
+    codeText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.primary,
+    },
 
-  container: {
-    padding: 20,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 16,
-  },
+    quickActions: {
+      marginTop: 10,
+      marginBottom: 25,
+    },
 
-  inputGroup: {
-    marginBottom: 18,
-  },
-  labelRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
+    waBtn: {
+      backgroundColor: colors.success,
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      minHeight: 48,
+    },
 
-  contactImportText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.secondaryText,
-    marginBottom: 8,
-  },
+    waText: {
+      color: colors.surface,
+      fontWeight: "700",
+    },
 
-  input: {
-    backgroundColor: colors.background,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    minHeight: 48,
-    fontSize: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: "center",
-  },
+    saveBtn: {
+      backgroundColor: colors.primary,
+      paddingVertical: 18,
+      borderRadius: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      shadowColor: colors.primary,
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 4,
+      marginBottom: 40,
+    },
 
-  codeText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.primary,
-  },
-
-  quickActions: {
-    marginTop: 10,
-    marginBottom: 25,
-  },
-
-  waBtn: {
-    backgroundColor: colors.success,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    minHeight: 48,
-  },
-
-  waText: {
-    color: colors.surface,
-    fontWeight: "700",
-  },
-
-  saveBtn: {
-    backgroundColor: colors.primary,
-    paddingVertical: 18,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    shadowColor: colors.primary,
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-    marginBottom: 40,
-  },
-
-  saveText: {
-    color: colors.surface,
-    fontWeight: "700",
-    fontSize: 16,
-  },
-});
+    saveText: {
+      color: colors.surface,
+      fontWeight: "700",
+      fontSize: 16,
+    },
+  });

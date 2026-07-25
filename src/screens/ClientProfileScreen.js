@@ -1,12 +1,12 @@
 import React from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
-import PremiumTouchable from '../components/PremiumTouchable';
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
 import { useTheme } from "../theme/ThemeContext";
 import {
   useFocusEffect,
   useNavigation,
   useRoute,
-} from "@react-navigation/native"; // ✅ Added useRoute
+} from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -27,13 +27,14 @@ import { toDisplay } from "../utils/date";
 
 export default function ClientProfileScreen({ profile, onBack }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const route = useRoute();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
-  // ✅ Extract client from route params if passed via navigation
-  // This prevents the "undefined" errors when coming from ClientsScreen
   const client = route.params?.client;
 
   const [cases, setCases] = useState([]);
@@ -45,7 +46,6 @@ export default function ClientProfileScreen({ profile, onBack }) {
       if (!client?.id) return;
       setLoading(true);
 
-      // Filter cases for this specific client
       const allCases = getAllCases();
       const clientCases = allCases.filter((c) => c.clientId === client.id);
       setCases(clientCases);
@@ -69,12 +69,14 @@ export default function ClientProfileScreen({ profile, onBack }) {
     loadCases();
   }, [loadCases]);
 
-  // If no client is found (safety check)
   if (!client) {
     return (
       <View style={styles.center}>
         <Text>Client data not found.</Text>
-        <PremiumTouchable accessibilityRole="button" onPress={() => navigation.goBack()}>
+        <PremiumTouchable
+          accessibilityRole="button"
+          onPress={() => navigation.goBack()}
+        >
           <Text style={{ color: colors.primary, marginTop: 10 }}>Go Back</Text>
         </PremiumTouchable>
       </View>
@@ -85,10 +87,18 @@ export default function ClientProfileScreen({ profile, onBack }) {
     <View style={styles.mainContainer}>
       <StatusBar barStyle="dark-content" translucent />
 
-            {/* PREMIUM HEADER */}
+      {/* PREMIUM HEADER - Migrated to use client data */}
       <PremiumPageHeader
-        title="Client Profile"
+        title={client?.name || "Client Profile"}
+        subtitle={client?.email || "No Email Provided"}
+        footer={`${cases.length} case${cases.length !== 1 ? "s" : ""} • ${client?.mobile || "No phone"}`}
         onBack={() => (onBack ? onBack() : navigation.goBack())}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
       />
 
       <ScrollView
@@ -113,7 +123,8 @@ export default function ClientProfileScreen({ profile, onBack }) {
           </Text>
 
           <View style={styles.actionHub}>
-            <PremiumTouchable accessibilityRole="button"
+            <PremiumTouchable
+              accessibilityRole="button"
               style={styles.callBtn}
               onPress={() => Linking.openURL(`tel:${client.mobile}`)}
             >
@@ -127,7 +138,8 @@ export default function ClientProfileScreen({ profile, onBack }) {
                 <Text style={styles.btnText}>Call</Text>
               </View>
             </PremiumTouchable>
-            <PremiumTouchable accessibilityRole="button"
+            <PremiumTouchable
+              accessibilityRole="button"
               style={styles.waBtn}
               onPress={() =>
                 Linking.openURL(
@@ -186,10 +198,10 @@ export default function ClientProfileScreen({ profile, onBack }) {
           </View>
         ) : (
           cases.map((item) => (
-            <PremiumTouchable accessibilityRole="button"
+            <PremiumTouchable
+              accessibilityRole="button"
               key={item.id}
               style={styles.caseCard}
-              // ✅ Navigates directly to CaseDetail using the app stack
               onPress={() =>
                 navigation.navigate("CaseDetail", { caseId: item.id })
               }
@@ -242,7 +254,9 @@ export default function ClientProfileScreen({ profile, onBack }) {
                     styles.metaValue,
                     {
                       color:
-                        Number(item.feeBalance) > 0 ? colors.danger : colors.success,
+                        Number(item.feeBalance) > 0
+                          ? colors.danger
+                          : colors.success,
                     },
                   ]}
                 >
@@ -257,121 +271,130 @@ export default function ClientProfileScreen({ profile, onBack }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: colors.background },
-  backIcon: { fontSize: 30, color: colors.primary, marginTop: -4 },
-  scrollContent: { padding: 20 },
-  identityCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  avatarCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: "rgba(26, 115, 232, 0.1)",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  avatarText: { color: colors.primary, fontSize: 28, fontWeight: "600" },
-  clientName: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: colors.text,
-  },
-  clientSub: { fontSize: 13, color: colors.secondaryText, marginTop: 4 },
-  actionHub: { flexDirection: "row", gap: 12, marginTop: 20 },
-  callBtn: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    minHeight: 48,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-  waBtn: {
-    flex: 1,
-    backgroundColor: colors.success,
-    paddingVertical: 14,
-    minHeight: 48,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-  btnText: { color: colors.surface, fontWeight: "600" },
-  statsRow: {
-    flexDirection: "row",
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statBox: { flex: 1, alignItems: "center" },
-  statLabel: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: colors.placeholder,
-    textTransform: "uppercase",
-  },
-  statVal: { fontSize: 20, fontWeight: "700", color: colors.primary, marginTop: 2 },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 16,
-    marginLeft: 4,
-  },
-  caseCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  caseHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  caseTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.text,
-    flex: 1,
-    marginRight: 10,
-  },
-  statusBadge: {
-    backgroundColor: "rgba(26, 115, 232, 0.1)",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  statusText: { fontSize: 10, fontWeight: "600", color: colors.primary },
-  caseCourt: { fontSize: 13, color: colors.secondaryText },
-  divider: { height: 1, backgroundColor: colors.background, marginVertical: 12 },
-  rowBetween: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  metaLabel: { fontSize: 12, color: colors.secondaryText, fontWeight: "600" },
-  metaValue: { fontSize: 14, fontWeight: "600" },
-  emptyCard: {
-    padding: 40,
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  emptyText: { color: colors.placeholder, fontWeight: "600" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-});
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: { flex: 1, backgroundColor: colors.background },
+    scrollContent: { padding: 20 },
+    identityCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 24,
+      alignItems: "center",
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    avatarCircle: {
+      width: 70,
+      height: 70,
+      borderRadius: 35,
+      backgroundColor: "rgba(26, 115, 232, 0.1)",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    avatarText: { color: colors.primary, fontSize: 28, fontWeight: "600" },
+    clientName: {
+      fontSize: 22,
+      fontWeight: "700",
+      color: colors.text,
+    },
+    clientSub: { fontSize: 13, color: colors.secondaryText, marginTop: 4 },
+    actionHub: { flexDirection: "row", gap: 12, marginTop: 20 },
+    callBtn: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      paddingVertical: 14,
+      minHeight: 48,
+      borderRadius: 14,
+      alignItems: "center",
+    },
+    waBtn: {
+      flex: 1,
+      backgroundColor: colors.success,
+      paddingVertical: 14,
+      minHeight: 48,
+      borderRadius: 14,
+      alignItems: "center",
+    },
+    btnText: { color: colors.surface, fontWeight: "600" },
+    statsRow: {
+      flexDirection: "row",
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    statBox: { flex: 1, alignItems: "center" },
+    statLabel: {
+      fontSize: 10,
+      fontWeight: "600",
+      color: colors.placeholder,
+      textTransform: "uppercase",
+    },
+    statVal: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.primary,
+      marginTop: 2,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 16,
+      marginLeft: 4,
+    },
+    caseCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    caseHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    caseTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.text,
+      flex: 1,
+      marginRight: 10,
+    },
+    statusBadge: {
+      backgroundColor: "rgba(26, 115, 232, 0.1)",
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 6,
+    },
+    statusText: { fontSize: 10, fontWeight: "600", color: colors.primary },
+    caseCourt: { fontSize: 13, color: colors.secondaryText },
+    divider: {
+      height: 1,
+      backgroundColor: colors.background,
+      marginVertical: 12,
+    },
+    rowBetween: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    metaLabel: { fontSize: 12, color: colors.secondaryText, fontWeight: "600" },
+    metaValue: { fontSize: 14, fontWeight: "600" },
+    emptyCard: {
+      padding: 40,
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    emptyText: { color: colors.placeholder, fontWeight: "600" },
+    center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  });

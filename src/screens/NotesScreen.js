@@ -21,6 +21,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ImageViewer from "react-native-image-zoom-viewer";
 import { toDisplay } from "../utils/date";
 import LegalInput from "../components/LegalInput";
+import PremiumPageHeader from "../components/PremiumPageHeader";
 
 import {
   addCaseNote,
@@ -29,9 +30,12 @@ import {
   updateCaseNote,
 } from "../services/sqliteService";
 
-export default function NotesScreen({ caseId, onBack }) {
+export default function NotesScreen({ caseId, onBack, caseTitle }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const insets = useSafeAreaInsets();
 
   const [note, setNote] = useState("");
@@ -135,25 +139,19 @@ export default function NotesScreen({ caseId, onBack }) {
     <View style={styles.mainWrapper}>
       <StatusBar barStyle="dark-content" translucent />
 
-      {/* HEADER */}
-      <View style={[styles.premiumHeader, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity accessibilityRole="button" onPress={onBack} style={styles.glassBackButton}>
-            <Text style={styles.backIcon}>‹</Text>
-          </TouchableOpacity>
-
-          <View style={styles.headerTitleWrapper}>
-            <Text style={styles.headerTitleText}>Digital briefcase</Text>
-            <View style={styles.jurisdictionPill}>
-              <Text style={styles.jurisdictionText}>
-                Legal Notes & Evidence
-              </Text>
-            </View>
-          </View>
-
-          <View style={{ width: 44 }} />
-        </View>
-      </View>
+      {/* Premium Header - Migrated to PremiumPageHeader */}
+      <PremiumPageHeader
+        title="Digital Briefcase"
+        subtitle={caseTitle || "Legal Notes & Evidence"}
+        footer={`${notes.length} note${notes.length !== 1 ? "s" : ""} recorded`}
+        onBack={onBack}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
+      />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -183,7 +181,8 @@ export default function NotesScreen({ caseId, onBack }) {
             notes.map((n) => (
               <View key={n.id} style={styles.noteCard}>
                 {n.image && (
-                  <TouchableOpacity accessibilityRole="button"
+                  <TouchableOpacity
+                    accessibilityRole="button"
                     onPress={() => openImageViewer(n.image)}
                     style={styles.imageContainer}
                   >
@@ -196,10 +195,16 @@ export default function NotesScreen({ caseId, onBack }) {
                 </Text>
 
                 <View style={styles.actionRow}>
-                  <TouchableOpacity accessibilityRole="button" onPress={() => editNote(n)}>
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => editNote(n)}
+                  >
                     <Text style={styles.editText}>Edit</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity accessibilityRole="button" onPress={() => deleteNote(n.id)}>
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => deleteNote(n.id)}
+                  >
                     <Text style={styles.delText}>Delete</Text>
                   </TouchableOpacity>
                 </View>
@@ -220,7 +225,11 @@ export default function NotesScreen({ caseId, onBack }) {
           )}
 
           <View style={styles.composerRow}>
-            <TouchableOpacity accessibilityRole="button" onPress={pickImage} style={styles.cameraButton}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              onPress={pickImage}
+              style={styles.cameraButton}
+            >
               <Text style={{ fontSize: 22 }}>📷</Text>
             </TouchableOpacity>
 
@@ -234,7 +243,10 @@ export default function NotesScreen({ caseId, onBack }) {
               />
             </View>
 
-            <TouchableOpacity accessibilityRole="button" onPress={handleAddNote}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              onPress={handleAddNote}
+            >
               <LinearGradient
                 colors={["#2A8FEA", "#1E73BE", "#155FA0"]}
                 style={styles.sendBtn}
@@ -258,7 +270,8 @@ export default function NotesScreen({ caseId, onBack }) {
           onSwipeDown={() => setViewerVisible(false)}
           onCancel={() => setViewerVisible(false)}
           renderHeader={() => (
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               onPress={() => setViewerVisible(false)}
               style={{
                 position: "absolute",
@@ -270,7 +283,9 @@ export default function NotesScreen({ caseId, onBack }) {
                 borderRadius: 20,
               }}
             >
-              <Text style={{ color: colors.surface, fontSize: 16 }}>✕ Close</Text>
+              <Text style={{ color: colors.surface, fontSize: 16 }}>
+                ✕ Close
+              </Text>
             </TouchableOpacity>
           )}
           backgroundColor="rgba(0,0,0,0.95)"
@@ -281,249 +296,186 @@ export default function NotesScreen({ caseId, onBack }) {
   );
 }
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainWrapper: {
-    flex: 1,
-    backgroundColor: colors.border,
-  },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainWrapper: {
+      flex: 1,
+      backgroundColor: colors.border,
+    },
 
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
+    container: {
+      flex: 1,
+      paddingHorizontal: 20,
+    },
 
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    zIndex: 10,
-  },
+    emptyState: {
+      alignItems: "center",
+      marginTop: 80,
+      paddingHorizontal: 40,
+    },
 
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
+    emptyIconCircle: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 20,
+    },
 
-  glassBackButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    emptyIcon: {
+      fontSize: 40,
+    },
 
-  backIcon: {
-    fontSize: 28,
-    color: colors.primary,
-    fontWeight: "300",
-    marginTop: -4,
-  },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: "800",
+      color: colors.text,
+    },
 
-  headerTitleWrapper: {
-    flex: 1,
-    alignItems: "center",
-  },
+    emptySub: {
+      color: colors.placeholder,
+      marginTop: 8,
+      textAlign: "center",
+      lineHeight: 22,
+    },
 
-  headerTitleText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: colors.primary,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
+    noteCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 18,
+      marginBottom: 16,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.03,
+      shadowRadius: 12,
+      elevation: 2,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  jurisdictionPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
+    imageContainer: {
+      marginBottom: 15,
+    },
 
-  jurisdictionText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
+    noteImage: {
+      width: "100%",
+      height: 220,
+      borderRadius: 18,
+    },
 
-  emptyState: {
-    alignItems: "center",
-    marginTop: 80,
-    paddingHorizontal: 40,
-  },
+    noteText: {
+      fontSize: 15,
+      color: colors.text,
+      lineHeight: 24,
+      marginBottom: 15,
+      fontWeight: "500",
+    },
 
-  emptyIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
+    dateText: {
+      fontSize: 11,
+      color: colors.secondaryText,
+      fontWeight: "800",
+      marginTop: 4,
+    },
 
-  emptyIcon: {
-    fontSize: 40,
-  },
+    actionRow: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: 10,
+    },
 
-  emptyText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: colors.text,
-  },
+    editText: {
+      color: colors.primary,
+      fontWeight: "800",
+      fontSize: 12,
+    },
 
-  emptySub: {
-    color: colors.placeholder,
-    marginTop: 8,
-    textAlign: "center",
-    lineHeight: 22,
-  },
+    delText: {
+      color: colors.danger,
+      fontWeight: "800",
+      fontSize: 12,
+    },
 
-  noteCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    padding: 18,
-    marginBottom: 16,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.03,
-    shadowRadius: 12,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    composer: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.1,
+      shadowRadius: 20,
+      elevation: 20,
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
 
-  imageContainer: {
-    marginBottom: 15,
-  },
+    composerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
 
-  noteImage: {
-    width: "100%",
-    height: 220,
-    borderRadius: 18,
-  },
+    cameraButton: {
+      padding: 4,
+    },
 
-  noteText: {
-    fontSize: 15,
-    color: colors.text,
-    lineHeight: 24,
-    marginBottom: 15,
-    fontWeight: "500",
-  },
+    inputWrapper: {
+      flex: 1,
+    },
 
-  dateText: {
-    fontSize: 11,
-    color: colors.secondaryText,
-    fontWeight: "800",
-    marginTop: 4,
-  },
+    noteInput: {
+      backgroundColor: colors.surface,
+      color: colors.background,
+      borderWidth: 0,
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 15,
+      fontWeight: "600",
+      maxHeight: 100,
+      minHeight: 50,
+    },
 
-  actionRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: 10,
-  },
+    sendBtn: {
+      width: 46,
+      height: 46,
+      borderRadius: 23,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  editText: {
-    color: colors.primary,
-    fontWeight: "800",
-    fontSize: 12,
-  },
+    previewThumb: {
+      width: 60,
+      height: 60,
+      borderRadius: 12,
+      marginBottom: 10,
+    },
 
-  delText: {
-    color: colors.danger,
-    fontWeight: "800",
-    fontSize: 12,
-  },
+    // IMAGE VIEWER – full screen background
+    viewerOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.95)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  composer: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 20,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
+    closeViewerBtn: {
+      position: "absolute",
+      top: 40,
+      right: 20,
+      zIndex: 10,
+      padding: 10,
+    },
 
-  composerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-
-  cameraButton: {
-    padding: 4,
-  },
-
-  inputWrapper: {
-    flex: 1,
-  },
-
-  noteInput: {
-    backgroundColor: colors.surface,
-    color: colors.background,
-    borderWidth: 0,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    fontWeight: "600",
-    maxHeight: 100,
-    minHeight: 50,
-  },
-
-  sendBtn: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  previewThumb: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-
-  // IMAGE VIEWER – full screen background
-  viewerOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.95)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  closeViewerBtn: {
-    position: "absolute",
-    top: 40,
-    right: 20,
-    zIndex: 10,
-    padding: 10,
-  },
-
-  fullImage: {
-    width: "95%",
-    height: "80%",
-  },
-});
+    fullImage: {
+      width: "95%",
+      height: "80%",
+    },
+  });

@@ -1,6 +1,7 @@
 import React from "react";
 import { useTheme } from "../theme/ThemeContext";
-// CaseDetailScreen.js – Clean, Premium, Action-Ready
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
 
 import {
   useFocusEffect,
@@ -45,7 +46,10 @@ import NotesScreen from "./NotesScreen";
 
 export default function CaseDetailScreen({ profile }) {
   const { colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const route = useRoute();
   const navigation = useNavigation();
   const [currentProfile, setCurrentProfile] = useState(profile || {});
@@ -305,7 +309,11 @@ ${profile?.name || "Advocate"}`;
     return Math.max(score, 5);
   })();
   const healthColor =
-    healthScore >= 75 ? "#22C55E" : healthScore >= 45 ? colors.warning : colors.danger;
+    healthScore >= 75
+      ? "#22C55E"
+      : healthScore >= 45
+        ? colors.warning
+        : colors.danger;
   const healthLabel =
     healthScore >= 75
       ? "LOW RISK"
@@ -315,20 +323,10 @@ ${profile?.name || "Advocate"}`;
 
   const recentHearings = hearings.slice(0, 2);
 
-  return (
-    <View style={styles.mainContainer}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
-
-            {/* HEADER */}
-      <PremiumPageHeader
-        title="Case Details"
-        subtitle={caseData?.caseNo ? `#${caseData.caseNo}` : undefined}
-        rightComponent={
-          <PremiumTouchable accessibilityRole="button"
-            style={styles.newAiCopyBtn}
-            onPress={async () => {
-              try {
-                const aiCaseText = `
+  // AI Copy handler
+  const handleAICopy = async () => {
+    try {
+      const aiCaseText = `
 Case Title: ${caseData?.title || "-"}
 Case No: ${caseData?.caseNo || "-"}
 Court: ${caseData?.court || "-"}
@@ -341,22 +339,38 @@ Next Hearing: ${toDisplay(caseData?.nextHearingISO, locale) || "-"}
 Fee Balance: ${formatMoney(caseData?.feeBalance, currency, locale) || "-"}
 Description: ${caseData?.description || "-"}
 Notes: ${caseData?.notes || "-"}`;
-                await Clipboard.setStringAsync(aiCaseText);
-                Haptics.notificationAsync(
-                  Haptics.NotificationFeedbackType.Success,
-                );
-                Alert.alert(
-                  "AI Copy Ready",
-                  "Case details copied for AI Litigation Room.",
-                );
-              } catch {
-                Alert.alert("Error", "Failed to copy case details.");
-              }
-            }}
-          >
-            <Ionicons name="sparkles-outline" size={20} color={colors.primary} />
-          </PremiumTouchable>
-        }
+      await Clipboard.setStringAsync(aiCaseText);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(
+        "AI Copy Ready",
+        "Case details copied for AI Litigation Room.",
+      );
+    } catch {
+      Alert.alert("Error", "Failed to copy case details.");
+    }
+  };
+
+  return (
+    <View style={styles.mainContainer}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={colors.primaryDark}
+      />
+
+      {/* HEADER - Migrated to PremiumPageHeader V5.1 */}
+      <PremiumPageHeader
+        title="Case Details"
+        subtitle={caseData?.caseNo ? `#${caseData.caseNo}` : "Case Detail"}
+        headerVariant="large"
+        showBackButton={true}
+        actions={[
+          {
+            icon: "sparkles-outline",
+            onPress: handleAICopy,
+            accessibilityLabel: "AI Copy",
+            accessibilityHint: "Copy case details for AI Litigation Room",
+          },
+        ]}
       />
 
       <ScrollView
@@ -389,9 +403,15 @@ Notes: ${caseData?.notes || "-"}`;
                   <Text
                     style={[
                       styles.priorityText,
-                      caseData.priority === "urgent" && { color: colors.danger },
-                      caseData.priority === "important" && { color: colors.text },
-                      caseData.priority === "normal" && { color: colors.primary },
+                      caseData.priority === "urgent" && {
+                        color: colors.danger,
+                      },
+                      caseData.priority === "important" && {
+                        color: colors.text,
+                      },
+                      caseData.priority === "normal" && {
+                        color: colors.primary,
+                      },
                     ]}
                   >
                     {caseData.priority?.toUpperCase()}
@@ -399,15 +419,33 @@ Notes: ${caseData?.notes || "-"}`;
                 </View>
               </View>
               <Text style={styles.caseCourt}>
-                <Ionicons name="business" size={12} color={colors.secondaryText} style={{ marginRight: 4 }} /> {caseData.court}
+                <Ionicons
+                  name="business"
+                  size={12}
+                  color={colors.secondaryText}
+                  style={{ marginRight: 4 }}
+                />{" "}
+                {caseData.court}
               </Text>
             </View>
           </View>
           <View style={styles.divider} />
 
-          <Row styles={styles} colors={colors} label="Current Stage" value={caseData.stage} />
-          <Row styles={styles} colors={colors} label="Proceeding" value={caseData.description} />
-          <Row styles={styles} colors={colors}
+          <Row
+            styles={styles}
+            colors={colors}
+            label="Current Stage"
+            value={caseData.stage}
+          />
+          <Row
+            styles={styles}
+            colors={colors}
+            label="Proceeding"
+            value={caseData.description}
+          />
+          <Row
+            styles={styles}
+            colors={colors}
             label="Next Hearing"
             value={toDisplay(caseData.nextHearingISO, locale)}
             highlight
@@ -425,7 +463,9 @@ Notes: ${caseData?.notes || "-"}`;
               <Text
                 style={[
                   styles.statusTagText,
-                  isArchived ? { color: colors.danger } : { color: colors.text },
+                  isArchived
+                    ? { color: colors.danger }
+                    : { color: colors.text },
                 ]}
               >
                 {caseData.status?.toUpperCase()}
@@ -439,25 +479,69 @@ Notes: ${caseData?.notes || "-"}`;
           <Text style={styles.sectionTitle}>Case Information</Text>
         </View>
         <View style={styles.card}>
-          {!!caseData?.judge && <Row styles={styles} colors={colors} label="Judge" value={caseData.judge} />}
+          {!!caseData?.judge && (
+            <Row
+              styles={styles}
+              colors={colors}
+              label="Judge"
+              value={caseData.judge}
+            />
+          )}
           {!!caseData?.caseType && (
-            <Row styles={styles} colors={colors} label="Case Type" value={caseData.caseType} />
+            <Row
+              styles={styles}
+              colors={colors}
+              label="Case Type"
+              value={caseData.caseType}
+            />
           )}
           {!!caseData?.litigationDomain && (
-            <Row styles={styles} colors={colors} label="Litigation Domain" value={caseData.litigationDomain} />
+            <Row
+              styles={styles}
+              colors={colors}
+              label="Litigation Domain"
+              value={caseData.litigationDomain}
+            />
           )}
           {!!caseData?.representingSide && (
-            <Row styles={styles} colors={colors} label="Representing Side" value={caseData.representingSide} />
+            <Row
+              styles={styles}
+              colors={colors}
+              label="Representing Side"
+              value={caseData.representingSide}
+            />
           )}
           {!!caseData?.opposingCounsel && (
-            <Row styles={styles} colors={colors} label="Opposing Counsel" value={caseData.opposingCounsel} />
+            <Row
+              styles={styles}
+              colors={colors}
+              label="Opposing Counsel"
+              value={caseData.opposingCounsel}
+            />
           )}
           {!!caseData?.opponent && (
-            <Row styles={styles} colors={colors} label="Opponent" value={caseData.opponent} />
+            <Row
+              styles={styles}
+              colors={colors}
+              label="Opponent"
+              value={caseData.opponent}
+            />
           )}
-          {!!caseData?.firNo && <Row styles={styles} colors={colors} label="FIR No" value={caseData.firNo} />}
+          {!!caseData?.firNo && (
+            <Row
+              styles={styles}
+              colors={colors}
+              label="FIR No"
+              value={caseData.firNo}
+            />
+          )}
           {!!caseData?.firDate && (
-            <Row styles={styles} colors={colors} label="FIR Date" value={caseData.firDate} />
+            <Row
+              styles={styles}
+              colors={colors}
+              label="FIR Date"
+              value={caseData.firDate}
+            />
           )}
         </View>
 
@@ -467,7 +551,7 @@ Notes: ${caseData?.notes || "-"}`;
         <View style={styles.actionSection}>
           {/* Row 1: Add Hearing (full width) */}
           <View style={styles.actionRow}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnFull]}
               onPress={() =>
@@ -478,14 +562,18 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Ionicons name="calendar-outline" size={18} color={colors.primaryDark} />
+              <Ionicons
+                name="calendar-outline"
+                size={18}
+                color={colors.primaryDark}
+              />
               <Text style={styles.actionBtnLabel}>Add Hearing</Text>
             </TouchableOpacity>
           </View>
 
           {/* Row 2: AI Room | Lex AI | Timeline */}
           <View style={styles.actionRow}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => {
@@ -496,11 +584,15 @@ Notes: ${caseData?.notes || "-"}`;
                 }
               }}
             >
-              <Ionicons name="sparkles-outline" size={18} color={colors.primaryDark} />
+              <Ionicons
+                name="sparkles-outline"
+                size={18}
+                color={colors.primaryDark}
+              />
               <Text style={styles.actionBtnLabel}>AI Room</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() =>
@@ -509,11 +601,15 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Ionicons name="flash-outline" size={18} color={colors.primaryDark} />
+              <Ionicons
+                name="flash-outline"
+                size={18}
+                color={colors.primaryDark}
+              />
               <Text style={styles.actionBtnLabel}>Lex AI</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => {
@@ -521,14 +617,18 @@ Notes: ${caseData?.notes || "-"}`;
                 navigation.navigate("Timeline", { caseId: caseData.id });
               }}
             >
-              <Ionicons name="time-outline" size={18} color={colors.primaryDark} />
+              <Ionicons
+                name="time-outline"
+                size={18}
+                color={colors.primaryDark}
+              />
               <Text style={styles.actionBtnLabel}>Timeline</Text>
             </TouchableOpacity>
           </View>
 
           {/* Row 3: Documents | Notes | Citations */}
           <View style={styles.actionRow}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() =>
@@ -538,11 +638,15 @@ Notes: ${caseData?.notes || "-"}`;
                 })
               }
             >
-              <Ionicons name="folder-open-outline" size={18} color={colors.primaryDark} />
+              <Ionicons
+                name="folder-open-outline"
+                size={18}
+                color={colors.primaryDark}
+              />
               <Text style={styles.actionBtnLabel}>Documents</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowNotesScreen(true)}
@@ -555,7 +659,7 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={styles.actionBtnLabel}>Notes</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.actionBtnThird]}
               onPress={() => setShowCitationsScreen(true)}
@@ -628,7 +732,7 @@ Notes: ${caseData?.notes || "-"}`;
             </View>
           </View>
           <View style={styles.actionRow}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.actionBtn}
               onPress={handleCallClient}
@@ -637,16 +741,18 @@ Notes: ${caseData?.notes || "-"}`;
               <Text style={styles.actionBtnLabel}>Call</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.actionBtn, styles.waBtn]}
               onPress={handleWhatsAppClient}
             >
               <Ionicons name="logo-whatsapp" size={16} color={colors.success} />
-              <Text style={[styles.actionBtnLabel, styles.waText]}>WhatsApp</Text>
+              <Text style={[styles.actionBtnLabel, styles.waText]}>
+                WhatsApp
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.actionBtn}
               onPress={handleSendReminder}
@@ -664,7 +770,7 @@ Notes: ${caseData?.notes || "-"}`;
         {/* FINANCIAL SUMMARY */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Financial Summary</Text>
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => setPaymentModalVisible(true)}
           >
@@ -673,11 +779,13 @@ Notes: ${caseData?.notes || "-"}`;
         </View>
         <View style={styles.card}>
           <View style={styles.feeGrid}>
-            <FeeBox styles={styles}
+            <FeeBox
+              styles={styles}
               label="Decided"
               val={formatMoney(caseData.feeDecided, currency, locale)}
             />
-            <FeeBox styles={styles}
+            <FeeBox
+              styles={styles}
               label="Paid"
               val={formatMoney(caseData.feePaid, currency, locale)}
               color={colors.success}
@@ -695,7 +803,7 @@ Notes: ${caseData?.notes || "-"}`;
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Hearings</Text>
           {hearings.length > 2 && (
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               onPress={() =>
                 navigation.navigate("Timeline", { caseId: caseData.id })
@@ -722,7 +830,7 @@ Notes: ${caseData?.notes || "-"}`;
                     <Text style={styles.timelineDate}>
                       {toDisplay(item.hearingDate, locale)}
                     </Text>
-                    <TouchableOpacity accessibilityRole="button"
+                    <TouchableOpacity
                       activeOpacity={0.7}
                       onPress={() => handleDeleteHearing(item.id)}
                     >
@@ -740,7 +848,7 @@ Notes: ${caseData?.notes || "-"}`;
             ))
           )}
           {hearings.length > 2 && (
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.viewFullButton}
               onPress={() =>
@@ -763,9 +871,12 @@ Notes: ${caseData?.notes || "-"}`;
         {/* ARCHIVE / RESTORE BUTTON */}
         <View style={{ marginTop: 10, marginBottom: 20 }}>
           {isArchived ? (
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
-              style={[styles.mainActionBtn, { backgroundColor: colors.success }]}
+              style={[
+                styles.mainActionBtn,
+                { backgroundColor: colors.success },
+              ]}
               onPress={handleRestore}
             >
               <Text style={styles.mainActionBtnText}>
@@ -773,7 +884,7 @@ Notes: ${caseData?.notes || "-"}`;
               </Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={[styles.mainActionBtn, { backgroundColor: colors.danger }]}
               onPress={handleArchive}
@@ -793,7 +904,7 @@ Notes: ${caseData?.notes || "-"}`;
             <Text style={styles.modalTitle}>AI Case Assistant</Text>
             <Text style={styles.modalSub}>Choose an AI workflow</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -843,7 +954,7 @@ ${caseData?.status || "-"}
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -862,7 +973,7 @@ ${caseData?.status || "-"}
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -881,7 +992,7 @@ ${caseData?.status || "-"}
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.aiActionBtn}
               onPress={() => {
@@ -891,7 +1002,11 @@ ${caseData?.status || "-"}
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
               >
-                <Ionicons name="calendar-outline" size={16} color={colors.primaryDark} />
+                <Ionicons
+                  name="calendar-outline"
+                  size={16}
+                  color={colors.primaryDark}
+                />
                 <Text style={styles.aiActionText}>Next Hearing Strategy</Text>
               </View>
             </TouchableOpacity>
@@ -924,7 +1039,7 @@ ${caseData?.status || "-"}
 
             {generatedSummary ? (
               <>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
                   activeOpacity={0.7}
                   style={styles.aiActionBtn}
                   onPress={() => {
@@ -944,13 +1059,17 @@ ${caseData?.status || "-"}
                       gap: 6,
                     }}
                   >
-                    <Ionicons name="save-outline" size={16} color={colors.primaryDark} />
+                    <Ionicons
+                      name="save-outline"
+                      size={16}
+                      color={colors.primaryDark}
+                    />
                     <Text style={styles.aiActionText}>
                       Save Summary To Notes
                     </Text>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
                   activeOpacity={0.7}
                   style={styles.aiActionBtn}
                   onPress={async () => {
@@ -965,14 +1084,18 @@ ${caseData?.status || "-"}
                       gap: 6,
                     }}
                   >
-                    <Ionicons name="copy-outline" size={16} color={colors.primaryDark} />
+                    <Ionicons
+                      name="copy-outline"
+                      size={16}
+                      color={colors.primaryDark}
+                    />
                     <Text style={styles.aiActionText}>Copy Summary</Text>
                   </View>
                 </TouchableOpacity>
               </>
             ) : null}
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
               activeOpacity={0.7}
               style={styles.modalCancel}
               onPress={() => setShowAiAssistant(false)}
@@ -999,14 +1122,14 @@ ${caseData?.status || "-"}
               style={{ marginBottom: 40 }}
             />
             <View style={styles.modalActionRow}>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.modalCancel}
                 onPress={() => setAiLinkModalVisible(false)}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.modalSave}
                 onPress={async () => {
@@ -1045,7 +1168,7 @@ ${caseData?.status || "-"}
               style={{ marginBottom: 20 }}
             />
             <View style={styles.modalActionRow}>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.modalCancel}
                 onPress={() => {
@@ -1055,7 +1178,7 @@ ${caseData?.status || "-"}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.modalSave}
                 onPress={handleAddPayment}
@@ -1086,7 +1209,7 @@ const Row = ({ label, value, highlight, styles, colors }) => (
 );
 
 const ActionIconButton = ({ color, icon, onPress, styles }) => (
-  <TouchableOpacity accessibilityRole="button"
+  <TouchableOpacity
     activeOpacity={0.7}
     style={[styles.actionIconBtn, { backgroundColor: color }]}
     onPress={onPress}
@@ -1103,512 +1226,493 @@ const FeeBox = ({ label, val, color, styles, colors }) => (
 );
 
 // ======================== STYLES ========================
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: colors.background },
-  loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    mainContainer: { flex: 1, backgroundColor: colors.background },
+    loaderContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  newHeader: {
-    backgroundColor: colors.primary,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    zIndex: 10,
-  },
-  newHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-  newBackButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.15)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  newHeaderCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
-  newHeaderTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.surface,
-    letterSpacing: 0.5,
-  },
-  newHeaderSubtitle: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.8)",
-    marginTop: 4,
-    fontWeight: "500",
-  },
-  newAiCopyBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.15)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 20 },
 
-  scrollContent: { paddingHorizontal: 20, paddingTop: 20 },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    titleRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+    },
+    summaryHeaderRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    caseTitle: { fontSize: 18, fontWeight: "700", color: colors.text, flex: 1 },
+    caseCourt: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      marginTop: 4,
+      fontWeight: "500",
+    },
+    priorityBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 12,
+      marginLeft: 12,
+      overflow: "hidden",
+    },
+    priorityText: { fontSize: 10, fontWeight: "600", letterSpacing: 0.5 },
+    divider: { height: 1, backgroundColor: colors.border, marginVertical: 14 },
+    row: { flexDirection: "row", alignItems: "flex-start", paddingVertical: 8 },
+    rowLabel: {
+      width: "42%",
+      fontSize: 13,
+      color: colors.secondaryText,
+      fontWeight: "500",
+    },
+    rowValue: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.text,
+      fontWeight: "600",
+      textAlign: "right",
+    },
+    statusRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 8,
+    },
+    statusTag: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 12,
+      overflow: "hidden",
+    },
+    statusTagText: { fontSize: 10, fontWeight: "600", letterSpacing: 0.5 },
 
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  summaryHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  caseTitle: { fontSize: 18, fontWeight: "700", color: colors.text, flex: 1 },
-  caseCourt: {
-    fontSize: 13,
-    color: colors.secondaryText,
-    marginTop: 4,
-    fontWeight: "500",
-  },
-  priorityBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 12,
-    overflow: "hidden",
-  },
-  priorityText: { fontSize: 10, fontWeight: "600", letterSpacing: 0.5 },
-  divider: { height: 1, backgroundColor: colors.border, marginVertical: 14 },
-  row: { flexDirection: "row", alignItems: "flex-start", paddingVertical: 8 },
-  rowLabel: { width: "42%", fontSize: 13, color: colors.secondaryText, fontWeight: "500" },
-  rowValue: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.text,
-    fontWeight: "600",
-    textAlign: "right",
-  },
-  statusRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  statusTag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  statusTagText: { fontSize: 10, fontWeight: "600", letterSpacing: 0.5 },
+    // ==================== NEW ACTION BUTTONS ====================
+    actionSection: {
+      marginBottom: 16,
+      gap: 12,
+    },
+    actionRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 10,
+      marginTop: 15,
+    },
+    actionBtn: {
+      flex: 1,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingVertical: 14,
+      borderRadius: 14,
+      backgroundColor: colors.primaryLight,
+      borderWidth: 1,
+      borderColor: resolvedTheme === "dark" ? colors.border : "transparent",
+    },
+    actionBtnFull: {
+      flex: 1,
+    },
+    actionBtnThird: {
+      flex: 1,
+    },
+    actionBtnLabel: {
+      fontSize: 13,
+      fontWeight: "800",
+      marginLeft: 6,
+      color: colors.primary,
+    },
+    waBtn: {
+      backgroundColor:
+        resolvedTheme === "dark"
+          ? "rgba(16,185,129,0.15)"
+          : "rgba(5,150,105,0.10)",
+      borderWidth: 1,
+      borderColor:
+        resolvedTheme === "dark" ? "rgba(16,185,129,0.30)" : "transparent",
+    },
+    waText: {
+      color: colors.success,
+    },
+    dangerBtn: {
+      backgroundColor:
+        resolvedTheme === "dark"
+          ? "rgba(239,68,68,0.15)"
+          : "rgba(220,38,38,0.10)",
+      borderWidth: 1,
+      borderColor:
+        resolvedTheme === "dark" ? "rgba(239,68,68,0.30)" : "transparent",
+    },
+    dangerText: {
+      color: colors.danger,
+    },
 
-  // ==================== NEW ACTION BUTTONS ====================
-  actionSection: {
-    marginBottom: 16,
-    gap: 12,
-  },
-  actionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-    marginTop: 15,
-  },
-  actionBtn: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: colors.primaryLight,
-    borderWidth: 1,
-    borderColor:
-      resolvedTheme === "dark"
-        ? colors.border
-        : "transparent",
-  },
-  actionBtnFull: {
-    flex: 1,
-  },
-  actionBtnThird: {
-    flex: 1,
-  },
-  actionBtnLabel: {
-    fontSize: 13,
-    fontWeight: "800",
-    marginLeft: 6,
-    color: colors.primary,
-  },
-  waBtn: {
-    backgroundColor:
-      resolvedTheme === "dark"
-        ? "rgba(16,185,129,0.15)"
-        : "rgba(5,150,105,0.10)",
-    borderWidth: 1,
-    borderColor:
-      resolvedTheme === "dark"
-        ? "rgba(16,185,129,0.30)"
-        : "transparent",
-  },
-  waText: {
-    color: colors.success,
-  },
-  dangerBtn: {
-    backgroundColor:
-      resolvedTheme === "dark"
-        ? "rgba(239,68,68,0.15)"
-        : "rgba(220,38,38,0.10)",
-    borderWidth: 1,
-    borderColor:
-      resolvedTheme === "dark"
-        ? "rgba(239,68,68,0.30)"
-        : "transparent",
-  },
-  dangerText: {
-    color: colors.danger,
-  },
+    aiInsightsCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    aiInsightsHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 16,
+    },
+    aiInsightsTitle: { color: colors.text, fontSize: 16, fontWeight: "700" },
+    aiInsightsBadge: {
+      backgroundColor: colors.surface,
+      color: colors.text,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+      fontWeight: "600",
+      fontSize: 10,
+      letterSpacing: 0.5,
+      overflow: "hidden",
+    },
+    aiInsightItem: {
+      color: colors.secondaryText,
+      fontSize: 14,
+      marginBottom: 12,
+      fontWeight: "500",
+      lineHeight: 20,
+    },
 
-  aiInsightsCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  aiInsightsHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  aiInsightsTitle: { color: colors.text, fontSize: 16, fontWeight: "700" },
-  aiInsightsBadge: {
-    backgroundColor: colors.surface,
-    color: colors.text,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    fontWeight: "600",
-    fontSize: 10,
-    letterSpacing: 0.5,
-    overflow: "hidden",
-  },
-  aiInsightItem: {
-    color: colors.secondaryText,
-    fontSize: 14,
-    marginBottom: 12,
-    fontWeight: "500",
-    lineHeight: 20,
-  },
+    healthCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      alignItems: "center",
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    healthTitle: { fontSize: 18, fontWeight: "900", color: colors.text },
+    healthCircle: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      borderWidth: 6,
+      justifyContent: "center",
+      alignItems: "center",
+      marginVertical: 16,
+    },
+    healthPercent: { fontSize: 28, fontWeight: "900" },
+    healthRisk: { fontSize: 14, fontWeight: "900", letterSpacing: 0.5 },
 
-  healthCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    alignItems: "center",
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  healthTitle: { fontSize: 18, fontWeight: "900", color: colors.text },
-  healthCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 6,
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 16,
-  },
-  healthPercent: { fontSize: 28, fontWeight: "900" },
-  healthRisk: { fontSize: 14, fontWeight: "900", letterSpacing: 0.5 },
+    clientProfileRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 16,
+    },
+    clientAvatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 16,
+      backgroundColor: colors.surface,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    avatarText: { color: colors.primary, fontSize: 20, fontWeight: "700" },
+    clientNameText: { fontSize: 18, fontWeight: "700", color: colors.text },
+    clientSubText: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      fontWeight: "500",
+      marginTop: 4,
+    },
+    actionGrid: { flexDirection: "row", gap: 12 },
+    actionIconBtn: {
+      flex: 1,
+      height: 48,
+      borderRadius: 12,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  clientProfileRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  clientAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: colors.surface,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: { color: colors.primary, fontSize: 20, fontWeight: "700" },
-  clientNameText: { fontSize: 18, fontWeight: "700", color: colors.text },
-  clientSubText: {
-    fontSize: 13,
-    color: colors.secondaryText,
-    fontWeight: "500",
-    marginTop: 4,
-  },
-  actionGrid: { flexDirection: "row", gap: 12 },
-  actionIconBtn: {
-    flex: 1,
-    height: 48,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    feeGrid: { flexDirection: "row", gap: 12, marginBottom: 16 },
+    feeBox: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 14,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    feeBoxLabel: {
+      fontSize: 9,
+      fontWeight: "800",
+      color: colors.placeholder,
+      textTransform: "uppercase",
+    },
+    feeBoxVal: {
+      fontSize: 16,
+      fontWeight: "900",
+      color: colors.text,
+      marginTop: 4,
+    },
+    balanceRibbon: {
+      backgroundColor: colors.border,
+      padding: 16,
+      borderRadius: 20,
+      borderLeftWidth: 6,
+      borderLeftColor: colors.danger,
+    },
+    balanceLabel: {
+      fontSize: 10,
+      fontWeight: "700",
+      color: colors.secondaryText,
+      letterSpacing: 0.5,
+    },
+    balanceValue: {
+      fontSize: 22,
+      fontWeight: "700",
+      color: colors.primary,
+      marginTop: 4,
+    },
 
-  feeGrid: { flexDirection: "row", gap: 12, marginBottom: 16 },
-  feeBox: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  feeBoxLabel: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.placeholder,
-    textTransform: "uppercase",
-  },
-  feeBoxVal: {
-    fontSize: 16,
-    fontWeight: "900",
-    color: colors.text,
-    marginTop: 4,
-  },
-  balanceRibbon: {
-    backgroundColor: colors.border,
-    padding: 16,
-    borderRadius: 20,
-    borderLeftWidth: 6,
-    borderLeftColor: colors.danger,
-  },
-  balanceLabel: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: colors.secondaryText,
-    letterSpacing: 0.5,
-  },
-  balanceValue: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: colors.primary,
-    marginTop: 4,
-  },
+    sectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12,
+      marginTop: 8,
+    },
+    sectionTitle: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.secondaryText,
+      letterSpacing: 1.0,
+      textTransform: "uppercase",
+    },
+    addPaymentLink: { fontSize: 13, fontWeight: "600", color: colors.primary },
+    viewAllLink: { fontSize: 12, fontWeight: "600", color: colors.primary },
 
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.secondaryText,
-    letterSpacing: 1.0,
-    textTransform: "uppercase",
-  },
-  addPaymentLink: { fontSize: 13, fontWeight: "600", color: colors.primary },
-  viewAllLink: { fontSize: 12, fontWeight: "600", color: colors.primary },
+    timelineItem: { flexDirection: "row", marginBottom: 16 },
+    timelineLeft: { alignItems: "center", marginRight: 16 },
+    timelineDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: colors.primary,
+      marginTop: 4,
+    },
+    timelineLine: {
+      width: 1,
+      flex: 1,
+      backgroundColor: colors.border,
+      marginTop: 4,
+    },
+    timelineModernCard: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      padding: 16,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    timelineHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    timelineDate: { fontSize: 14, fontWeight: "600", color: colors.text },
+    delText: {
+      fontSize: 11,
+      color: colors.danger,
+      fontWeight: "600",
+      backgroundColor: colors.surface,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 8,
+      overflow: "hidden",
+    },
+    timelineStage: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.secondaryText,
+      marginTop: 6,
+    },
+    timelineNotes: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      marginTop: 6,
+      lineHeight: 20,
+    },
+    viewFullButton: {
+      marginTop: 8,
+      paddingVertical: 12,
+      alignItems: "center",
+      borderRadius: 12,
+      backgroundColor: colors.surface,
+    },
+    viewFullButtonText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.primary,
+    },
 
-  timelineItem: { flexDirection: "row", marginBottom: 16 },
-  timelineLeft: { alignItems: "center", marginRight: 16 },
-  timelineDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.primary,
-    marginTop: 4,
-  },
-  timelineLine: { width: 1, flex: 1, backgroundColor: colors.border, marginTop: 4 },
-  timelineModernCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  timelineHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  timelineDate: { fontSize: 14, fontWeight: "600", color: colors.text },
-  delText: {
-    fontSize: 11,
-    color: colors.danger,
-    fontWeight: "600",
-    backgroundColor: colors.surface,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  timelineStage: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: colors.secondaryText,
-    marginTop: 6,
-  },
-  timelineNotes: {
-    fontSize: 13,
-    color: colors.secondaryText,
-    marginTop: 6,
-    lineHeight: 20,
-  },
-  viewFullButton: {
-    marginTop: 8,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderRadius: 12,
-    backgroundColor: colors.surface,
-  },
-  viewFullButtonText: { fontSize: 13, fontWeight: "600", color: colors.primary },
+    cardSubtitle: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 8,
+    },
+    descriptionText: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      lineHeight: 22,
+    },
 
-  cardSubtitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 8,
-  },
-  descriptionText: { fontSize: 14, color: colors.secondaryText, lineHeight: 22 },
+    mainActionBtn: {
+      paddingVertical: 16,
+      borderRadius: 16,
+      alignItems: "center",
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    mainActionBtnText: {
+      color: colors.surface,
+      fontWeight: "700",
+      fontSize: 14,
+      letterSpacing: 0.5,
+    },
 
-  mainActionBtn: {
-    paddingVertical: 16,
-    borderRadius: 16,
-    alignItems: "center",
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  mainActionBtnText: {
-    color: colors.surface,
-    fontWeight: "700",
-    fontSize: 14,
-    letterSpacing: 0.5,
-  },
+    aiActionBtn: {
+      backgroundColor: colors.surface,
+      paddingVertical: 14,
+      borderRadius: 12,
+      marginBottom: 12,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 6,
+            elevation: 2,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    aiActionText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: "600",
+    },
 
-  aiActionBtn: {
-    backgroundColor: colors.surface,
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginBottom: 12,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(resolvedTheme === 'light' ? {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    } : {
-      elevation: 0,
-    }),
-  },
-  aiActionText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(15, 23, 42, 0.4)",
-    justifyContent: "center",
-    padding: 16,
-  },
-  modalCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    minHeight: 220,
-  },
-  modalTitle: { fontSize: 18, fontWeight: "700", color: colors.text },
-  modalSub: {
-    color: colors.secondaryText,
-    marginTop: 4,
-    marginBottom: 20,
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  modalActionRow: { flexDirection: "row", gap: 12, marginTop: 16 },
-  modalCancel: {
-    flex: 1,
-    paddingVertical: 14,
-    alignItems: "center",
-    backgroundColor: colors.border,
-    borderRadius: 12,
-  },
-  modalCancelText: { color: colors.secondaryText, fontWeight: "600" },
-  modalSave: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  modalSaveText: { color: colors.surface, fontWeight: "600" },
-  emptyText: {
-    color: colors.placeholder,
-    fontWeight: "600",
-    fontStyle: "italic",
-    textAlign: "center",
-    paddingVertical: 12,
-  },
-});
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(15, 23, 42, 0.4)",
+      justifyContent: "center",
+      padding: 16,
+    },
+    modalCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      minHeight: 220,
+    },
+    modalTitle: { fontSize: 18, fontWeight: "700", color: colors.text },
+    modalSub: {
+      color: colors.secondaryText,
+      marginTop: 4,
+      marginBottom: 20,
+      fontSize: 13,
+      fontWeight: "500",
+    },
+    modalActionRow: { flexDirection: "row", gap: 12, marginTop: 16 },
+    modalCancel: {
+      flex: 1,
+      paddingVertical: 14,
+      alignItems: "center",
+      backgroundColor: colors.border,
+      borderRadius: 12,
+    },
+    modalCancelText: { color: colors.secondaryText, fontWeight: "600" },
+    modalSave: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: "center",
+    },
+    modalSaveText: { color: colors.surface, fontWeight: "600" },
+    emptyText: {
+      color: colors.placeholder,
+      fontWeight: "600",
+      fontStyle: "italic",
+      textAlign: "center",
+      paddingVertical: 12,
+    },
+  });

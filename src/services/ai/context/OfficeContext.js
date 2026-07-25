@@ -20,41 +20,79 @@ export class OfficeContext {
      */
     static async build() {
         try {
-            // Note: We use the existing sqliteService for data fetching.
-            // A production implementation would optimize these queries.
-
             const allCases = await getAllCases();
 
             const dashboardStats = await this._fetchDashboardStats();
 
-            // Limit to 3 for context size management (tighter limits for production)
+            // Limit to 3 for context size management
             const recentCases = allCases ? allCases.slice(0, 3).map(c => ({
-                id: c.id, caseNo: c.caseNo, title: c.title, status: c.status
+                id: c.id,
+                caseNo: c.caseNo,
+                title: c.title,
+                status: c.status
             })) : [];
 
-            const { today, tomorrow } = HearingClassificationService.classifyHearings(allCases);
+            // Classify hearings using the fixed service (now falls back to nextHearingDate)
+            const {
+                today,
+                tomorrow,
+                upcoming,
+                overdue,
+                pipeline
+            } = HearingClassificationService.classifyHearings(allCases);
 
-            // Trim hearing details to keep context small
-            const mapHearing = h => ({ date: h.date, title: h.title, court: h.court });
-            const upcomingHearings = [...today.map(mapHearing), ...tomorrow.map(mapHearing)];
+            // Helper to format a hearing for the AI with all relevant details
+            const formatHearing = (c) => ({
+                title: c.title || 'Untitled Case',
+                court: c.court || 'Court not specified',
+                caseNo: c.caseNo || 'N/A',
+                judge: c.judge || 'Not assigned',
+                date: c.nextHearingDate || c.nextHearingISO || 'No date',
+                priority: c.priority || 'normal',
+                feeBalance: c.feeBalance || 0
+            });
+
+            // Build a structured hearings object
+            const hearings = {
+                today: today.map(formatHearing),
+                tomorrow: tomorrow.map(formatHearing),
+                upcoming: upcoming.map(formatHearing),
+                overdue: overdue.map(formatHearing),
+                pipeline: pipeline.map(formatHearing)
+            };
+
+            // Legacy flat array for backward compatibility
+            const upcomingHearings = [
+                ...today.map(formatHearing),
+                ...tomorrow.map(formatHearing),
+                ...upcoming.map(formatHearing)
+            ];
 
             return {
                 contextType: 'Office',
                 timestamp: toISO(new Date()),
                 dashboard: dashboardStats,
                 recentCases: recentCases,
-                upcomingHearings: upcomingHearings,
-                // Additional global data can be appended here (e.g. process fees, notes)
+                hearings,                // structured by category
+                upcomingHearings         // legacy flat list
             };
         } catch (error) {
             if (__DEV__) {
                 console.error('OfficeContext Error:', error.message);
             }
-            // Return minimal context on failure rather than crashing the AI
+            // Return minimal context on failure
             return {
                 contextType: 'Office',
                 error: 'Failed to fully load office context.',
                 timestamp: toISO(new Date()),
+                hearings: {
+                    today: [],
+                    tomorrow: [],
+                    upcoming: [],
+                    overdue: [],
+                    pipeline: []
+                },
+                upcomingHearings: []
             };
         }
     }

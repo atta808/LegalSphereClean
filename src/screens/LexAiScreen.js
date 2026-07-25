@@ -34,6 +34,7 @@ import LegalInput from "../components/LegalInput";
 import { LegalSphereEngine } from "../services/ai/core/LegalSphereEngine";
 import { AIEvents } from "../services/ai/core/AIEvents";
 import { LexAIRequest } from "../services/ai/core/models/Requests";
+import { FileIngestionService } from "../services/ai/document/FileIngestionService";
 
 // Sleek typing animation component
 const TypingIndicator = ({ styles, colors }) => {
@@ -84,10 +85,10 @@ const TypingIndicator = ({ styles, colors }) => {
   }, []);
 
   const dotStyle = (anim) => ({
-    width: 5,
-    height: 5,
+    width: 6,
+    height: 6,
     borderRadius: 3,
-    backgroundColor: colors.placeholder,
+    backgroundColor: colors.primary,
     marginHorizontal: 3,
     opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }),
     transform: [
@@ -110,15 +111,26 @@ const TypingIndicator = ({ styles, colors }) => {
 };
 
 const QUICK_ACTIONS = [
-  { icon: "calendar-today", label: "Today's Hearings", prompt: "Show me today's hearings" },
-  { icon: "calendar-arrow-right", label: "Tomorrow's Hearings", prompt: "Show me tomorrow's hearings" },
-  { icon: "view-dashboard", label: "Office Dashboard", prompt: "Show me the office dashboard" },
-  { icon: "clock-alert", label: "Pending Hearings", prompt: "Show me pending hearings" },
-  { icon: "format-list-bulleted", label: "Pipeline Cases", prompt: "Show me pipeline cases" },
-  { icon: "account-group", label: "Client Summary", prompt: "Show me the client summary" },
-  { icon: "currency-usd", label: "Fee Summary", prompt: "Show me the fee summary" },
-  { icon: "file-document-edit", label: "Draft Application", prompt: "Help me draft an application for" },
-  { icon: "scale-balance", label: "Legal Research", prompt: "Help me with legal research regarding" },
+  {
+    icon: "scale-balance",
+    label: "Case Law",
+    prompt: "Find relevant case law about",
+  },
+  {
+    icon: "file-document",
+    label: "Review Doc",
+    prompt: "Review this legal document:",
+  },
+  {
+    icon: "gavel",
+    label: "Precedents",
+    prompt: "Research legal precedent for",
+  },
+  {
+    icon: "clock-time",
+    label: "Limitations",
+    prompt: "What's the statute of limitations for",
+  },
 ];
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -138,6 +150,9 @@ export default function LexAiScreen() {
   const inputRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
 
+  // Animation value for send button
+  const sendButtonScale = useRef(new Animated.Value(0.9)).current;
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -148,6 +163,18 @@ export default function LexAiScreen() {
   const [isTyping, setIsTyping] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  // Derive active state for the send button to trigger animations
+  const isReadyToSend = input.trim().length > 0 && !loading && !isAttaching;
+
+  useEffect(() => {
+    Animated.spring(sendButtonScale, {
+      toValue: isReadyToSend ? 1 : 0.9,
+      friction: 5,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  }, [isReadyToSend, sendButtonScale]);
 
   useEffect(() => {
     loadMessages();
@@ -202,8 +229,9 @@ export default function LexAiScreen() {
           {
             id: "welcome",
             role: "ai",
-            text: `### Welcome to Lex AI\n\nYour intelligent legal office assistant.\n\n**Available capabilities**\n\n• Today's Hearings\n• Tomorrow's Hearings\n• Office Dashboard\n• Drafting\n• Legal Research\n• Document Analysis\n• Office Statistics\n\nHow may I assist you today?`,
+            text: "Welcome to your AI Workspace. I am Lex, your intelligent legal assistant.\n\nI operate in English by default for optimal legal precision, but feel free to ask questions in Urdu or any other language if you prefer.",
             timestamp: Date.now(),
+            isWelcome: true, // Tag added for specific UI rendering
           },
         ]);
       }
@@ -246,6 +274,7 @@ export default function LexAiScreen() {
                 role: "ai",
                 text: "✨ Workspace cleared. Ready for a new conversation.",
                 timestamp: Date.now(),
+                isWelcome: true,
               },
             ];
             setMessages(defaultMsg);
@@ -267,13 +296,7 @@ export default function LexAiScreen() {
   const handleAttachDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: [
-          "image/*",
-          "application/pdf",
-          "text/plain",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ],
+        type: ["image/*", "application/pdf"],
         copyToCacheDirectory: true,
         multiple: false,
       });
@@ -293,14 +316,7 @@ export default function LexAiScreen() {
         return;
       }
 
-      const docObj = {
-        uri: asset.uri,
-        name: asset.name,
-        type: asset.mimeType, // Map to what engine expects
-        size: asset.size,
-      };
-
-      setSelectedFile(docObj);
+      setSelectedFile(FileIngestionService.fromPickerAsset(asset));
       inputRef.current?.focus();
     } catch (error) {
       Alert.alert("Error", "Failed to process the document. Please try again.");
@@ -316,13 +332,16 @@ export default function LexAiScreen() {
   };
 
   const handleSendMessage = async () => {
-    if (!input.trim() || loading || isAttaching) return;
+    if (!isReadyToSend) return;
 
     const userRawText = input.trim();
     setInput("");
     setShowQuickActions(false);
-    Keyboard.dismiss();
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Don't forcefully dismiss keyboard to keep interaction fluid if user wants to keep typing
+    // Keyboard.dismiss();
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     const userMessage = {
       id: `user_${Date.now()}`,
@@ -384,12 +403,14 @@ export default function LexAiScreen() {
     ({ item }) => {
       const isUser = item.role === "user";
       const isCopied = copyFeedback === item.id;
+      const isWelcome = item.isWelcome;
 
       return (
         <Animated.View
           style={[
             styles.messageContainer,
             isUser ? styles.userAlign : styles.aiAlign,
+            isWelcome && styles.welcomeAlign,
             {
               opacity: scrollY.interpolate({
                 inputRange: [0, 100],
@@ -399,23 +420,41 @@ export default function LexAiScreen() {
             },
           ]}
         >
-          {!isUser && (
+          {!isUser && !isWelcome && (
             <View style={styles.avatarContainer}>
               <View style={styles.aiAvatar}>
-                <Ionicons name="sparkles" size={14} color={colors.text} />
+                <Ionicons name="sparkles" size={14} color={colors.primary} />
               </View>
             </View>
           )}
 
           <View
-            style={[styles.bubbleWrapper, isUser && styles.userBubbleWrapper]}
+            style={[
+              styles.bubbleWrapper,
+              isUser && styles.userBubbleWrapper,
+              isWelcome && styles.welcomeBubbleWrapper,
+            ]}
           >
             <View
               style={[
                 styles.messageBubble,
                 isUser ? styles.userBubble : styles.aiBubble,
+                isWelcome && styles.welcomeBubble,
               ]}
             >
+              {isWelcome && (
+                <View style={styles.welcomeHeader}>
+                  <View style={styles.welcomeIconContainer}>
+                    <Ionicons
+                      name="sparkles"
+                      size={20}
+                      color={colors.primary}
+                    />
+                  </View>
+                  <Text style={styles.welcomeTitle}>Lex AI</Text>
+                </View>
+              )}
+
               {isUser ? (
                 <Text style={[styles.messageText, styles.userText]}>
                   {item.text}
@@ -423,7 +462,11 @@ export default function LexAiScreen() {
               ) : (
                 <Markdown
                   style={{
-                    body: { ...styles.messageText, color: colors.text },
+                    body: {
+                      ...styles.messageText,
+                      color: isWelcome ? colors.text : colors.text,
+                      lineHeight: 24,
+                    },
                     paragraph: { marginTop: 0, marginBottom: 8 },
                   }}
                 >
@@ -433,7 +476,11 @@ export default function LexAiScreen() {
             </View>
 
             <View
-              style={[styles.messageFooter, isUser && styles.messageFooterUser]}
+              style={[
+                styles.messageFooter,
+                isUser && styles.messageFooterUser,
+                isWelcome && styles.welcomeFooter,
+              ]}
             >
               <Text style={styles.timestamp}>
                 {new Date(item.timestamp).toLocaleTimeString("en-US", {
@@ -451,7 +498,7 @@ export default function LexAiScreen() {
                 >
                   <Ionicons
                     name={isCopied ? "checkmark" : "copy-outline"}
-                    size={12}
+                    size={14}
                     color={isCopied ? colors.success : colors.placeholder}
                   />
                   <Text
@@ -466,11 +513,12 @@ export default function LexAiScreen() {
         </Animated.View>
       );
     },
-    [copyFeedback, scrollY],
+    [copyFeedback, scrollY, colors],
   );
 
   const renderQuickActions = () => (
     <View style={styles.quickActionsContainer}>
+      <Text style={styles.quickActionHeader}>SUGGESTED ACTIONS</Text>
       <View style={styles.quickActionsGrid}>
         {QUICK_ACTIONS.map((action, index) => (
           <TouchableOpacity
@@ -482,8 +530,8 @@ export default function LexAiScreen() {
           >
             <MaterialCommunityIcons
               name={action.icon}
-              size={16}
-              color={colors.text}
+              size={18}
+              color={colors.primary}
             />
             <Text style={styles.quickActionLabel}>{action.label}</Text>
           </TouchableOpacity>
@@ -498,31 +546,44 @@ export default function LexAiScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
-      {/* Clean Header */}
-      <PremiumPageHeader
-        title="Lex Workspace"
-        rightComponent={
-          <PremiumTouchable
-            accessibilityRole="button"
-            onPress={clearChatHistory}
-            style={styles.iconButton}
+      {/* COMPACT AI HEADER */}
+      <View style={styles.compactHeader}>
+        <View style={styles.compactHeaderLeft}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.compactHeaderIconBtn}
           >
-            <Ionicons
-              name="trash-outline"
-              size={18}
-              color={resolvedTheme === "dark" ? colors.danger : colors.surface}
-            />
-          </PremiumTouchable>
-        }
-      />
+            <Ionicons name="chevron-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <View style={styles.compactHeaderTitleContainer}>
+            <Text style={styles.compactHeaderTitle}>Lex Workspace</Text>
+            <View style={styles.compactHeaderSubtitleRow}>
+              <View style={styles.statusDot} />
+              <Text style={styles.compactHeaderSubtitle}>
+                AI Legal Assistant
+              </Text>
+            </View>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={clearChatHistory}
+          style={styles.compactHeaderIconBtn}
+        >
+          <Ionicons
+            name="trash-outline"
+            size={20}
+            color={colors.secondaryText}
+          />
+        </TouchableOpacity>
+      </View>
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         <AnimatedFlatList
           ref={flatListRef}
@@ -548,19 +609,23 @@ export default function LexAiScreen() {
 
         {isTyping && (
           <View style={styles.typingWrapper}>
+            <View style={styles.avatarContainerTyping}>
+              <View style={styles.aiAvatar}>
+                <Ionicons name="sparkles" size={14} color={colors.primary} />
+              </View>
+            </View>
             <View style={styles.typingBubble}>
               <TypingIndicator styles={styles} colors={colors} />
             </View>
           </View>
         )}
 
-        {/* Fixed Input Wrapper - Now properly positioned */}
         <View
           style={[
             styles.bottomInputWrapper,
             {
               paddingBottom:
-                Platform.OS === "ios" ? Math.max(insets.bottom, 20) : 20,
+                Platform.OS === "ios" ? Math.max(insets.bottom, 12) : 16,
             },
           ]}
         >
@@ -569,8 +634,8 @@ export default function LexAiScreen() {
               <View style={styles.selectedFileChip}>
                 <Ionicons
                   name="document-text"
-                  size={14}
-                  color={colors.primary}
+                  size={16}
+                  color={colors.surface}
                 />
                 <Text style={styles.selectedFileName} numberOfLines={1}>
                   {selectedFile.name}
@@ -578,15 +643,13 @@ export default function LexAiScreen() {
                 <TouchableOpacity
                   accessibilityRole="button"
                   onPress={() => setSelectedFile(null)}
+                  style={styles.clearFileBtn}
                 >
-                  <Ionicons
-                    name="close-circle"
-                    size={16}
-                    color={colors.placeholder}
-                  />
+                  <Ionicons name="close" size={16} color={colors.surface} />
                 </TouchableOpacity>
               </View>
             )}
+
             <View style={styles.inputInner}>
               <TouchableOpacity
                 accessibilityRole="button"
@@ -597,7 +660,7 @@ export default function LexAiScreen() {
                 {isAttaching ? (
                   <ActivityIndicator size="small" color={colors.text} />
                 ) : (
-                  <Ionicons name="add" size={24} color={colors.secondaryText} />
+                  <Ionicons name="add" size={28} color={colors.secondaryText} />
                 )}
               </TouchableOpacity>
 
@@ -612,19 +675,25 @@ export default function LexAiScreen() {
                 returnKeyType="default"
               />
 
-              <TouchableOpacity
-                accessibilityRole="button"
-                onPress={handleSendMessage}
-                disabled={!input.trim() || loading || isAttaching}
-                style={[
-                  styles.sendButton,
-                  input.trim() && !loading && !isAttaching
-                    ? styles.sendActive
-                    : styles.sendDisabled,
-                ]}
+              <Animated.View
+                style={{ transform: [{ scale: sendButtonScale }] }}
               >
-                <Ionicons name="arrow-up" size={18} color={colors.surface} />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={handleSendMessage}
+                  disabled={!isReadyToSend}
+                  style={[
+                    styles.sendButton,
+                    isReadyToSend ? styles.sendActive : styles.sendDisabled,
+                  ]}
+                >
+                  <Ionicons
+                    name="arrow-up"
+                    size={20}
+                    color={isReadyToSend ? "#FFFFFF" : colors.placeholder}
+                  />
+                </TouchableOpacity>
+              </Animated.View>
             </View>
           </View>
         </View>
@@ -634,12 +703,12 @@ export default function LexAiScreen() {
       {loading && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <BlurView
-            intensity={20}
-            tint="dark"
+            intensity={30}
+            tint={resolvedTheme === "dark" ? "dark" : "light"}
             style={StyleSheet.absoluteFill}
           />
           <View style={styles.loadingPill}>
-            <ActivityIndicator size="small" color={colors.text} />
+            <ActivityIndicator size="small" color={colors.primary} />
             <Text style={styles.loadingText}>{loadingMessage}</Text>
           </View>
         </View>
@@ -654,57 +723,73 @@ const createStyles = (colors, resolvedTheme) =>
       flex: 1,
       backgroundColor: colors.background,
     },
-    header: {
+
+    // Compact Standardized AI Header
+    compactHeader: {
       flexDirection: "row",
-      height: 56,
+      height: 60,
       alignItems: "center",
       justifyContent: "space-between",
-      paddingHorizontal: 16,
+      paddingHorizontal: 12,
       backgroundColor:
-        resolvedTheme === "dark" ? colors.surface : colors.primary,
+        resolvedTheme === "dark" ? colors.surface : colors.background,
       borderBottomWidth: 1,
-      borderBottomColor:
-        resolvedTheme === "dark" ? colors.border : colors.primary,
+      borderBottomColor: colors.border,
       zIndex: 10,
     },
-    headerLeft: {
+    compactHeaderLeft: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 12,
+      gap: 8,
     },
-    iconButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+    compactHeaderIconBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor:
-        resolvedTheme === "dark" ? colors.card : "rgba(255,255,255,0.15)",
-      borderWidth: 1,
-      borderColor:
-        resolvedTheme === "dark" ? colors.border : "rgba(255,255,255,0.1)",
     },
-    headerTitleContainer: {
+    compactHeaderTitleContainer: {
+      justifyContent: "center",
+    },
+    compactHeaderTitle: {
+      fontSize: 17,
+      fontWeight: "700",
+      color: colors.text,
+      letterSpacing: -0.4,
+    },
+    compactHeaderSubtitleRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-    },
-    headerTitle: {
-      fontSize: 16,
-      fontWeight: "700",
-      color: resolvedTheme === "dark" ? colors.primary : colors.surface,
-      letterSpacing: -0.3,
+      marginTop: 2,
     },
     statusDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
+      width: 8,
+      height: 8,
+      borderRadius: 4,
       backgroundColor: colors.success,
+      borderWidth: 1,
+      borderColor: colors.background,
+    },
+    compactHeaderSubtitle: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      fontWeight: "500",
+    },
+
+    // Message List Styling
+    scrollWindow: {
+      paddingHorizontal: 16,
+      paddingTop: 24,
+      paddingBottom: 24,
+      gap: 20,
+      flexGrow: 1,
     },
     messageContainer: {
       flexDirection: "row",
       width: "100%",
-      marginBottom: 6,
+      marginBottom: 8,
     },
     userAlign: {
       justifyContent: "flex-end",
@@ -712,117 +797,169 @@ const createStyles = (colors, resolvedTheme) =>
     aiAlign: {
       justifyContent: "flex-start",
     },
-    avatarContainer: {
-      marginRight: 10,
-      alignSelf: "flex-end",
+    welcomeAlign: {
+      justifyContent: "center",
+      marginTop: 10,
       marginBottom: 20,
     },
+    avatarContainer: {
+      marginRight: 12,
+      alignSelf: "flex-end",
+      marginBottom: 24,
+    },
+    avatarContainerTyping: {
+      marginRight: 12,
+      alignSelf: "center",
+    },
     aiAvatar: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
-      backgroundColor: colors.border,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: resolvedTheme === "dark" ? "#2A2A2A" : "#F0F4F8",
       borderWidth: 1,
       borderColor: colors.border,
       alignItems: "center",
       justifyContent: "center",
     },
     bubbleWrapper: {
-      maxWidth: "80%",
+      maxWidth: "85%",
     },
     userBubbleWrapper: {
-      maxWidth: "75%",
+      maxWidth: "80%",
+    },
+    welcomeBubbleWrapper: {
+      maxWidth: "95%",
+      width: "100%",
     },
     messageBubble: {
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderRadius: 20,
+      paddingHorizontal: 18,
+      paddingVertical: 14,
+      borderRadius: 24,
     },
     userBubble: {
       backgroundColor: colors.primary,
-      borderBottomRightRadius: 4,
+      borderBottomRightRadius: 6,
     },
     aiBubble: {
       backgroundColor: colors.surface,
-      borderBottomLeftRadius: 4,
+      borderBottomLeftRadius: 6,
       borderWidth: 1,
       borderColor: colors.border,
       ...(resolvedTheme === "light"
         ? {
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.04,
-            shadowRadius: 4,
-            elevation: 2,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.03,
+            shadowRadius: 3,
+            elevation: 1,
           }
         : {
             elevation: 0,
           }),
     },
+    welcomeBubble: {
+      backgroundColor: resolvedTheme === "dark" ? colors.surface : "#F8FAFC",
+      borderRadius: 24,
+      borderBottomLeftRadius: 24,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 24,
+    },
+    welcomeHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: 16,
+    },
+    welcomeIconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: resolvedTheme === "dark" ? "#2A2A2A" : "#E2E8F0",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    welcomeTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.text,
+      letterSpacing: -0.5,
+    },
     messageText: {
-      fontSize: 15,
-      lineHeight: 22,
+      fontSize: 16,
+      lineHeight: 24,
       fontWeight: "400",
     },
     userText: {
-      color: colors.surface,
-    },
-    aiText: {
-      color: colors.text,
+      color: "#FFFFFF",
     },
     messageFooter: {
       flexDirection: "row",
       alignItems: "center",
-      marginTop: 6,
-      paddingHorizontal: 4,
-      gap: 12,
+      marginTop: 8,
+      paddingHorizontal: 6,
+      gap: 16,
     },
     messageFooterUser: {
       justifyContent: "flex-end",
     },
+    welcomeFooter: {
+      justifyContent: "flex-start",
+      marginTop: 12,
+    },
     timestamp: {
-      fontSize: 11,
+      fontSize: 12,
       color: colors.placeholder,
       fontWeight: "500",
     },
     copyButton: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 4,
+      gap: 6,
     },
     copyText: {
-      fontSize: 11,
+      fontSize: 12,
       color: colors.placeholder,
       fontWeight: "600",
     },
     copyTextActive: {
       color: colors.success,
     },
+
+    // Quick Actions
     quickActionsContainer: {
-      paddingBottom: 16,
-      paddingTop: 8,
+      paddingBottom: 24,
+      paddingTop: 12,
+      paddingHorizontal: 4,
+    },
+    quickActionHeader: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.placeholder,
+      marginBottom: 12,
+      letterSpacing: 0.5,
     },
     quickActionsGrid: {
       flexDirection: "row",
       flexWrap: "wrap",
-      gap: 8,
+      gap: 10,
     },
     quickActionItem: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: 8,
       backgroundColor: colors.surface,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      borderRadius: 24,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderRadius: 20,
       borderWidth: 1,
       borderColor: colors.border,
       ...(resolvedTheme === "light"
         ? {
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.04,
-            shadowRadius: 3,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 2,
             elevation: 2,
           }
         : {
@@ -830,61 +967,138 @@ const createStyles = (colors, resolvedTheme) =>
           }),
     },
     quickActionLabel: {
-      fontSize: 13,
-      fontWeight: "500",
+      fontSize: 14,
+      fontWeight: "600",
       color: colors.text,
     },
+
+    // Typing Indicator
     typingWrapper: {
+      flexDirection: "row",
       paddingHorizontal: 16,
-      paddingBottom: 8,
+      paddingBottom: 16,
+      alignItems: "flex-end",
     },
     typingBubble: {
       backgroundColor: colors.surface,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      borderRadius: 20,
-      borderBottomLeftRadius: 4,
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderRadius: 24,
+      borderBottomLeftRadius: 6,
       borderWidth: 1,
       borderColor: colors.border,
-      alignSelf: "flex-start",
     },
     typingContainer: {
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
+      height: 10,
+    },
+
+    // Bottom Input
+    bottomInputWrapper: {
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      backgroundColor: colors.background,
+      borderTopWidth: 0,
+    },
+    inputGlass: {
+      borderRadius: 28,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.08,
+            shadowRadius: 16,
+            elevation: 4,
+          }
+        : {
+            elevation: 0,
+          }),
+    },
+    inputInner: {
+      flexDirection: "row",
+      alignItems: "flex-end", // Aligns buttons to the bottom as the input grows
+      paddingHorizontal: 6,
+      paddingVertical: 6,
     },
     attachButton: {
-      width: 40,
-      height: 40,
+      width: 44,
+      height: 44,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 20,
-      backgroundColor: colors.border,
-      marginRight: 8,
+      borderRadius: 22,
+      marginRight: 4,
     },
     textInputModifier: {
       flex: 1,
-      fontSize: 15,
+      fontSize: 16,
+      lineHeight: 22,
       color: colors.text,
-      maxHeight: 100,
-      minHeight: 40,
-      paddingTop: 10,
-      paddingBottom: 10,
+      maxHeight: 120,
+      minHeight: 44,
+      paddingTop: 12, // Keeps text vertically centered when single line
+      paddingBottom: 12,
       paddingHorizontal: 8,
     },
+
+    // Refined Send Button
     sendButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       alignItems: "center",
       justifyContent: "center",
-      marginLeft: 8,
+      marginLeft: 4,
     },
     sendActive: {
-      backgroundColor: colors.primary,
+      backgroundColor: colors.primary, // Using primary color to ensure deep contrast
+      ...(resolvedTheme === "light"
+        ? {
+            shadowColor: colors.primary,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 4,
+          }
+        : {
+            elevation: 0,
+          }),
     },
     sendDisabled: {
       backgroundColor: colors.border,
+      opacity: 0.6,
     },
+
+    // Document Chip
+    selectedFileChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary, // Changed to primary for better file visibility
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 16,
+      marginHorizontal: 12,
+      marginTop: 12,
+      gap: 8,
+      alignSelf: "flex-start",
+    },
+    selectedFileName: {
+      fontSize: 13,
+      color: "#FFFFFF",
+      fontWeight: "600",
+      maxWidth: 200,
+    },
+    clearFileBtn: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      borderRadius: 10,
+      padding: 2,
+    },
+
+    // Loading Overlay
     loadingOverlay: {
       ...StyleSheet.absoluteFillObject,
       alignItems: "center",
@@ -895,81 +1109,27 @@ const createStyles = (colors, resolvedTheme) =>
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: colors.surface,
-      paddingHorizontal: 20,
-      paddingVertical: 12,
-      borderRadius: 30,
-      gap: 12,
+      paddingHorizontal: 24,
+      paddingVertical: 16,
+      borderRadius: 32,
+      gap: 16,
       borderWidth: 1,
       borderColor: colors.border,
       ...(resolvedTheme === "light"
         ? {
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.1,
-            shadowRadius: 16,
-            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.15,
+            shadowRadius: 20,
+            elevation: 8,
           }
         : {
             elevation: 0,
           }),
     },
     loadingText: {
-      fontSize: 14,
+      fontSize: 15,
       color: colors.text,
-      fontWeight: "500",
-    },
-    scrollWindow: {
-      paddingHorizontal: 16,
-      paddingTop: 16,
-      paddingBottom: 140, // Increased significantly for keyboard space
-      gap: 16,
-      flexGrow: 1,
-    },
-    bottomInputWrapper: {
-      paddingHorizontal: 16,
-      paddingTop: 8,
-      backgroundColor: colors.background,
-      borderTopWidth: 0,
-      // Removed absolute positioning
-    },
-    inputGlass: {
-      borderRadius: 32,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      ...(resolvedTheme === "light"
-        ? {
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.05,
-            shadowRadius: 12,
-            elevation: 3,
-          }
-        : {
-            elevation: 0,
-          }),
-    },
-    inputInner: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: 8,
-      paddingVertical: 8,
-    },
-    selectedFileChip: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.background,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 16,
-      marginHorizontal: 12,
-      marginTop: 8,
-      gap: 6,
-    },
-    selectedFileName: {
-      flex: 1,
-      fontSize: 12,
-      color: colors.text,
-      fontWeight: "500",
+      fontWeight: "600",
     },
   });

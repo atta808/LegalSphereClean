@@ -1,8 +1,8 @@
 import React from "react";
-import PremiumPageHeader from '../components/PremiumPageHeader';
-import PremiumTouchable from '../components/PremiumTouchable';
-import SkeletonLoader from '../components/SkeletonLoader';
-import EmptyState from '../components/EmptyState';
+import PremiumPageHeader from "../components/PremiumPageHeader";
+import PremiumTouchable from "../components/PremiumTouchable";
+import SkeletonLoader from "../components/SkeletonLoader";
+import EmptyState from "../components/EmptyState";
 import { useTheme } from "../theme/ThemeContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useState } from "react";
@@ -13,17 +13,23 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-// Updated imports for the premium expandable features
 import { CalendarProvider, ExpandableCalendar } from "react-native-calendars";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getAllCases, getProfile } from "../services/sqliteService";
 import { formatMoney, getCurrency } from "../utils/currency";
 import { toYMD } from "../utils/date";
+
 export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
   const { colors, resolvedTheme } = useTheme();
-  const calendarTheme = React.useMemo(() => getCalendarTheme(colors, resolvedTheme), [colors, resolvedTheme]);
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const calendarTheme = React.useMemo(
+    () => getCalendarTheme(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const [currentProfile, setCurrentProfile] = useState(profile || {});
   const currency = getCurrency(currentProfile);
   const locale = currentProfile?.locale || "en-PK";
@@ -33,7 +39,6 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
   const [selectedDate, setSelectedDate] = useState(toYMD(new Date()));
   const [allCases, setAllCases] = useState([]);
 
-  // Logic remains untouched as requested
   const loadCases = useCallback(async () => {
     try {
       const data = await getAllCases();
@@ -66,10 +71,8 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
       const init = async () => {
         const fresh = await getProfile();
         if (fresh) setCurrentProfile(fresh);
-
-        await loadCases(); // keep your existing logic
+        await loadCases();
       };
-
       init();
     }, [loadCases]),
   );
@@ -80,37 +83,44 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
     return localKey === selectedDate;
   });
 
+  const goToToday = () => {
+    setSelectedDate(toYMD(new Date()));
+  };
+
   return (
     <View style={styles.container}>
-            {/* PREMIUM HEADER */}
+      {/* HEADER - Migrated to PremiumPageHeader V5.1 */}
       <PremiumPageHeader
         title="Chamber Calendar"
         subtitle="OFFICIAL DIARY"
+        headerVariant="large"
+        showBackButton={true}
         onBack={() => {
-          if (navigation.canGoBack()) {
+          if (onBack) {
+            onBack();
+          } else if (navigation.canGoBack()) {
             navigation.goBack();
           } else {
-            navigation.navigate("Dashboard"); // or MainTabs
+            navigation.navigate("Dashboard");
           }
         }}
-        rightComponent={
-          <PremiumTouchable accessibilityRole="button"
-            style={styles.todayBtn}
-            onPress={() => setSelectedDate(toYMD(new Date()))}
-          >
-            <Text style={styles.todayText}>Today</Text>
-          </PremiumTouchable>
-        }
+        actions={[
+          {
+            icon: "calendar-outline",
+            onPress: goToToday,
+            accessibilityLabel: "Today",
+            accessibilityHint: "Jump to today's date",
+          },
+        ]}
       />
 
-      {/* EXPANDABLE CALENDAR SECTION */}
       <CalendarProvider
         date={selectedDate}
         onDateChanged={(date) => setSelectedDate(date)}
         showTodayButton={false}
       >
         <ExpandableCalendar
-          initialPosition={ExpandableCalendar.positions.CLOSED} // Starts in Weekly view for premium feel
+          initialPosition={ExpandableCalendar.positions.CLOSED}
           markingType="multi-dot"
           markedDates={{
             ...markedDates,
@@ -125,7 +135,9 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
           style={styles.calendarBorder}
         />
 
-        <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 }]}>
+        <ScrollView
+          contentContainerStyle={[styles.content, { paddingBottom: 120 }]}
+        >
           <View style={styles.agendaHeader}>
             <Text style={styles.agendaTitle}>Hearings & Tasks</Text>
             <Text style={styles.caseCount}>{agendaList.length} Scheduled</Text>
@@ -139,11 +151,22 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
                 color={colors.placeholder}
                 style={{ marginBottom: 16 }}
               />
-              <EmptyState icon={<Ionicons name="calendar-outline" size={64} color={colors.placeholder} />} title="No Hearings" description="Enjoy your free day." style={{ minHeight: 200 }} />
+              <EmptyState
+                icon={
+                  <Ionicons
+                    name="calendar-outline"
+                    size={64}
+                    color={colors.placeholder}
+                  />
+                }
+                title="No Hearings"
+                description="Enjoy your free day."
+                style={{ minHeight: 200 }}
+              />
             </View>
           ) : (
             agendaList.map((item) => (
-              <PremiumTouchable accessibilityRole="button"
+              <PremiumTouchable
                 key={item.id}
                 style={styles.card}
                 onPress={() =>
@@ -153,7 +176,9 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
                 <View
                   style={[
                     styles.priorityIndicator,
-                    { backgroundColor: getPriorityColor(item.priority, colors) },
+                    {
+                      backgroundColor: getPriorityColor(item.priority, colors),
+                    },
                   ]}
                 />
                 <View style={styles.cardMain}>
@@ -183,6 +208,18 @@ export default function CalendarScreen({ onBack, onOpenCaseDetail, profile }) {
                       {item.court || "District Court"}
                     </Text>
                   </View>
+
+                  {item.judge ? (
+                    <View style={styles.judgeRow}>
+                      <Ionicons
+                        name="person-outline"
+                        size={14}
+                        color={colors.secondaryText}
+                        style={{ marginRight: 4 }}
+                      />
+                      <Text style={styles.caseJudge}>{item.judge}</Text>
+                    </View>
+                  ) : null}
                   <View style={styles.footerRow}>
                     <View
                       style={[
@@ -229,7 +266,6 @@ const getPriorityColor = (p, colors) => {
 };
 
 const getCalendarTheme = (colors, resolvedTheme) => ({
-
   backgroundColor: colors.surface,
   calendarBackground: colors.surface,
   textSectionTitlecolor: colors.secondaryText,
@@ -248,115 +284,81 @@ const getCalendarTheme = (colors, resolvedTheme) => ({
   textDayFontSize: 14,
   textMonthFontSize: 18,
   textDayHeaderFontSize: 12,
-
 });
 
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.border },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: colors.surface,
-  },
-  backIcon: { color: colors.primary, fontSize: 24, fontWeight: "300" },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.primary,
-    letterSpacing: -0.5,
-  },
-  badge: {
-    backgroundColor: "rgba(26, 115, 232, 0.1)",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    marginTop: 2,
-  },
-  badgeText: { fontSize: 8, fontWeight: "600", color: colors.primary },
-  todayBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    backgroundColor: colors.border,
-  },
-  todayText: { color: colors.primary, fontSize: 12, fontWeight: "700" },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.border },
+    calendarBorder: {
+      borderBottomLeftRadius: 25,
+      borderBottomRightRadius: 25,
+      borderBottomWidth: 1,
+      borderColor: colors.border,
+    },
+    content: { padding: 20, paddingBottom: 100 },
+    agendaHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "baseline",
+      marginBottom: 15,
+    },
+    agendaTitle: { fontSize: 20, fontWeight: "700", color: colors.text },
+    caseCount: { fontSize: 12, color: colors.secondaryText, fontWeight: "600" },
+    card: {
+      flexDirection: "row",
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: "hidden",
+    },
+    priorityIndicator: { width: 4 },
+    cardMain: { flex: 1, padding: 16 },
+    cardRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    caseTitle: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.text,
+      flex: 1,
+      marginRight: 10,
+    },
+    caseFee: { fontSize: 14, color: colors.success, fontWeight: "600" },
+    caseCourt: {
+      fontSize: 13,
+      color: colors.secondaryText,
+      fontWeight: "500",
+    },
+    judgeRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 2,
+    },
 
-  calendarBorder: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 10 },
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-    elevation: 0,
-    shadowOpacity: 0,
-  },
-
-  content: { padding: 20, paddingBottom: 100 },
-  agendaHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    marginBottom: 15,
-  },
-  agendaTitle: { fontSize: 20, fontWeight: "700", color: colors.text },
-  caseCount: { fontSize: 12, color: colors.secondaryText, fontWeight: "600" },
-
-  card: {
-    flexDirection: "row",
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    marginBottom: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 0,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: "hidden",
-  },
-  priorityIndicator: { width: 4 },
-  cardMain: { flex: 1, padding: 16 },
-  cardRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  caseTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.text,
-    flex: 1,
-    marginRight: 10,
-  },
-  caseFee: { fontSize: 14, color: colors.success, fontWeight: "600" },
-  caseCourt: {
-    fontSize: 13,
-    color: colors.secondaryText,
-    fontWeight: "500",
-  },
-  footerRow: { marginTop: 10, flexDirection: "row" },
-  tag: {
-    backgroundColor: colors.background,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tagText: { fontSize: 9, fontWeight: "700", color: colors.secondaryText },
-
-  emptyCard: {
-    padding: 40,
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    marginTop: 20,
-  },
-  emptyIcon: { fontSize: 40, marginBottom: 10 },
-  emptyText: { color: colors.placeholder, fontWeight: "600" },
-});
+    caseJudge: {
+      fontSize: 13,
+      color: colors.text,
+      fontWeight: "600",
+    },
+    footerRow: { marginTop: 10, flexDirection: "row" },
+    tag: {
+      backgroundColor: colors.background,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    tagText: { fontSize: 9, fontWeight: "700", color: colors.secondaryText },
+    emptyCard: {
+      padding: 40,
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      marginTop: 20,
+    },
+  });

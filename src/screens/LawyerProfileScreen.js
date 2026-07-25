@@ -117,8 +117,19 @@ export default function LawyerProfileScreen({ navigation }) {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.mainWrapper}>
-        {/* HEADER */}
-        <PremiumPageHeader title="Professional Profile" subtitle="Advocate Identity" />
+        {/* HEADER - Enhanced with complete configuration */}
+        <PremiumPageHeader
+          title="Professional Profile"
+          subtitle={profile.name || "Advocate Identity"}
+          footer={profile.court ? `Jurisdiction: ${profile.court}` : "Set your legal jurisdiction"}
+          onBack={() => navigation.goBack()}
+          showBackButton={true}
+          headerVariant="default"
+          backgroundVariant="surface"
+          showDivider={true}
+          showShadow={true}
+          elevationLevel={2}
+        />
 
         <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
           {/* IMAGE */}
@@ -255,28 +266,6 @@ export default function LawyerProfileScreen({ navigation }) {
 const createStyles = (colors, resolvedTheme) => StyleSheet.create({
   mainWrapper: { flex: 1, backgroundColor: colors.border },
 
-  backIcon: {
-    fontSize: 28,
-    color: colors.primary,
-    marginTop: -4,
-  },
-
-  titleCenter: { flex: 1, alignItems: "center" },
-
-  jurisdictionPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-
-  jurisdictionText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.primary,
-  },
-
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 20,
@@ -337,6 +326,16 @@ const createStyles = (colors, resolvedTheme) => StyleSheet.create({
     color: colors.primary,
     marginBottom: 15,
   },
+
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  fieldIcon: {
+    marginRight: 10,
+  },
+
   saveBtn: {
     padding: 16,
     borderRadius: 15,

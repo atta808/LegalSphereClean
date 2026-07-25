@@ -1,6 +1,6 @@
 // screens/SettingsScreen.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import PremiumPageHeader from '../components/PremiumPageHeader';
+import PremiumPageHeader from "../components/PremiumPageHeader";
 import LegalPicker from "../components/LegalPicker";
 import LegalInput from "../components/LegalInput";
 import * as ImagePicker from "expo-image-picker";
@@ -31,9 +31,11 @@ import {
 import { useTheme } from "../theme/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 export default function SettingsScreen({ navigation }) {
-
   const { currentTheme, setTheme, colors, resolvedTheme } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors, resolvedTheme), [colors, resolvedTheme]);
+  const styles = React.useMemo(
+    () => createStyles(colors, resolvedTheme),
+    [colors, resolvedTheme],
+  );
   const insets = useSafeAreaInsets();
   const [profileReady, setProfileReady] = useState(false);
   const [countryPickerVisible, setCountryPickerVisible] = useState(false);
@@ -46,7 +48,7 @@ export default function SettingsScreen({ navigation }) {
     jurisdiction: "",
     image: null,
     country: "PK",
-    defaultClientCountry: "PK", // ✅ NEW
+    defaultClientCountry: "PK",
     currency: "PKR",
     locale: "en-PK",
 
@@ -87,7 +89,7 @@ export default function SettingsScreen({ navigation }) {
           await saveProfile(defaultProfile);
         }
 
-        setProfileReady(true); // ✅ CRITICAL
+        setProfileReady(true);
       } catch (e) {
         console.log("Profile load error", e);
       }
@@ -168,10 +170,8 @@ export default function SettingsScreen({ navigation }) {
         activeCMS: updatedCMS,
       };
 
-      // ✅ UPDATE UI IMMEDIATELY
       setProfile(updatedProfile);
 
-      // ✅ SAVE TO SQLITE
       await saveProfile(updatedProfile);
 
       console.log("✅ CMS Saved:", updatedProfile.activeCMS);
@@ -246,7 +246,23 @@ export default function SettingsScreen({ navigation }) {
   };
   return (
     <View style={styles.container}>
-      <PremiumPageHeader title="Settings" subtitle="App Preferences" />
+      {/* HEADER - Enhanced with complete configuration */}
+      <PremiumPageHeader
+        title="Settings"
+        subtitle={
+          profile.name
+            ? `${profile.name} • ${profile.jurisdiction || "No Jurisdiction"}`
+            : "App Preferences"
+        }
+        footer={`${profile.country || "PK"} • ${profile.currency || "PKR"} • ${profile.locale || "en-PK"}`}
+        onBack={() => navigation.goBack()}
+        showBackButton={true}
+        headerVariant="default"
+        backgroundVariant="surface"
+        showDivider={true}
+        showShadow={true}
+        elevationLevel={2}
+      />
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         {/* HEADER */}
         <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
@@ -267,7 +283,8 @@ export default function SettingsScreen({ navigation }) {
             {profile.jurisdiction || "Add Jurisdiction"}
           </Text>
 
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.editBtn}
             onPress={() => navigation.navigate("LawyerProfile")}
           >
@@ -283,7 +300,8 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Country</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -331,7 +349,8 @@ export default function SettingsScreen({ navigation }) {
                 placeholder="https://examplecourt.gov"
               />
 
-              <TouchableOpacity accessibilityRole="button"
+              <TouchableOpacity
+                accessibilityRole="button"
                 onPress={addCustomCMS}
                 style={{
                   backgroundColor: colors.primary,
@@ -356,7 +375,8 @@ export default function SettingsScreen({ navigation }) {
               const enabled = profile.activeCMS?.includes(cms.id);
 
               return (
-                <TouchableOpacity accessibilityRole="button"
+                <TouchableOpacity
+                  accessibilityRole="button"
                   key={cms.id}
                   style={[
                     styles.item,
@@ -400,7 +420,8 @@ export default function SettingsScreen({ navigation }) {
               placeholder="https://www.pakistanlawsite.com"
             />
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               onPress={addResearchSource}
               style={{
                 backgroundColor: colors.primary,
@@ -438,7 +459,8 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Default Client Country</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -462,7 +484,8 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Currency</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -486,7 +509,8 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.item}>
             <Text style={styles.label}>Date Format</Text>
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               activeOpacity={0.85}
               style={{
                 paddingVertical: 14,
@@ -516,7 +540,8 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Appearance</Text>
           <View style={styles.item}>
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.themeRow}
               onPress={() => setTheme("light")}
             >
@@ -528,7 +553,8 @@ export default function SettingsScreen({ navigation }) {
 
             <View style={styles.themeDivider} />
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.themeRow}
               onPress={() => setTheme("dark")}
             >
@@ -540,7 +566,8 @@ export default function SettingsScreen({ navigation }) {
 
             <View style={styles.themeDivider} />
 
-            <TouchableOpacity accessibilityRole="button"
+            <TouchableOpacity
+              accessibilityRole="button"
               style={styles.themeRow}
               onPress={() => setTheme("system")}
             >
@@ -556,7 +583,8 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Help</Text>
 
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.item}
             onPress={() => Linking.openURL("mailto:support@technaam.com")}
           >
@@ -567,7 +595,8 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Cloud & Backup</Text>
 
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.item}
             onPress={() =>
               Alert.alert(
@@ -602,7 +631,8 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Danger Zone</Text>
 
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.item}
             onPress={() =>
               Alert.alert(
@@ -619,28 +649,22 @@ export default function SettingsScreen({ navigation }) {
 
                         const uid = auth.currentUser?.uid;
 
-                        // 🔴 STOP SYNC
                         if (global) global.isSyncing = false;
 
-                        // 🔥 1. DELETE FIRESTORE
                         if (uid) {
                           await deleteUserFirestoreData(uid);
                         }
 
-                        // 🧹 2. CLEAR LOCAL SQLITE
                         await clearAllLocalData();
 
-                        // 🧠 3. CLEAR CACHE
                         if (global?.remoteCache) {
                           Object.keys(global.remoteCache).forEach(
                             (k) => delete global.remoteCache[k],
                           );
                         }
 
-                        // 🔐 4. DELETE AUTH USER
                         await deleteAccount();
 
-                        // 🧠 5. CLEAR SESSION
                         await AsyncStorage.multiRemove([
                           "isLoggedIn",
                           "uid",
@@ -650,9 +674,6 @@ export default function SettingsScreen({ navigation }) {
                         console.log("✅ FULL DELETE COMPLETE");
 
                         Alert.alert("Deleted", "Account removed successfully");
-
-                        // ❌ NO navigation.reset
-                        // ✅ auto redirect via auth state
                       } catch (e) {
                         console.log("❌ Delete error:", e);
 
@@ -678,7 +699,8 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
 
-          <TouchableOpacity accessibilityRole="button"
+          <TouchableOpacity
+            accessibilityRole="button"
             style={styles.logoutBtn}
             onPress={() =>
               Alert.alert("Sign Out", "Are you sure you want to sign out?", [
@@ -694,7 +716,6 @@ export default function SettingsScreen({ navigation }) {
                         "isRestored",
                       ]);
 
-                      // 🔐 Firebase sign out
                       await auth.signOut();
 
                       console.log("✅ User signed out");
@@ -793,149 +814,89 @@ export default function SettingsScreen({ navigation }) {
     </View>
   );
 }
-const createStyles = (colors, resolvedTheme) => StyleSheet.create({
-  premiumHeader: {
-    backgroundColor: colors.surface,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    zIndex: 10,
-  },
+const createStyles = (colors, resolvedTheme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
 
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
+    header: {
+      alignItems: "center",
+      paddingBottom: 20,
+    },
 
-  glassBackButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    avatar: {
+      width: 90,
+      height: 90,
+      borderRadius: 45,
+      marginBottom: 10,
+    },
 
-  backIcon: {
-    fontSize: 28,
-    color: colors.primary,
-    fontWeight: "300",
-    marginTop: -4,
-  },
+    name: {
+      fontSize: 18,
+      fontWeight: "600",
+    },
 
-  titleCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
+    sub: {
+      color: colors.secondaryText,
+      marginBottom: 10,
+    },
 
-  headerTitleText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: colors.primary,
-  },
+    editBtn: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 10,
+    },
 
-  jurisdictionPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginTop: 4,
-  },
+    editText: { color: colors.surface },
 
-  jurisdictionText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
-  container: { flex: 1, backgroundColor: colors.background },
+    section: {
+      marginTop: 20,
+      paddingHorizontal: 20,
+    },
 
-  header: {
-    alignItems: "center",
-    paddingBottom: 20,
-  },
+    sectionTitle: {
+      fontWeight: "600",
+      marginBottom: 10,
+    },
 
-  avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    marginBottom: 10,
-  },
+    item: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      marginBottom: 10,
+      paddingHorizontal: 10,
+    },
 
-  name: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
+    label: {
+      fontSize: 12,
+      color: colors.secondaryText,
+      marginTop: 10,
+      marginLeft: 5,
+    },
+    themeRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 14,
+      paddingHorizontal: 5,
+    },
+    themeRowText: {
+      fontSize: 15,
+    },
+    themeDivider: {
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    logoutBtn: {
+      backgroundColor: colors.danger,
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: "center",
+      marginTop: 10,
+    },
 
-  sub: {
-    color: colors.secondaryText,
-    marginBottom: 10,
-  },
-
-  editBtn: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-
-  editText: { color: colors.surface },
-
-  section: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-
-  sectionTitle: {
-    fontWeight: "600",
-    marginBottom: 10,
-  },
-
-  item: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-
-  label: {
-    fontSize: 12,
-    color: colors.secondaryText,
-    marginTop: 10,
-    marginLeft: 5,
-  },
-  themeRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 5,
-  },
-  themeRowText: {
-    fontSize: 15,
-  },
-  themeDivider: {
-    height: 1,
-    backgroundColor: colors.border,
-  },
-  logoutBtn: {
-    backgroundColor: colors.danger,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 10,
-  },
-
-  logoutBtnText: {
-    color: colors.surface,
-    fontWeight: "700",
-    fontSize: 15,
-  },
-});
+    logoutBtnText: {
+      color: colors.surface,
+      fontWeight: "700",
+      fontSize: 15,
+    },
+  });

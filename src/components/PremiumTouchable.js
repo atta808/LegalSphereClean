@@ -1,21 +1,16 @@
-import React, { useCallback } from 'react';
-import { Pressable, StyleSheet, Platform, View } from 'react-native';
+import React, { useCallback } from "react";
+import { Pressable, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   withTiming,
-  interpolateColor
-} from 'react-native-reanimated';
-import { useTheme } from '../theme/ThemeContext';
+  interpolateColor,
+} from "react-native-reanimated";
+import { useTheme } from "../theme/ThemeContext";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-/**
- * PremiumTouchable
- * A standardized interactive component providing a subtle scale down animation on press,
- * with a smooth spring release. Replaces TouchableOpacity for a premium feel.
- */
 export default function PremiumTouchable({
   children,
   onPress,
@@ -48,7 +43,7 @@ export default function PremiumTouchable({
     if (showHighlight) {
       highlight.value = withTiming(1, { duration: 150 });
     }
-  }, [disabled, scaleTo, activeOpacity, showHighlight, scale, opacity, highlight]);
+  }, [disabled, scaleTo, activeOpacity, showHighlight]);
 
   const handlePressOut = useCallback(() => {
     if (disabled) return;
@@ -66,7 +61,7 @@ export default function PremiumTouchable({
     if (showHighlight) {
       highlight.value = withTiming(0, { duration: 250 });
     }
-  }, [disabled, activeOpacity, showHighlight, scale, opacity, highlight]);
+  }, [disabled, activeOpacity, showHighlight]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const baseStyle = {
@@ -75,17 +70,17 @@ export default function PremiumTouchable({
     };
 
     if (showHighlight) {
-      // Very subtle highlight color based on theme
-      const highlightColor = resolvedTheme === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
-        : 'rgba(0, 0, 0, 0.03)';
+      const highlightColor =
+        resolvedTheme === "dark"
+          ? "rgba(255, 255, 255, 0.05)"
+          : "rgba(0, 0, 0, 0.03)";
 
       return {
         ...baseStyle,
         backgroundColor: interpolateColor(
           highlight.value,
           [0, 1],
-          ['transparent', highlightColor]
+          ["transparent", highlightColor],
         ),
       };
     }
@@ -99,13 +94,12 @@ export default function PremiumTouchable({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
-      style={[
-        disabled && styles.disabled,
-        animatedStyle,
-        style
-      ]}
+      style={[disabled && styles.disabled, animatedStyle, style]}
       android_ripple={{
-        color: resolvedTheme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+        color:
+          resolvedTheme === "dark"
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(0,0,0,0.1)",
         borderless: false,
       }}
       {...rest}
@@ -118,5 +112,5 @@ export default function PremiumTouchable({
 const styles = StyleSheet.create({
   disabled: {
     opacity: 0.5,
-  }
+  },
 });

@@ -7,8 +7,7 @@ import {
   updateNotificationRecordStatus
 } from './notificationService';
 import { db } from './sqliteService';
-import { toDatePickerDate } from '../utils/date';
-
+import { toDatePickerDate, toISO } from '../utils/date';  // Added toISO import
 
 const applyTimeToString = (dateStr, timeStr) => {
   const [hours, minutes] = timeStr.split(':').map(Number);
@@ -87,9 +86,15 @@ export const scheduleCaseNotifications = async (caseData, options = {}) => {
     }
   }
 
+  // 🔥 FALLBACK: Use nextHearingDate if nextHearingISO is missing
+  let hearingISO = caseData.nextHearingISO;
+  if (!hearingISO && caseData.nextHearingDate) {
+    hearingISO = toISO(caseData.nextHearingDate);
+  }
+
   // 1. Hearing Reminders
-  if (NOTIFICATION_FEATURES.hearingReminders && caseData.nextHearingISO) {
-    const reminders = calculateReminderDates(caseData.nextHearingISO);
+  if (NOTIFICATION_FEATURES.hearingReminders && hearingISO) {
+    const reminders = calculateReminderDates(hearingISO);
     for (const reminder of reminders) {
       const title = `Hearing Reminder: ${caseData.title || 'Case'}`;
       const body = `Hearing scheduled ${reminder.label} for case ${caseData.caseNo || ''}.`;
@@ -104,7 +109,7 @@ export const scheduleCaseNotifications = async (caseData, options = {}) => {
       if (identifier) {
         insertNotificationRecord({
           caseId: caseData.id,
-          hearingId: null, // If we don't have the specific hearing ID at case creation
+          hearingId: null,
           title,
           body,
           type: 'hearing',
@@ -116,9 +121,9 @@ export const scheduleCaseNotifications = async (caseData, options = {}) => {
   }
 
   // 2. Overdue Hearing Reminder
-  if (NOTIFICATION_FEATURES.overdueReminder && caseData.nextHearingISO) {
+  if (NOTIFICATION_FEATURES.overdueReminder && hearingISO) {
     const now = new Date();
-    const overdueReminder = applyTimeToString(caseData.nextHearingISO, NOTIFICATION_CONFIG.overdueReminderTime);
+    const overdueReminder = applyTimeToString(hearingISO, NOTIFICATION_CONFIG.overdueReminderTime);
 
     // Only schedule if it's in the future
     if (overdueReminder > now) {
